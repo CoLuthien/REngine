@@ -44,7 +44,7 @@ requires(!is_type_list<T>) struct append_type_to_list<T, type_list<Us...>>
 
 template <typename T, class U>
 requires(!is_type_list<T>) // 약간 비 직관적임.. :(
-    using append_type = typename append_type_to_list<T, U>::type;
+using append_type = typename append_type_to_list<T, U>::type;
 
 template <class T, class U>
 struct merge_type_list;

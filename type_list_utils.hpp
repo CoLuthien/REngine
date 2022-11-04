@@ -3,6 +3,9 @@
 
 #include <tuple>
 #include <string_view>
+#include <iostream>
+#include "frozen/bits/elsa_std.h"
+#include "frozen/unordered_map.h"
 
 template <typename List>
 struct length
@@ -34,25 +37,36 @@ struct visitor<void, F>
     }
 };
 
-template <class List, template <class> class F, class... Ts>
+template <class List, template <class> class F>
 struct flatten_to_type
 {
-    static constexpr auto value = F<typename List::current>::action(); // get a return value;
-    static auto get()
+    static constexpr auto value = F<typename List::current>::action(); // get a container;
+
+    static consteval auto get()
     {
-        return flatten_to_type<typename List::next, F, Ts...>::next(value); // get a container;
+        return next();
     }
-    static auto next(Ts... v, Ts... vs)
+    static consteval auto next()
     {
-        return flatten_to_type<typename List::next, F, Ts...>::next(v..., vs...); // get a container;
+        return flatten_to_type<typename List::next, F>::next(value);
+    }
+
+    template <typename T, typename... Args>
+    static consteval auto next(T v, Args... args)
+    {
+        return flatten_to_type<typename List::next, F>::next(value, v, args...);
     }
 };
 
-template <template <class> class F, class... Ts>
-struct flatten_to_type<void, F, Ts...>
+template <template <class> class F>
+struct flatten_to_type<void, F>
 {
-    static auto next(Ts... v, Ts... vs)
+    template <typename... Args>
+    static consteval auto next(Args... args)
     {
-        return std::initializer_list<std::string_view>{v..., vs...};
+        // std::cout << "print out types : ";
+        //((std::cout << (args) << " "), ...);
+        auto const p = std::initializer_list<std::pair<std::string_view, int>>{{args}...};
+        return frozen::unordered_map<std::string_view, int, 2>(p);
     }
 };

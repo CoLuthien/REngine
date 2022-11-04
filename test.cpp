@@ -1,66 +1,49 @@
 
 #include "type_list.hpp"
 #include "type_list_utils.hpp"
-#include <type_traits>
 #include <string>
 #include <iostream>
+#include <tuple>
+#include "frozen/unordered_map.h"
 
 class T0
 {
 public:
-    static constexpr std::string_view GetName()
+    static consteval std::pair<std::string_view, int> GetInfo()
     {
-        return "T0";
+        return {name, 0};
     }
+    static constexpr char const *name = "T0";
 };
 class T1
 {
 public:
-    static constexpr std::string_view GetName()
+    static consteval std::string_view GetName()
     {
         return "T1";
     }
-};
-class T2
-{
-public:
-    static constexpr std::string_view GetName()
+    static consteval std::pair<std::string_view, int> GetInfo()
     {
-        return "T2";
+        return {name, 1};
     }
+    static constexpr std::string_view name = "T1";
 };
 
-template< class T>
+template <class T>
 struct get_name
 {
-    static consteval std::string_view action()
+    static consteval std::pair<std::string_view, int> action()
     {
-        return T::GetName();
+        return T::GetInfo();
     }
 };
-
-int func(int a, int b, int c)
-{
-    return 0;
-}
-
-auto func2(char) -> int (*)()
-{
-    return nullptr;
-}
 
 int main()
 {
-    using L1 = type_list<T0, T1, T2>;
+    using L1 = type_list<T1>;
+    using L2 = append_type<T0, L1>;
 
-
-    auto list = flatten_to_type<L1, get_name>::get();
-
-
-
-    static_assert(std::is_invocable_v<int()>);
-    constexpr auto p1 = std::pair(std::string_view("12"), 12);
-    constexpr auto p2 = std::pair(std::string_view("13"), 13);
+    constexpr auto a = flatten_to_type<L2, get_name>::get();
 
     // static_assert( not std::is_invocable_v<int(), int> );
     // static_assert( std::is_invocable_r_v<int, int()> );
