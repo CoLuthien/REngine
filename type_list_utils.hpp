@@ -1,11 +1,13 @@
 
 #pragma once
 
+#define FROZEN_LETITGO_HAS_STRING_VIEW
+
 #include <tuple>
-#include <string_view>
 #include <iostream>
-#include "frozen/bits/elsa_std.h"
+#include <string_view>
 #include "frozen/unordered_map.h"
+#include "frozen/bits/elsa_std.h"
 
 template <typename List>
 struct length
@@ -13,7 +15,7 @@ struct length
     static constexpr size_t of = 1 + length<typename List::next>::of;
 };
 template <>
-struct length<void>
+struct length<null_type_list>
 {
     static constexpr size_t of = 0;
 };
@@ -23,50 +25,45 @@ struct visitor
 {
     static consteval void visit()
     {
-        F<typename List::current>::action();      // get a return value;
-        visitor<typename List::next, F>::visit(); // get a container;
-        // need flatten
+        F<typename List::current>::action();
+        visitor<typename List::next, F>::visit();
     }
 };
 
 template <template <class> class F>
-struct visitor<void, F>
+struct visitor<null_type_list, F>
 {
     static consteval void visit()
     {
     }
 };
 
-template <class List, template <class> class F>
-struct flatten_to_type
+template <class List, template <class> class MetaFunc, size_t Size = 0>
+requires(is_type_list<List>) struct list_to_frozen_map
 {
-    static constexpr auto value = F<typename List::current>::action(); // get a container;
+    static constexpr auto value = MetaFunc<typename List::current>::retrieve_info(); // get a container;
 
-    static consteval auto get()
+    static consteval auto make_map()
     {
-        return next();
-    }
-    static consteval auto next()
-    {
-        return flatten_to_type<typename List::next, F>::next(value);
+        return list_to_frozen_map<typename List::next, MetaFunc, length<typename List::type>::of>::recurse(value);
     }
 
     template <typename T, typename... Args>
-    static consteval auto next(T v, Args... args)
+    static consteval auto recurse(T v, Args... args)
     {
-        return flatten_to_type<typename List::next, F>::next(value, v, args...);
+        return list_to_frozen_map<typename List::next, MetaFunc, Size>::recurse(value, v, args...);
     }
 };
 
-template <template <class> class F>
-struct flatten_to_type<void, F>
+template <template <class> class MetaFunc, size_t Size>
+struct list_to_frozen_map<null_type_list, MetaFunc, Size>
 {
     template <typename... Args>
-    static consteval auto next(Args... args)
+    static consteval auto recurse(Args... args)
     {
-        // std::cout << "print out types : ";
-        //((std::cout << (args) << " "), ...);
-        auto const p = std::initializer_list<std::pair<std::string_view, int>>{{args}...};
-        return frozen::unordered_map<std::string_view, int, 2>(p);
+        return frozen::make_unordered_map({args...});
     }
 };
+
+template <typename ListType, template <typename> class MetaFunc>
+using make_frozen = list_to_frozen_map<ListType, MetaFunc, length<ListType>::of>;
