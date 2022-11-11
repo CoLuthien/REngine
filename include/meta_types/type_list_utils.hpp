@@ -10,9 +10,9 @@
 #include <iostream>
 #include <string_view>
 
-
 template <class List, template <class> class MetaFunc, size_t Size = 0>
-requires(is_type_list<List>) struct list_to_frozen_map
+requires(is_type_list<List>)
+struct list_to_frozen_map
 {
     static constexpr auto value =
         MetaFunc<typename List::current>::retrieve_info(); // get a container;

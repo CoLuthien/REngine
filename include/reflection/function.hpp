@@ -19,6 +19,9 @@ using func_type_t =
     typename Target::template detail_function_reflection<I, struct detail_function_tag>::
         template type<Target>;
 
+template <class Target, size_t I>
+using func_trait_t = func_traits<func_type_t<Target, I>>;
+
 template <class Target, std::size_t I>
 constexpr auto ptr_to_function =
     Target::template detail_function_reflection<I, struct detail_function_tag>::
@@ -37,7 +40,7 @@ constexpr size_t count_function =
     template <size_t, class>                                                             \
     struct detail_function_reflection;                                                   \
     static constexpr std::size_t detail_##NAME##_function_index =                        \
-        refl::detail::index<struct detail_##NAME##_tag,                                  \
+        refl::detail::index<struct detail_##NAME##_function_tag,                         \
                             detail_function_reflection>::value;                          \
     template <class Tag>                                                                 \
     struct detail_function_reflection<detail_##NAME##_function_index, Tag>               \
@@ -49,9 +52,26 @@ constexpr size_t count_function =
         template <class Target>                                                          \
         static constexpr type<Target> offset_v = &Target::NAME;                          \
     };
-}; // namespace refl
 
-/*
-    using T1 = detail_member_reflection<0, TargetClass>;
-    //...
-*/
+class reflected_function_t
+{
+public:
+    template <class Target, class Reflection>
+    reflected_function_t();
+
+private:
+    template <class Target, class Reflection>
+    struct function_impl_t
+    {
+        using type        = typename Reflection::template type<Target>;
+        using trait       = func_traits<type>;
+        using return_type = typename trait::result_type;
+
+    private:
+        static constexpr type ptr                = Reflection::template offset_v<Target>;
+        static constexpr std::string_view m_name = Reflection::m_name;
+    };
+
+private:
+};
+}; // namespace refl

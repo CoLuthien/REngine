@@ -26,11 +26,11 @@ constexpr size_t count_variable =
     detail::index<struct counter_tag, Target::template detail_member_reflection>::value;
 
 #define REFLECT_MEMBER(NAME, ...)                                                        \
-    __VA_ARGS__ NAME;                                                                    \
+    __VA_ARGS__ NAME{};                                                                  \
     template <size_t, class>                                                             \
     struct detail_member_reflection;                                                     \
     static constexpr size_t detail_##NAME##_member_index =                               \
-        refl::detail::index<struct detail_##NAME##_tag,                                  \
+        refl::detail::index<struct detail_##NAME##_member_tag,                           \
                             detail_member_reflection>::value;                            \
     template <class T>                                                                   \
     struct detail_member_reflection<detail_##NAME##_member_index, T>                     \
@@ -40,6 +40,10 @@ constexpr size_t count_variable =
         template <class U>                                                               \
         static constexpr type U::*offset_v = &U::NAME;                                   \
     };
+
+class property_t
+{
+};
 
 /*
     using T1 = detail_member_reflection<0, TargetClass>;
