@@ -28,7 +28,6 @@ public:
 class Test : public Base
 {
 public:
-
 public:
     REFLECT_FUNCTION(add, int, int);
     int add(int a, int b);
@@ -38,7 +37,7 @@ public:
     REFLECT_FUNCTION(mult, int);
     int mult(int)
     {
-        std::cout << "Real Done!!";
+        std::cout << "Real mult!!";
         return 0;
     }
 
@@ -46,6 +45,14 @@ public:
     REFLECT_MEMBER(arr, int);
     REFLECT_MEMBER(arr2, int);
 };
+class Test2 : public Base
+{
+public:
+public:
+    REFLECT_FUNCTION(add, int, int);
+    int add(int a, int b) { return 0; }
+};
+
 int
 Test::add(int a, int b)
 {
@@ -67,6 +74,8 @@ main()
 
     auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
     auto f2 = refl::refl_func_t(refl::dummy_t<Test, 1>{});
+
+    auto f3 = refl::refl_func_t(refl::dummy_t<Test2, 0>{});
 
     int (Test::*p)(int, int) = &Test::add;
     f1.Invoke<int>(c, 1, 2);

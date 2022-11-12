@@ -33,7 +33,7 @@ template <typename R, typename... Args>
 struct func_traits<R (*)(Args...)>
 {
     using result_type = R;
-    static constexpr auto arg_count =
+    static constexpr auto args_count =
         std::integral_constant<std::size_t, sizeof...(Args)>::value;
     using args_type = std::tuple<typename std::decay<Args>::type...>;
 };

@@ -15,7 +15,7 @@ namespace refl
 
 template <class Target, size_t I>
 constexpr auto func_name_v =
-    Target::template detail_function_reflection<I, struct detail_function_tag>::name;
+    Target::template detail_function_reflection<I, struct detail_function_tag>::m_name;
 
 template <class Target, size_t I>
 using func_type_t =
@@ -58,7 +58,9 @@ constexpr size_t count_function =
     };
 
 template <class T, std::size_t Index>
-struct dummy_t{};
+struct dummy_t
+{
+};
 class refl_func_t
 {
 
@@ -69,14 +71,14 @@ public:
         using func  = func_type_t<Target, Index>;
         using trait = method_traits<func>;
 
-        using iface = actual_func_t<typename trait::result_type,
-                                    typename trait::args_type,
-                                    Target,
-                                    Index>;
-        // using iface2 =
-        // interface_t<typename trait::result_type, typename trait::args_type>;
-        // iface2 a;
-        instance = std::make_unique<iface>();
+        using func_type = actual_func_t<typename trait::result_type,
+                                        typename trait::args_type,
+                                        Target,
+                                        Index>;
+
+        m_instance = std::make_unique<func_type>();
+        m_argc     = trait::args_count;
+        m_name     = func_name_v<Target, Index>;
     }
 
 public:
@@ -84,8 +86,7 @@ public:
     R Invoke(void* ptr, Args... args)
     {
         using interface_type = interface_t<R, std::tuple<Args...>>;
-        auto raw             = instance.get();
-        auto iface           = static_cast<interface_type*>(raw);
+        auto iface           = static_cast<interface_type*>(m_instance.get());
         return iface->InvokeInternal(ptr, std::forward_as_tuple(args...));
     }
 
@@ -95,7 +96,9 @@ private:
     };
 
     template <typename R, typename T>
-    struct interface_t;
+    struct interface_t : public holder_t
+    {
+    };
 
     template <typename R, typename... Args>
     struct interface_t<R, std::tuple<Args...>> : public holder_t
@@ -137,10 +140,19 @@ private:
     private:
         static constexpr type ptr                = func_ptr_v<Target, Index>;
         static constexpr std::string_view m_name = func_name_v<Target, Index>;
+        inline static constinit const actual_func_t<R, T, Target, Index> instance{};
+
+    public:
+        static constexpr actual_func_t<R, T, Target, Index> get_instance()
+        {
+            return instance;
+        }
     };
 
 private:
-    std::unique_ptr<holder_t> instance;
+    std::unique_ptr<holder_t> m_instance;
+    std::size_t m_argc;
+    std::string_view m_name;
 };
 
 }; // namespace refl

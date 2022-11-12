@@ -10,7 +10,7 @@ namespace refl
 
 template <class Target, size_t I>
 constexpr auto member_name_v =
-    Target::template detail_member_reflection<I, struct detail_member_tag>::name;
+    Target::template detail_member_reflection<I, struct detail_member_tag>::m_name;
 
 template <class Target, size_t I>
 using member_type_t =
