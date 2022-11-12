@@ -7,7 +7,6 @@
 
 template <typename... Ts>
 struct type_list;
-
 using null_type_list = type_list<std::nullptr_t>;
 
 template <typename T>
@@ -68,7 +67,7 @@ struct length
 template <>
 struct length<null_type_list>
 {
-    static constexpr size_t of = 0;
+    static constexpr std::size_t of = 0;
 };
 
 template <class List, template <class> class F>

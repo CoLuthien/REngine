@@ -15,7 +15,10 @@ struct index_impl
 };
 
 template <size_t I, class Tag, template <size_t, class> class Type>
-requires requires { Type<I, Tag>::name; }
+requires requires
+{
+    Type<I, Tag>::m_name;
+}
 struct index_impl<I, Tag, Type>
 {
     static constexpr size_t value = 1 + index_impl<I + 1, Tag, Type>::value;

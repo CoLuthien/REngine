@@ -23,7 +23,8 @@ constexpr auto ptr_to_member_var =
 
 template <class Target>
 constexpr size_t count_variable =
-    detail::index<struct counter_tag, Target::template detail_member_reflection>::value;
+    detail::index<struct member_counter_tag,
+                  Target::template detail_member_reflection>::value;
 
 #define REFLECT_MEMBER(NAME, ...)                                                        \
     __VA_ARGS__ NAME{};                                                                  \
@@ -35,8 +36,8 @@ constexpr size_t count_variable =
     template <class T>                                                                   \
     struct detail_member_reflection<detail_##NAME##_member_index, T>                     \
     {                                                                                    \
-        using type                             = __VA_ARGS__;                            \
-        static constexpr std::string_view name = #NAME;                                  \
+        using type                               = __VA_ARGS__;                          \
+        static constexpr std::string_view m_name = #NAME;                                \
         template <class U>                                                               \
         static constexpr type U::*offset_v = &U::NAME;                                   \
     };

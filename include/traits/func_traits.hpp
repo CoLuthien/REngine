@@ -3,6 +3,7 @@
 #include <type_traits>
 #include <functional>
 #include <utility>
+#include <iostream>
 
 template <class T>
 struct extract_class_info;
@@ -41,31 +42,30 @@ template <class F>
 struct method_traits : public func_traits<F>
 {
     using type       = F;
-    using owner_type = typename extract_class_info<F>::type;
+    using owner_type = std::decay_t<typename extract_class_info<F>::type>;
 };
 
 template <class T>
-struct strip
-{
-    static void func() { std::cout << "Hello"; }
-};
+struct strip_base;
 
 template <class... Ts>
-struct strip<std::tuple<Ts...>>
+struct strip_base<std::tuple<Ts...>>
 {
-    static void func() { std::cout << "World"; }
 };
 
-template <class F, class T>
-struct strip_and_apply
-{
-    static void func() { std::cout << "World"; }
-};
+template <class F, class Tuple>
+struct extract_tuple_and_apply;
 
 template <class F, class... Ts>
-struct strip_and_apply<F, std::tuple<Ts...>>
+struct extract_tuple_and_apply<F, std::tuple<Ts...>>
 {
     using R = typename method_traits<F>::result_type;
     using C = typename method_traits<F>::owner_type;
-    static R func(void* ptr, C& c, Ts... args) { return std::invoke(ptr, c, args...); }
+    static R apply(F ptr, void* object, Ts... args)
+    {
+        return std::invoke(ptr, *static_cast<C*>(object), args...);
+    }
 };
+
+template <typename F>
+using strip_types = extract_tuple_and_apply<F, typename method_traits<F>::args_type>;

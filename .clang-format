@@ -13,4 +13,3 @@ AlwaysBreakAfterReturnType: TopLevelDefinitions
 BinPackArguments: false
 BinPackParameters: false
 AlignConsecutiveAssignments: Consecutive
-RequiresClausePosition: WithPreceding

@@ -3,9 +3,12 @@
 
 #include "detail.hpp"
 #include "traits/func_traits.hpp"
+#include "type_helper.hpp"
 
 #include <cstddef>
 #include <string_view>
+#include <memory>
+#include <tuple>
 
 namespace refl
 {
@@ -23,13 +26,14 @@ template <class Target, size_t I>
 using func_trait_t = func_traits<func_type_t<Target, I>>;
 
 template <class Target, std::size_t I>
-constexpr auto ptr_to_function =
+constexpr auto func_ptr_v =
     Target::template detail_function_reflection<I, struct detail_function_tag>::
         template offset_v<Target>;
 
 template <class Target>
 constexpr size_t count_function =
-    detail::index<struct counter_tag, Target::template detail_function_reflection>::value;
+    detail::index<struct function_counter_tag,
+                  Target::template detail_function_reflection>::value;
 
 #define INFER_FUNC_TYPE(NAME)                                                            \
     template <class C, typename... Args>                                                 \
@@ -37,13 +41,13 @@ constexpr size_t count_function =
         decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
 
 #define REFLECT_FUNCTION(NAME, ...)                                                      \
-    template <size_t, class>                                                             \
+    template <std::size_t, class>                                                        \
     struct detail_function_reflection;                                                   \
-    static constexpr std::size_t detail_##NAME##_function_index =                        \
+    static constexpr size_t detail_##NAME##_function_index =                             \
         refl::detail::index<struct detail_##NAME##_function_tag,                         \
                             detail_function_reflection>::value;                          \
-    template <class Tag>                                                                 \
-    struct detail_function_reflection<detail_##NAME##_function_index, Tag>               \
+    template <class T>                                                                   \
+    struct detail_function_reflection<detail_##NAME##_function_index, T>                 \
     {                                                                                    \
         INFER_FUNC_TYPE(NAME);                                                           \
         static constexpr std::string_view m_name = #NAME;                                \
@@ -53,25 +57,90 @@ constexpr size_t count_function =
         static constexpr type<Target> offset_v = &Target::NAME;                          \
     };
 
-class reflected_function_t
+template <class T, std::size_t Index>
+struct dummy_t{};
+class refl_func_t
 {
+
 public:
-    template <class Target, class Reflection>
-    reflected_function_t();
+    template <class Target, std::size_t Index>
+    refl_func_t(dummy_t<Target, Index>)
+    {
+        using func  = func_type_t<Target, Index>;
+        using trait = method_traits<func>;
+
+        using iface = actual_func_t<typename trait::result_type,
+                                    typename trait::args_type,
+                                    Target,
+                                    Index>;
+        // using iface2 =
+        // interface_t<typename trait::result_type, typename trait::args_type>;
+        // iface2 a;
+        instance = std::make_unique<iface>();
+    }
+
+public:
+    template <typename R, typename... Args>
+    R Invoke(void* ptr, Args... args)
+    {
+        using interface_type = interface_t<R, std::tuple<Args...>>;
+        auto raw             = instance.get();
+        auto iface           = static_cast<interface_type*>(raw);
+        return iface->InvokeInternal(ptr, std::forward_as_tuple(args...));
+    }
 
 private:
-    template <class Target, class Reflection>
-    struct function_impl_t
+    struct holder_t
     {
-        using type        = typename Reflection::template type<Target>;
-        using trait       = func_traits<type>;
-        using return_type = typename trait::result_type;
+    };
+
+    template <typename R, typename T>
+    struct interface_t;
+
+    template <typename R, typename... Args>
+    struct interface_t<R, std::tuple<Args...>> : public holder_t
+    {
+        virtual R InvokeInternal(void* obj, std::tuple<Args...>) { return {}; }
+    };
+    template <typename R, typename T, class Target, std::size_t Index>
+    struct actual_func_t : public interface_t<R, T>
+    {
+        using type        = func_type_t<Target, Index>;
+        using trait       = method_traits<type>;
+        using result_type = typename trait::result_type;
+        using arg_type    = typename trait::args_type;
+        using owner_type  = typename trait::owner_type;
+
+        template <class Tuple, size_t... Idx>
+        result_type InvokeInternalImpl(void* obj,
+                                       Tuple&& args,
+                                       std::index_sequence<Idx...>) requires requires
+        {
+            std::tuple_size_v<Tuple> == std::tuple_size_v<arg_type>;
+        }
+        {
+            return std::invoke(ptr,
+                               static_cast<owner_type*>(obj),
+                               std::get<Idx>(std::forward<Tuple>(args))...);
+        }
+
+        virtual result_type InvokeInternal(void* obj, T args) override
+        {
+            std::cout << "Done!!" << std::tuple_size_v<T>;
+
+            // unpack and apply
+            using Indices =
+                std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<T>>>;
+            return InvokeInternalImpl(obj, std::forward<T>(args), Indices{});
+        }
 
     private:
-        static constexpr type ptr                = Reflection::template offset_v<Target>;
-        static constexpr std::string_view m_name = Reflection::m_name;
+        static constexpr type ptr                = func_ptr_v<Target, Index>;
+        static constexpr std::string_view m_name = func_name_v<Target, Index>;
     };
 
 private:
+    std::unique_ptr<holder_t> instance;
 };
+
 }; // namespace refl
