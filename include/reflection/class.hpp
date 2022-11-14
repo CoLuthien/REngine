@@ -13,8 +13,6 @@ namespace refl
 class refl_class_t
 {
 public:
-    using super     = std::void_t<>;
-    using this_type = refl_class_t;
 
 private:
 };
