@@ -45,20 +45,29 @@ public:
     REFLECT_MEMBER(arr, int);
     REFLECT_MEMBER(arr2, int);
 };
-class Test2 : public Base
-{
-public:
-public:
-    REFLECT_FUNCTION(add, int, int);
-    int add(int a, int b) { return 0; }
-};
 
 int
 Test::add(int a, int b)
 {
 
-    std::cout << "Real Done!!";
+    std::cout << "Real Add!!";
+
+    arr += (a + b);
     return a + b;
+}
+
+class T
+{
+public:
+    constexpr T() = default;
+    virtual void test(){};
+};
+static constexpr auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
+
+void
+test(decltype(f1)& p, void* object)
+{
+    p.Invoke<int>(object, 1, 2);
 }
 
 // on other file maybe?
@@ -66,18 +75,18 @@ Test::add(int a, int b)
 int
 main()
 {
+    constexpr auto var = T{};
+
     Test* c = new Test;
+    Test* d = new Test;
 
-    void* d = static_cast<void*>(c);
-    std::cout << refl::count_function<Test>;
-    std::cout << refl::count_variable<Test>;
-
-    auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
-    auto f2 = refl::refl_func_t(refl::dummy_t<Test, 1>{});
-
-    auto f3 = refl::refl_func_t(refl::dummy_t<Test2, 0>{});
+    auto f2 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
 
     int (Test::*p)(int, int) = &Test::add;
-    f1.Invoke<int>(c, 1, 2);
-    f2.Invoke<int>(c, 1);
+    std::cout << f1.Invoke<int>(c, 1, 12);
+    std::cout << c->arr << '\n';
+    test(f1, c);
+    std::cout << c->arr << '\n';
+
+    auto value = f1.Invoke<int>(c, 1, 13);
 }

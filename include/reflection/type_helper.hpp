@@ -30,8 +30,9 @@ using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader
 
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
-    constexpr auto this_type_helper()->decltype(                                         \
-        refl::type_helper::this_type_writer<struct this_type_tag, decltype(this)>{},     \
-        void());                                                                         \
+    constexpr auto this_type_helper()                                                    \
+        ->decltype(refl::type_helper::this_type_writer<struct this_type_tag,             \
+                                                       decltype(this)>{},                \
+                   void());                                                              \
     using super     = this_type;                                                         \
     using this_type = refl::type_helper::this_type_read<struct this_type_tag>;
