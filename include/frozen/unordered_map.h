@@ -23,6 +23,7 @@
 #ifndef FROZEN_LETITGO_UNORDERED_MAP_H
 #define FROZEN_LETITGO_UNORDERED_MAP_H
 
+#include "frozen/bits/defines.h"
 #include "frozen/bits/basic_types.h"
 #include "frozen/bits/constexpr_assert.h"
 #include "frozen/bits/elsa.h"

@@ -1,5 +1,4 @@
 
-#define FROZEN_LETITGO_HAS_STRING_VIEW // We assume Visual Studio always has string_view
                                        // in C++17
 #include "meta_types/type_list.hpp"
 #include "reflection/function.hpp"
@@ -9,6 +8,7 @@
 #include <string>
 #include <iostream>
 #include <tuple>
+#include <string_view>
 
 #include <type_traits>
 
@@ -91,8 +91,6 @@ Test2::add(int a, int b)
 
 static constexpr auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
 
-static constexpr auto map = refl::
-    to_frozen_map<refl::function_info, Test, refl::count_properties<Test>>::make_map();
 
 void
 test(decltype(f1)& p, void* object)
@@ -115,6 +113,9 @@ main()
     auto f2 = refl::refl_func_t(refl::dummy_t<Test2, 0>{});
 
     auto p1 = refl::refl_prop_t(refl::dummy_t<Test, 0>{});
+    #ifdef __clang__
+    std::cout << "clang";
+    #endif
 
     int Test::*ptr = &Test::arr;
 
@@ -123,8 +124,4 @@ main()
     int (Test::*p)(int, int) = &Test::add;
     std::cout << f1.invoke<int>(c, 1, 18);
 
-    for (auto const& entry : map)
-    {
-        std::cout << map.size() << '\n';
-    }
 }
