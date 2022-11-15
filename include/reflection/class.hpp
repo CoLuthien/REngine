@@ -45,11 +45,10 @@ struct type_info
 {
 };
 
-class refl_object_t
+class refl_class_t
 {
 public:
-    refl_object_t(refl_object_t const&) = default;
-    refl_object_t(std::string_view const name, void* object) {}
+    refl_class_t(refl_class_t const&) = default;
 
     auto get_function(std::string_view const name) const
     {
@@ -63,14 +62,14 @@ public:
     template <class Target>
     static consteval auto make_reflection()
     {
-        return refl_object_t{type_info<Target>{}};
+        return refl_class_t{type_info<Target>{}};
     }
 
 private:
     template <class Target>
-    consteval refl_object_t(type_info<Target>)
+    consteval refl_class_t(type_info<Target>)
     {
-        using object_type = refl_class_t<Target>;
+        using object_type = refl_object_t<Target>;
         m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
     }
 
@@ -83,7 +82,7 @@ private:
         virtual prop_pair const* get_property(std::string_view name) const noexcept = 0;
     };
     template <class Target>
-    struct refl_class_t : public handle_t
+    struct refl_object_t : public handle_t
     {
         virtual func_pair const* get_function(
             std::string_view name) const noexcept override
@@ -101,14 +100,16 @@ private:
             to_frozen_map<function_info, Target, count_functions<Target>>::make_map();
         static constexpr auto m_props =
             to_frozen_map<property_info, Target, count_properties<Target>>::make_map();
-        static constinit const refl_class_t instance;
+        static constinit const refl_object_t instance;
     };
 
 private:
     handle_t const* m_ptr;
 };
 template <class Target>
-constinit const refl_object_t::refl_class_t<Target>
-    refl_object_t::refl_class_t<Target>::instance = {};
+constinit const refl_class_t::refl_object_t<Target>
+    refl_class_t::refl_object_t<Target>::instance = {};
+
+#define REGISTER_CLASS(NAME)
 
 } // namespace refl
