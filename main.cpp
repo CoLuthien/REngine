@@ -1,4 +1,6 @@
 
+#define FROZEN_LETITGO_HAS_STRING_VIEW // We assume Visual Studio always has string_view
+                                       // in C++17
 #include "meta_types/type_list.hpp"
 #include "reflection/function.hpp"
 #include "reflection/member.hpp"
@@ -8,6 +10,8 @@
 #include <iostream>
 #include <tuple>
 
+#include <type_traits>
+
 template <class T>
 struct get_info
 {
@@ -16,7 +20,6 @@ struct get_info
         return T::GetInfo();
     }
 };
-#include <type_traits>
 
 class Base
 {
@@ -28,6 +31,25 @@ public:
 class Test : public Base
 {
 public:
+    REFLECT_FUNCTION(add, int, int);
+    int add(int a, int b);
+
+    int add2(int a, int b, bool c);
+
+    REFLECT_FUNCTION(mult, int);
+    int mult(int)
+    {
+        std::cout << "Real mult!!";
+        return 0;
+    }
+
+public:
+    REFLECT_MEMBER(arr, int);
+    REFLECT_MEMBER(arr2, int);
+};
+
+class Test2 : public Base
+{
 public:
     REFLECT_FUNCTION(add, int, int);
     int add(int a, int b);
@@ -50,24 +72,32 @@ int
 Test::add(int a, int b)
 {
 
-    std::cout << "Real Add!!";
+    std::cout << "Real Add Test!!";
+
+    arr += (a + b);
+    arr2 = (arr / 2);
+    return a + b;
+}
+
+int
+Test2::add(int a, int b)
+{
+
+    std::cout << "Real Add Test2!!";
 
     arr += (a + b);
     return a + b;
 }
 
-class T
-{
-public:
-    constexpr T() = default;
-    virtual void test(){};
-};
 static constexpr auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
+
+static constexpr auto map = refl::
+    to_frozen_map<refl::function_info, Test, refl::count_properties<Test>>::make_map();
 
 void
 test(decltype(f1)& p, void* object)
 {
-    p.Invoke<int>(object, 1, 2);
+    p.invoke<int>(object, 1, 2);
 }
 
 // on other file maybe?
@@ -75,18 +105,26 @@ test(decltype(f1)& p, void* object)
 int
 main()
 {
-    constexpr auto var = T{};
 
-    Test* c = new Test;
-    Test* d = new Test;
+    Test* c  = new Test;
+    Test2* d = new Test2;
 
-    auto f2 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
+    static_assert(refl::count_functions<Test> == 2);
+    static_assert(refl::count_properties<Test> == 2);
+
+    auto f2 = refl::refl_func_t(refl::dummy_t<Test2, 0>{});
+
+    auto p1 = refl::refl_prop_t(refl::dummy_t<Test, 0>{});
+
+    int Test::*ptr = &Test::arr;
+
+    using type = int Test::*;
 
     int (Test::*p)(int, int) = &Test::add;
-    std::cout << f1.Invoke<int>(c, 1, 12);
-    std::cout << c->arr << '\n';
-    test(f1, c);
-    std::cout << c->arr << '\n';
+    std::cout << f1.invoke<int>(c, 1, 18);
 
-    auto value = f1.Invoke<int>(c, 1, 13);
+    for (auto const& entry : map)
+    {
+        std::cout << map.size() << '\n';
+    }
 }

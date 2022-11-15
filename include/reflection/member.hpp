@@ -51,22 +51,23 @@ class refl_prop_t
 {
 public:
     template <class Target, std::size_t Index>
-    constexpr refl_prop_t(dummy_t<Target, Index>) : m_name(prop_name_v<Target, Index>)
+    consteval refl_prop_t(dummy_t<Target, Index>) : m_name(prop_name_v<Target, Index>)
     {
         using object_type = prop_object_t<Target, Index>;
         m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
     }
 
+    consteval std::string_view const get_name() const { return m_name; }
     template <typename T>
     T get(void* object) const
     {
-        auto iface = static_cast<interface_t<T>*>(m_ptr);
+        auto iface = static_cast<interface_t<T> const*>(m_ptr);
         return iface->get(object);
     }
     template <typename T>
     void set(void* object, T value) const
     {
-        auto iface = static_cast<interface_t<T>*>(m_ptr);
+        auto iface = static_cast<interface_t<T> const*>(m_ptr);
         return iface->set(object, value);
     }
 

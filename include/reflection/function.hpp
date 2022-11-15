@@ -58,7 +58,7 @@ class refl_func_t
 
 public:
     template <class Target, std::size_t Index>
-    constexpr refl_func_t(dummy_t<Target, Index>) : name(func_name_v<Target, Index>)
+    constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
     {
         using func  = func_type_t<Target, Index>;
         using trait = method_traits<func>;
@@ -72,6 +72,7 @@ public:
 
         m_ptr = static_cast<handle_t const*>(object_type::get_instance());
     }
+    consteval std::string_view const get_name() const { return m_name; }
 
 public:
     template <typename R, typename... Args>
@@ -121,11 +122,9 @@ private:
 
         virtual R invoke_internal(void* obj, T args) const override
         {
-            std::cout << "Done!!" << std::tuple_size_v<T>;
-
-            // unpack and apply
             using Indices =
                 std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<T>>>;
+            // unpack and apply
             return invoke_internal_impl(obj, std::forward<T>(args), Indices{});
         }
         static constexpr func_object_t const* get_instance() { return &instance; }
@@ -138,7 +137,7 @@ private:
 
 private:
     handle_t const* m_ptr;
-    std::string_view const name;
+    std::string_view const m_name;
 };
 
 template <typename R, typename T, class Target, std::size_t Index>
