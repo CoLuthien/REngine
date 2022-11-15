@@ -97,7 +97,8 @@ private:
     {
         constexpr interface_t() = default;
         virtual ~interface_t()  = default;
-        virtual R invoke_internal(void* obj, std::tuple<Args...>) const { return {}; }
+
+        virtual R invoke_internal(void* obj, std::tuple<Args...>) const = 0;
     };
     template <typename R, typename T, class Target, std::size_t Index>
     struct func_object_t : public interface_t<R, T>
@@ -111,9 +112,7 @@ private:
         consteval func_object_t() = default;
 
         template <class Tuple, size_t... Idx>
-        R invoke_internal_impl(void* obj,
-                                         Tuple&& args,
-                                         std::index_sequence<Idx...>) const
+        R invoke_internal_impl(void* obj, Tuple&& args, std::index_sequence<Idx...>) const
         {
             return std::invoke(ptr,
                                static_cast<owner_type*>(obj),
