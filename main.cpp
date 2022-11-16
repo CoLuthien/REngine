@@ -1,9 +1,9 @@
 
-                                       // in C++17
+// in C++17
 #include "meta_types/type_list.hpp"
-#include "reflection/function.hpp"
-#include "reflection/member.hpp"
 #include "reflection/class.hpp"
+#include "reflection/property.hpp"
+#include "reflection/function.hpp"
 #include "frozen/unordered_map.h"
 #include <string>
 #include <iostream>
@@ -34,10 +34,8 @@ public:
     REFLECT_FUNCTION(add, int, int);
     int add(int a, int b);
 
-    int add2(int a, int b, bool c);
-
-    REFLECT_FUNCTION(mult, int);
-    int mult(int)
+    REFLECT_FUNCTION(mult, int, int);
+    int mult(int, int)
     {
         std::cout << "Real mult!!";
         return 0;
@@ -90,7 +88,8 @@ Test2::add(int a, int b)
 }
 
 static constexpr auto f1 = refl::refl_func_t(refl::dummy_t<Test, 0>{});
-
+static constexpr auto fn = refl::
+    to_frozen_map<refl::function_info, Test, refl::count_functions<Test>>::make_map();
 
 void
 test(decltype(f1)& p, void* object)
@@ -99,6 +98,8 @@ test(decltype(f1)& p, void* object)
 }
 
 // on other file maybe?
+
+constexpr auto clazz = refl::refl_object_t::make_reflection<Test>();
 
 int
 main()
@@ -113,15 +114,17 @@ main()
     auto f2 = refl::refl_func_t(refl::dummy_t<Test2, 0>{});
 
     auto p1 = refl::refl_prop_t(refl::dummy_t<Test, 0>{});
-    #ifdef __clang__
-    std::cout << "clang";
-    #endif
 
     int Test::*ptr = &Test::arr;
 
     using type = int Test::*;
 
-    int (Test::*p)(int, int) = &Test::add;
-    std::cout << f1.invoke<int>(c, 1, 18);
+    auto pair = clazz.get_function("add");
+    auto prop_pair = clazz.get_property("arr");
 
+    pair->second.invoke<int>(c, 1, 3);
+    std::cout << prop_pair->second.get<int>(c) << '\n';
+    pair->second.invoke<int>(c, 1, 3);
+    std::cout << prop_pair->second.get<int>(c) << '\n';
+    std::cout << c->arr;
 }

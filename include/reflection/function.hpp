@@ -7,55 +7,13 @@
 
 #include <cstddef>
 #include <string_view>
-#include <memory>
 #include <tuple>
 
 namespace refl
 {
 
-template <class Target, std::size_t I>
-using refl_func_info =
-    typename Target::template detail_function_reflection<I, struct detail_function_tag>;
-
-template <class Target, std::size_t I>
-constexpr auto func_name_v = refl_func_info<Target, I>::name;
-
-template <class Target, std::size_t I>
-using func_type_t = typename refl_func_info<Target, I>::template type<Target>;
-
-template <class Target, std::size_t I>
-constexpr auto func_ptr_v = refl_func_info<Target, I>::template offset_v<Target>;
-
-template <class Target>
-constexpr std::size_t count_functions =
-    detail::index<struct function_counter_tag,
-                  Target::template detail_function_reflection>::value;
-
-#define INFER_FUNC_TYPE(NAME)                                                            \
-    template <class C, typename... Args>                                                 \
-    using func_type =                                                                    \
-        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
-
-#define REFLECT_FUNCTION(NAME, ...)                                                      \
-    template <std::size_t, class>                                                        \
-    struct detail_function_reflection;                                                   \
-    static constexpr size_t detail_##NAME##_function_index =                             \
-        refl::detail::index<struct detail_##NAME##_function_tag,                         \
-                            detail_function_reflection>::value;                          \
-    template <class T>                                                                   \
-    struct detail_function_reflection<detail_##NAME##_function_index, T>                 \
-    {                                                                                    \
-        INFER_FUNC_TYPE(NAME);                                                           \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class Target>                                                          \
-        using type = func_type<Target, __VA_ARGS__>;                                     \
-        template <class Target>                                                          \
-        static constexpr type<Target> offset_v = &Target::NAME;                          \
-    };
-
 class refl_func_t
 {
-
 public:
     template <class Target, std::size_t Index>
     constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
@@ -73,6 +31,12 @@ public:
         m_ptr = static_cast<handle_t const*>(object_type::get_instance());
     }
     consteval std::string_view const get_name() const { return m_name; }
+
+public:
+    consteval std::pair<std::string_view, refl_func_t> make_info()
+    {
+        return std::make_pair(get_name(), *this);
+    }
 
 public:
     template <typename R, typename... Args>
@@ -144,4 +108,35 @@ template <typename R, typename T, class Target, std::size_t Index>
 constinit const refl_func_t::func_object_t<R, T, Target, Index>
     refl_func_t::func_object_t<R, T, Target, Index>::instance = {};
 
+template <class Target, std::size_t Index>
+struct function_info
+{
+    static consteval std::pair<std::string_view, refl::refl_func_t> get_entry()
+    {
+        return refl::refl_func_t(refl::dummy_t<Target, Index>()).make_info();
+    }
+};
+
 }; // namespace refl
+
+#define INFER_FUNC_TYPE(NAME)                                                            \
+    template <class C, typename... Args>                                                 \
+    using func_type =                                                                    \
+        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
+
+#define REFLECT_FUNCTION(NAME, ...)                                                      \
+    template <std::size_t, class>                                                        \
+    struct detail_function_reflection;                                                   \
+    static constexpr size_t detail_##NAME##_function_index =                             \
+        refl::detail::index<struct detail_##NAME##_function_tag,                         \
+                            detail_function_reflection>::value;                          \
+    template <class T>                                                                   \
+    struct detail_function_reflection<detail_##NAME##_function_index, T>                 \
+    {                                                                                    \
+        INFER_FUNC_TYPE(NAME);                                                           \
+        static constexpr std::string_view name = #NAME;                                  \
+        template <class Target>                                                          \
+        using type = func_type<Target, __VA_ARGS__>;                                     \
+        template <class Target>                                                          \
+        static constexpr type<Target> offset_v = &Target::NAME;                          \
+    };

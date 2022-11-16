@@ -1,51 +1,14 @@
 
 #pragma once
 
+#include "detail.hpp"
+#include "type_helper.hpp"
+
 #include <cstddef>
 #include <string_view>
-#include "detail.hpp"
 
 namespace refl
 {
-
-template <class Target, std::size_t I>
-using refl_prop_info =
-    typename Target::template detail_property_reflection<I, struct detail_member_tag>;
-
-template <class Target, size_t I>
-constexpr auto prop_name_v = refl_prop_info<Target, I>::name;
-
-template <class Target, size_t I>
-using prop_type_t = typename refl_prop_info<Target, I>::type;
-
-template <class Target, size_t I>
-using prop_ptr_type_t = typename refl_prop_info<Target, I>::template ptr_type<Target>;
-
-template <class Target, std::size_t I>
-constexpr auto prop_ptr_v = refl_prop_info<Target, I>::template offset_v<Target>;
-
-template <class Target>
-constexpr size_t count_properties =
-    detail::index<struct property_counter_tag,
-                  Target::template detail_property_reflection>::value;
-
-#define REFLECT_MEMBER(NAME, ...)                                                        \
-    __VA_ARGS__ NAME{};                                                                  \
-    template <size_t, class>                                                             \
-    struct detail_property_reflection;                                                   \
-    static constexpr std::size_t detail_##NAME##_property_index =                        \
-        refl::detail::index<struct detail_##NAME##_property_tag,                         \
-                            detail_property_reflection>::value;                          \
-    template <class T>                                                                   \
-    struct detail_property_reflection<detail_##NAME##_property_index, T>                 \
-    {                                                                                    \
-        using type                             = __VA_ARGS__;                            \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using ptr_type = type U::*;                                                      \
-        template <class U>                                                               \
-        static constexpr type U::*offset_v = &U::NAME;                                   \
-    };
 
 class refl_prop_t
 {
@@ -57,6 +20,13 @@ public:
         m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
     }
 
+public:
+    consteval std::pair<std::string_view, refl_prop_t> make_info()
+    {
+        return std::make_pair(get_name(), *this);
+    }
+
+public:
     consteval std::string_view const get_name() const { return m_name; }
     template <typename T>
     T get(void* object) const
@@ -119,9 +89,31 @@ template <class Target, std::size_t Index>
 constinit const refl_prop_t::prop_object_t<Target, Index>
     refl_prop_t::prop_object_t<Target, Index>::instance = {};
 
-/*
-    using T1 = detail_member_reflection<0, TargetClass>;
-    //...
-*/
+template <class Target, std::size_t Index>
+struct property_info
+{
+    static consteval std::pair<std::string_view, refl::refl_prop_t> get_entry()
+    {
+        return refl::refl_prop_t(refl::dummy_t<Target, Index>()).make_info();
+    }
+};
 
 } // namespace refl
+
+#define REFLECT_MEMBER(NAME, ...)                                                        \
+    __VA_ARGS__ NAME{};                                                                  \
+    template <size_t, class>                                                             \
+    struct detail_property_reflection;                                                   \
+    static constexpr std::size_t detail_##NAME##_property_index =                        \
+        refl::detail::index<struct detail_##NAME##_property_tag,                         \
+                            detail_property_reflection>::value;                          \
+    template <class T>                                                                   \
+    struct detail_property_reflection<detail_##NAME##_property_index, T>                 \
+    {                                                                                    \
+        using type                             = __VA_ARGS__;                            \
+        static constexpr std::string_view name = #NAME;                                  \
+        template <class U>                                                               \
+        using ptr_type = type U::*;                                                      \
+        template <class U>                                                               \
+        static constexpr type U::*offset_v = &U::NAME;                                   \
+    };
