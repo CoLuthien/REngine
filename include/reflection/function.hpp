@@ -15,24 +15,6 @@ namespace refl
 class refl_func_t
 {
 public:
-    template <class Target, std::size_t Index>
-    constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
-    {
-        using func  = func_type_t<Target, Index>;
-        using trait = method_traits<func>;
-
-        using interface_type =
-            interface_t<typename trait::result_type, typename trait::args_type>;
-        using object_type = func_object_t<typename trait::result_type,
-                                          typename trait::args_type,
-                                          Target,
-                                          Index>;
-
-        m_ptr = static_cast<handle_t const*>(object_type::get_instance());
-    }
-    consteval std::string_view const get_name() const { return m_name; }
-
-public:
     consteval std::pair<std::string_view, refl_func_t> make_info()
     {
         return std::make_pair(get_name(), *this);
@@ -42,11 +24,11 @@ public:
     template <typename R, typename... Args>
     R invoke(void* ptr, Args... args) const
     {
-        using interface_type = interface_t<R, std::tuple<Args...>>;
+        using interface_type = interface_t<R, Args...>;
         // auto iface           = static_cast<interface_type*>(m_instance.get());
         auto iface = static_cast<interface_type const*>(m_ptr);
 
-        return iface->invoke_internal(ptr, std::forward_as_tuple(args...));
+        return iface->invoke_internal(ptr, std::forward<Args>(args)...);
     }
 
 private:
@@ -54,19 +36,16 @@ private:
     {
     };
 
-    template <typename R, typename T>
-    struct interface_t;
-
     template <typename R, typename... Args>
-    struct interface_t<R, std::tuple<Args...>> : public handle_t
+    struct interface_t : public handle_t
     {
         constexpr interface_t() = default;
         virtual ~interface_t()  = default;
 
-        virtual R invoke_internal(void* obj, std::tuple<Args...>) const = 0;
+        virtual R invoke_internal(void*, Args...) const = 0;
     };
-    template <typename R, typename T, class Target, std::size_t Index>
-    struct func_object_t : public interface_t<R, T>
+    template <typename R, class Target, std::size_t Index, typename... Args>
+    struct func_object_t : public interface_t<R, Args...>
     {
         using type        = func_type_t<Target, Index>;
         using trait       = method_traits<type>;
@@ -76,20 +55,10 @@ private:
 
         consteval func_object_t() = default;
 
-        template <class Tuple, size_t... Idx>
-        R invoke_internal_impl(void* obj, Tuple&& args, std::index_sequence<Idx...>) const
+        virtual R invoke_internal(void* obj, Args... args) const override
         {
-            return std::invoke(ptr,
-                               static_cast<owner_type*>(obj),
-                               std::get<Idx>(std::forward<Tuple>(args))...);
-        }
-
-        virtual R invoke_internal(void* obj, T args) const override
-        {
-            using Indices =
-                std::make_index_sequence<std::tuple_size_v<std::remove_reference_t<T>>>;
-            // unpack and apply
-            return invoke_internal_impl(obj, std::forward<T>(args), Indices{});
+            return std::invoke(
+                ptr, static_cast<owner_type*>(obj), std::forward<Args>(args)...);
         }
         static constexpr func_object_t const* get_instance() { return &instance; }
 
@@ -99,14 +68,39 @@ private:
         static constinit const func_object_t instance;
     };
 
+public:
+    template <typename R, class Target, std::size_t Index, typename T>
+    struct strip_tuple;
+
+    template <typename R, class Target, std::size_t Index, typename... Ts>
+    struct strip_tuple<R, Target, Index, std::tuple<Ts...>>
+    {
+        using type = func_object_t<R, Target, Index, Ts...>;
+    };
+
+    template <class Target, std::size_t Index>
+    constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
+    {
+        using func              = func_type_t<Target, Index>;
+        using trait             = method_traits<func>;
+        using concrete_function = strip_tuple<typename trait::result_type,
+                                              Target,
+                                              Index,
+                                              typename trait::args_type>;
+        using object_type       = typename concrete_function::type;
+
+        m_ptr = static_cast<handle_t const*>(object_type::get_instance());
+    }
+    constexpr std::string_view const get_name() const { return m_name; }
+
 private:
     handle_t const* m_ptr;
     std::string_view const m_name;
 };
 
-template <typename R, typename T, class Target, std::size_t Index>
-constinit const refl_func_t::func_object_t<R, T, Target, Index>
-    refl_func_t::func_object_t<R, T, Target, Index>::instance = {};
+template <typename R, class Target, std::size_t Index, typename... Args>
+constinit const refl_func_t::func_object_t<R, Target, Index, Args...>
+    refl_func_t::func_object_t<R, Target, Index, Args...>::instance = {};
 
 template <class Target, std::size_t Index>
 struct function_info
