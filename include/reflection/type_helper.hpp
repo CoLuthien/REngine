@@ -52,10 +52,10 @@ template <class Target, size_t I>
 constexpr auto prop_name_v = refl_prop_info<Target, I>::name;
 
 template <class Target, size_t I>
-using prop_type_t = typename refl_prop_info<Target, I>::type;
+using prop_value_t = typename refl_prop_info<Target, I>::type;
 
 template <class Target, size_t I>
-using prop_ptr_type_t = typename refl_prop_info<Target, I>::template ptr_type<Target>;
+using prop_ptr_t = typename refl_prop_info<Target, I>::template ptr_type<Target>;
 
 template <class Target, std::size_t I>
 constexpr auto prop_ptr_v = refl_prop_info<Target, I>::template offset_v<Target>;

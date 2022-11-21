@@ -1,8 +1,9 @@
 
 #pragma once
 
-#include "function.hpp"
 #include "property.hpp"
+#include "function.hpp"
+#include "type_helper.hpp"
 
 #include "frozen/unordered_map.h"
 #include "frozen/bits/elsa_std.h"
@@ -68,9 +69,12 @@ public:
 private:
     template <class Target>
     consteval refl_class_t(type_info<Target>)
+        : n_funcs(refl_class_info_t<Target>::num_funcs),
+          n_props(refl_class_info_t<Target>::num_props)
     {
         using object_type = refl_class_info_t<Target>;
-        m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
+
+        m_ptr = static_cast<handle_t const*>(object_type::get_instance());
     }
 
 private:
@@ -81,9 +85,11 @@ private:
         virtual func_pair const* get_function(std::string_view name) const noexcept = 0;
         virtual prop_pair const* get_property(std::string_view name) const noexcept = 0;
     };
+
     template <class Target>
     struct refl_class_info_t : public handle_t
     {
+        static constinit const refl_class_info_t instance;
         virtual func_pair const* get_function(
             std::string_view name) const noexcept override
         {
@@ -100,11 +106,14 @@ private:
             to_frozen_map<function_info, Target, count_functions<Target>>::make_map();
         static constexpr auto m_props =
             to_frozen_map<property_info, Target, count_properties<Target>>::make_map();
-        static constinit const refl_class_info_t instance;
+        static constexpr auto num_funcs = m_funcs.size();
+        static constexpr auto num_props = m_props.size();
     };
 
 private:
     handle_t const* m_ptr;
+    std::size_t const n_funcs;
+    std::size_t const n_props;
 };
 template <class Target>
 constinit const refl_class_t::refl_class_info_t<Target>

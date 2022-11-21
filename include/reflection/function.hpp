@@ -20,20 +20,10 @@ public:
         return std::make_pair(get_name(), *this);
     }
 
-public:
-    template <typename R, typename... Args>
-    R invoke(void* ptr, Args... args) const
-    {
-        using interface_type = interface_t<R, Args...>;
-        // auto iface           = static_cast<interface_type*>(m_instance.get());
-        auto iface = static_cast<interface_type const*>(m_ptr);
-
-        return iface->invoke_internal(ptr, std::forward<Args>(args)...);
-    }
-
 private:
     struct handle_t
     {
+        virtual ~handle_t() = default;
     };
 
     template <typename R, typename... Args>
@@ -57,18 +47,19 @@ private:
 
         virtual R invoke_internal(void* obj, Args... args) const override
         {
+            std::cout << "internal:" << sizeof...(Args) << '\n';
             return std::invoke(
                 ptr, static_cast<owner_type*>(obj), std::forward<Args>(args)...);
         }
         static constexpr func_object_t const* get_instance() { return &instance; }
 
     public:
+        static constexpr auto argc             = trait::args_count;
         static constexpr type ptr              = func_ptr_v<Target, Index>;
         static constexpr std::string_view name = func_name_v<Target, Index>;
         static constinit const func_object_t instance;
     };
 
-public:
     template <typename R, class Target, std::size_t Index, typename T>
     struct strip_tuple;
 
@@ -78,8 +69,21 @@ public:
         using type = func_object_t<R, Target, Index, Ts...>;
     };
 
+public:
+    template <typename R, typename... Args>
+    R invoke(void* ptr, Args... args) const
+    {
+        using interface_type = interface_t<R, Args...>;
+
+        auto iface = static_cast<interface_type const*>(m_ptr);
+
+        std::cout << "outside:" << sizeof...(Args) << '\n';
+
+        return iface->invoke_internal(ptr, std::forward<Args>(args)...);
+    }
+
     template <class Target, std::size_t Index>
-    constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
+    consteval refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
     {
         using func              = func_type_t<Target, Index>;
         using trait             = method_traits<func>;
@@ -115,7 +119,7 @@ struct function_info
 
 #define INFER_FUNC_TYPE(NAME)                                                            \
     template <class C, typename... Args>                                                 \
-    using func_type =                                                                    \
+    using inferred_type =                                                                \
         decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
 
 #define REFLECT_FUNCTION(NAME, ...)                                                      \
@@ -130,7 +134,7 @@ struct function_info
         INFER_FUNC_TYPE(NAME);                                                           \
         static constexpr std::string_view name = #NAME;                                  \
         template <class Target>                                                          \
-        using type = func_type<Target, __VA_ARGS__>;                                     \
+        using type = inferred_type<Target, __VA_ARGS__>;                                 \
         template <class Target>                                                          \
         static constexpr type<Target> offset_v = &Target::NAME;                          \
     };

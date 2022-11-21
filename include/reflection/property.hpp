@@ -3,6 +3,7 @@
 
 #include "detail.hpp"
 #include "type_helper.hpp"
+#include "property_macros.hpp"
 
 #include <cstddef>
 #include <string_view>
@@ -27,7 +28,7 @@ public:
     }
 
 public:
-    consteval std::string_view const get_name() const { return m_name; }
+    constexpr std::string_view const get_name() const { return m_name; }
     template <typename T>
     T get(void* object) const
     {
@@ -49,19 +50,22 @@ private:
     template <typename T>
     struct interface_t : public handle_t
     {
-        virtual T get(void* object) const             = 0;
-        virtual void set(void* object, T value) const = 0;
+        virtual T get(void* object) const = 0;
+        virtual void set(void* object, T value) const;
     };
 
     template <class Target, std::size_t Index>
     struct prop_object_t
-        : public interface_t<typename refl_prop_info<Target, Index>::type> // unique for
-                                                                           // all data
+        : public interface_t<prop_value_t<Target, Index>> // globally unique
     {
-        using refl_info  = refl_prop_info<Target, Index>;
-        using type       = typename refl_info::template ptr_type<Target>;
-        using value_type = typename refl_info::type;
+        using ptr_type   = prop_ptr_t<Target, Index>;
+        using value_type = prop_value_t<Target, Index>;
         using owner_type = Target;
+
+        static constinit const prop_object_t instance;
+        static constexpr prop_object_t const* get_instance() { return &instance; }
+        static constexpr ptr_type ptr = prop_ptr_v<Target, Index>; // just an offset
+        static constexpr std::string_view name = prop_name_v<Target, Index>; // name
 
         constexpr prop_object_t() = default;
 
@@ -71,13 +75,15 @@ private:
         }
         virtual void set(void* object, value_type value) const override
         {
-            static_cast<owner_type*>(object)->*ptr = value;
+            if constexpr (std::is_const_v<value_type>)
+            {
+                return;
+            }
+            else
+            {
+                static_cast<owner_type*>(object)->*ptr = value;
+            }
         }
-
-        static constexpr prop_object_t const* get_instance() { return &instance; }
-        static constexpr type ptr = prop_ptr_v<Target, Index>; // just an offset
-        static constexpr std::string_view name = prop_name_v<Target, Index>; // name
-        static constinit const prop_object_t instance;
     };
 
 private:
@@ -94,26 +100,8 @@ struct property_info
 {
     static consteval std::pair<std::string_view, refl::refl_prop_t> get_entry()
     {
-        return refl::refl_prop_t(refl::dummy_t<Target, Index>()).make_info();
+        return refl::refl_prop_t(refl::dummy_t<Target, Index>{}).make_info();
     }
 };
 
 } // namespace refl
-
-#define REFLECT_MEMBER(NAME, ...)                                                        \
-    __VA_ARGS__ NAME{};                                                                  \
-    template <size_t, class>                                                             \
-    struct detail_property_reflection;                                                   \
-    static constexpr std::size_t detail_##NAME##_property_index =                        \
-        refl::detail::index<struct detail_##NAME##_property_tag,                         \
-                            detail_property_reflection>::value;                          \
-    template <class T>                                                                   \
-    struct detail_property_reflection<detail_##NAME##_property_index, T>                 \
-    {                                                                                    \
-        using type                             = __VA_ARGS__;                            \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using ptr_type = type U::*;                                                      \
-        template <class U>                                                               \
-        static constexpr type U::*offset_v = &U::NAME;                                   \
-    };
