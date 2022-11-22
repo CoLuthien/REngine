@@ -1,23 +1,6 @@
 
 #pragma once
 
-#define REFLECT_MEMBER(TYPES, NAME, ...)                                                 \
-    TYPES NAME{};                                                                        \
-    template <size_t, class>                                                             \
-    struct detail_property_reflection;                                                   \
-    static constexpr std::size_t detail_##NAME##_property_index =                        \
-        refl::detail::index<struct detail_##NAME##_property_tag,                         \
-                            detail_property_reflection>::value;                          \
-    template <class T>                                                                   \
-    struct detail_property_reflection<detail_##NAME##_property_index, T>                 \
-    {                                                                                    \
-        using type                             = TYPES;                                  \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using ptr_type = type U::*;                                                      \
-        template <class U>                                                               \
-        static constexpr type U::*offset_v = &U::NAME;                                   \
-    };
 
 #define REFELCT_MEMBER_DEFAULT(NAME, TYPE) REFLECT_MEMBER(NAME, TYPE)
 #define REFLECT_1ARGS(A, B, C) REFELCT_MEMBER_DEFAULT(A, B)

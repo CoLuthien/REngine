@@ -1,5 +1,6 @@
 
 // in C++17
+#include "test.hpp"
 #include "meta_types/type_list.hpp"
 #include "reflection/class.hpp"
 #include "reflection/property.hpp"
@@ -11,31 +12,6 @@
 #include <string_view>
 
 #include <type_traits>
-
-class Base
-{
-public:
-    using this_type = Base;
-};
-
-class Test : public Base
-{
-public:
-    DECLARE_TYPE();
-    REFLECT_FUNCTION(add, int, int);
-    int add(int a, int b);
-
-    REFLECT_FUNCTION(mult, int, int);
-    int mult(int, int)
-    {
-        std::cout << "Real mult!!";
-        return 0;
-    }
-
-public:
-    REFLECT_MEMBER(int, arr);
-    REFLECT_MEMBER(int, arr2);
-};
 
 int
 Test::add(int a, int b)
@@ -61,8 +37,7 @@ main()
     auto pair      = cl.get_function("add");
     auto prop_pair = cl.get_property("arr");
 
-
-    pair->second.invoke<int>(c, 1, 3, 4, 5);
+    pair->second.invoke<int>(c, 1, 3);
     std::cout << prop_pair->second.get<int>(c) << '\n';
     pair->second.invoke<int>(c, 1, 3);
     std::cout << prop_pair->second.get<int>(c) << '\n';
