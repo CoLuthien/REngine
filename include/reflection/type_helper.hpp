@@ -69,9 +69,9 @@ constexpr size_t count_properties =
 
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
+    struct this_type_tag;                                                                \
     constexpr auto this_type_helper()                                                    \
-        ->decltype(refl::type_helper::this_type_writer<struct this_type_tag,             \
-                                                       decltype(this)>{},                \
+        ->decltype(refl::type_helper::this_type_writer<this_type_tag, decltype(this)>{}, \
                    void());                                                              \
     using super     = this_type;                                                         \
-    using this_type = refl::type_helper::this_type_read<struct this_type_tag>;
+    using this_type = refl::type_helper::this_type_read<this_type_tag>;
