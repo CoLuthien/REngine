@@ -16,9 +16,34 @@ namespace refl
 class refl_func_t
 {
 public:
-    consteval auto make_info() { return std::make_pair(get_name(), *this); }
+    template <class Target, std::size_t Idx>
+    static consteval auto make_info()
+    {
+        return std::make_pair(get_name<Target, Idx>(),
+                              refl_func_t(dummy_t<Target, Idx>{}));
+    }
+
+    template <class Target, std::size_t Idx>
+    static constexpr auto get_name()
+    {
+        return func_name_v<Target, Idx>;
+    }
+    constexpr auto get_name() { return m_name; }
 
 private:
+    template <class Target, std::size_t Index>
+    consteval refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
+    {
+        using func              = func_type_t<Target, Index>;
+        using trait             = method_traits<func>;
+        using concrete_function = strip_tuple<typename trait::result_type,
+                                              Target,
+                                              Index,
+                                              typename trait::args_type>;
+        using object_type       = typename concrete_function::type;
+
+        m_ptr = static_cast<handle_t const*>(object_type::get_instance());
+    }
     struct handle_t
     {
         virtual ~handle_t() = default;
@@ -80,21 +105,6 @@ public:
         return iface->invoke_internal(ptr, std::forward<Args>(args)...);
     }
 
-    template <class Target, std::size_t Index>
-    consteval refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
-    {
-        using func              = func_type_t<Target, Index>;
-        using trait             = method_traits<func>;
-        using concrete_function = strip_tuple<typename trait::result_type,
-                                              Target,
-                                              Index,
-                                              typename trait::args_type>;
-        using object_type       = typename concrete_function::type;
-
-        m_ptr = static_cast<handle_t const*>(object_type::get_instance());
-    }
-    constexpr std::string_view const get_name() const { return m_name; }
-
 private:
     handle_t const* m_ptr;
     std::string_view const m_name;
@@ -109,7 +119,7 @@ struct function_info
 {
     static consteval auto get_entry()
     {
-        return refl::refl_func_t(refl::dummy_t<Target, Index>()).make_info();
+        return refl::refl_func_t::make_info<Target, Index>();
     }
 };
 

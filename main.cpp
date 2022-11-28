@@ -30,7 +30,6 @@ main()
     constexpr auto clazz = refl::refl_class_t::make_reflection<Test>();
     auto cl              = clazz;
 
-
     Test* c = new Test;
 
     auto pair      = cl.get_function("add");

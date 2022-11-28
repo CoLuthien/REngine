@@ -17,6 +17,7 @@ namespace refl
 {
 
 template <template <class, std::size_t> class Info, class Target, std::size_t Index>
+    requires requires { Index > 0; }
 struct to_frozen_map
 {
     static constexpr auto value = Info<Target, Index - 1>::get_entry();
@@ -48,36 +49,47 @@ struct type_info
 {
 };
 
-class refl_class_t 
+class refl_class_t
 {
 public:
-    refl_class_t(refl_class_t const&) = default;
+    constexpr refl_class_t(refl_class_t const&) = default;
 
-    auto get_function(std::string_view const name) const
+    constexpr auto get_function(std::string_view const name) const
     {
         return m_ptr->get_function(name);
     }
-    auto get_property(std::string_view const name) const
+
+    constexpr auto get_property(std::string_view const name) const
     {
         return m_ptr->get_property(name);
     }
 
     template <class Target>
+        requires requires {
+                     Target::detail_function_reflection;
+                     Target::detail_property_reflection;
+                 }
     static consteval auto make_reflection()
     {
+
         return refl_class_t{type_info<Target>{}};
+    }
+
+    template <class Target>
+    static consteval auto make_reflection()
+    {
+        return refl_class_t{};
     }
 
 private:
     template <class Target>
     consteval refl_class_t(type_info<Target>)
-        : n_funcs(refl_class_info_t<Target>::num_funcs),
-          n_props(refl_class_info_t<Target>::num_props)
     {
         using object_type = refl_class_info_t<Target>;
 
         m_ptr = static_cast<handle_t const*>(object_type::get_instance());
     }
+    constexpr refl_class_t() = default;
 
 private:
     struct handle_t
@@ -114,8 +126,6 @@ private:
 
 private:
     handle_t const* m_ptr;
-    std::size_t const n_funcs;
-    std::size_t const n_props;
 };
 template <class Target>
 constinit const refl_class_t::refl_class_info_t<Target>
@@ -125,7 +135,7 @@ constinit const refl_class_t::refl_class_info_t<Target>
     DECLARE_TYPE();                                                                      \
                                                                                          \
 public:                                                                                  \
-    static constexpr auto static_reflection()                                            \
+    static constexpr auto reflected_class()                                              \
     {                                                                                    \
         constexpr auto type = refl::refl_class_t::make_reflection<this_type>();          \
         return type;                                                                     \

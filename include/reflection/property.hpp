@@ -13,22 +13,29 @@ namespace refl
 
 class refl_prop_t
 {
-public:
+private:
     template <class Target, std::size_t Index>
     consteval refl_prop_t(dummy_t<Target, Index>) : m_name(prop_name_v<Target, Index>)
     {
         using object_type = prop_object_t<Target, Index>;
         m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
     }
+    template <class Target, std::size_t Index>
+    static constexpr std::string_view get_name()
+    {
+        return prop_name_v<Target, Index>;
+    }
+    constexpr auto get_name() { return m_name; }
 
 public:
-    consteval std::pair<std::string_view, refl_prop_t> make_info()
+    template <class Target, std::size_t Index>
+    static constexpr auto make_info()
     {
-        return std::make_pair(get_name(), *this);
+        return std::make_pair(get_name<Target, Index>(),
+                              refl_prop_t(dummy_t<Target, Index>{}));
     }
 
 public:
-    constexpr std::string_view const get_name() const { return m_name; }
     template <typename T>
     T get(void* object) const
     {
@@ -45,11 +52,13 @@ public:
 private:
     struct handle_t
     {
+        virtual ~handle_t() = default;
     };
 
     template <typename T>
     struct interface_t : public handle_t
     {
+        virtual ~interface_t() = default;
         virtual T get(void* object) const = 0;
         virtual void set(void* object, T value) const;
     };
@@ -100,7 +109,7 @@ struct property_info
 {
     static consteval std::pair<std::string_view, refl::refl_prop_t> get_entry()
     {
-        return refl::refl_prop_t(refl::dummy_t<Target, Index>{}).make_info();
+        return refl::refl_prop_t::make_info<Target, Index>();
     }
 };
 

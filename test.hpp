@@ -3,6 +3,10 @@
 #include <reflection/reflection.hpp>
 
 
+class U : public refl_object_t
+{
+    REFLECT_CLASS();
+};
 
 class Test : public refl_object_t
 {
@@ -22,5 +26,6 @@ public:
 public:
     REFLECT_MEMBER(int, arr);
     REFLECT_MEMBER(int, arr2);
+    REFLECT_MEMBER(U, inst);
 
 };
