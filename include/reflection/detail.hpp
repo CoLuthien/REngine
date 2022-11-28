@@ -52,8 +52,13 @@ template <typename T>
 using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader<T>{}))>;
 
 } // namespace detail
+template <class T, std::size_t Index>
+struct dummy_t
+{
+};
 
 } // namespace refl
+
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
     struct this_type_tag;                                                                \
@@ -62,8 +67,3 @@ public:                                                                         
                    void());                                                              \
     using super     = this_type;                                                         \
     using this_type = refl::detail::this_type_read<this_type_tag>;
-
-template <class T, std::size_t Index>
-struct dummy_t
-{
-};

@@ -3,6 +3,7 @@
 
 #include "detail.hpp"
 #include "traits/func_traits.hpp"
+#include "object.hpp"
 #include "type_helper.hpp"
 
 #include <cstddef>
@@ -12,7 +13,7 @@
 namespace refl
 {
 
-class refl_func_t
+class refl_func_t : public refl_object_t
 {
 public:
     consteval std::pair<std::string_view, refl_func_t> make_info()

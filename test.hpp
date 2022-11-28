@@ -1,11 +1,10 @@
 
 #pragma once
-#include "reflection/class.hpp"
+#include "reflection/reflection.hpp"
 
-inline void this_type_();
-class Test : public Base
+class Test : public refl_object_t
 {
-    REGISTER_CLASS();
+    REFLECT_CLASS();
 
 public:
     REFLECT_FUNCTION(add, int, int);

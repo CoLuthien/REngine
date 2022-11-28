@@ -3,6 +3,7 @@
 
 #include "detail.hpp"
 #include "type_helper.hpp"
+#include "object.hpp"
 
 #include <cstddef>
 #include <string_view>
@@ -10,7 +11,7 @@
 namespace refl
 {
 
-class refl_prop_t
+class refl_prop_t : public refl_object_t
 {
 public:
     template <class Target, std::size_t Index>

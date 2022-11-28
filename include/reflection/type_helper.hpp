@@ -43,7 +43,7 @@ template <class Target, std::size_t I>
 constexpr auto prop_ptr_v = refl_prop_info<Target, I>::template offset_v<Target>;
 
 template <class Target>
-constexpr size_t count_properties =
+constexpr std::size_t count_properties =
     detail::index<struct property_counter_tag,
                   Target::template detail_property_reflection>::value;
 

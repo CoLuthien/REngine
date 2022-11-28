@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "detail.hpp"
+#include "object.hpp"
 #include "property.hpp"
 #include "function.hpp"
 #include "type_helper.hpp"
@@ -46,7 +48,7 @@ struct type_info
 {
 };
 
-class refl_class_t
+class refl_class_t : public refl_object_t
 {
 public:
     refl_class_t(refl_class_t const&) = default;
@@ -119,6 +121,14 @@ template <class Target>
 constinit const refl_class_t::refl_class_info_t<Target>
     refl_class_t::refl_class_info_t<Target>::instance = {};
 
-#define REGISTER_CLASS(NAME)
+#define REFLECT_CLASS()                                                                  \
+    DECLARE_TYPE();                                                                      \
+                                                                                         \
+public:                                                                                  \
+    static constexpr auto static_reflection()                                            \
+    {                                                                                    \
+        constexpr auto type = refl::refl_class_t::make_reflection<this_type>();          \
+        return type;                                                                     \
+    }
 
 } // namespace refl
