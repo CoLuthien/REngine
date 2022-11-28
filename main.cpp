@@ -2,10 +2,8 @@
 // in C++17
 #include "test.hpp"
 #include "meta_types/type_list.hpp"
-#include "reflection/class.hpp"
-#include "reflection/property.hpp"
-#include "reflection/function.hpp"
 #include "frozen/unordered_map.h"
+#include <reflection/reflection.hpp>
 #include <string>
 #include <iostream>
 #include <tuple>
@@ -31,6 +29,7 @@ main()
 {
     constexpr auto clazz = refl::refl_class_t::make_reflection<Test>();
     auto cl              = clazz;
+
 
     Test* c = new Test;
 

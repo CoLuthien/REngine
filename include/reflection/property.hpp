@@ -11,7 +11,7 @@
 namespace refl
 {
 
-class refl_prop_t : public refl_object_t
+class refl_prop_t
 {
 public:
     template <class Target, std::size_t Index>

@@ -13,13 +13,10 @@
 namespace refl
 {
 
-class refl_func_t : public refl_object_t
+class refl_func_t
 {
 public:
-    consteval std::pair<std::string_view, refl_func_t> make_info()
-    {
-        return std::make_pair(get_name(), *this);
-    }
+    consteval auto make_info() { return std::make_pair(get_name(), *this); }
 
 private:
     struct handle_t
@@ -110,7 +107,7 @@ constinit const refl_func_t::func_object_t<R, Target, Index, Args...>
 template <class Target, std::size_t Index>
 struct function_info
 {
-    static consteval std::pair<std::string_view, refl::refl_func_t> get_entry()
+    static consteval auto get_entry()
     {
         return refl::refl_func_t(refl::dummy_t<Target, Index>()).make_info();
     }

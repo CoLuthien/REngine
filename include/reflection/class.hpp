@@ -48,7 +48,7 @@ struct type_info
 {
 };
 
-class refl_class_t : public refl_object_t
+class refl_class_t 
 {
 public:
     refl_class_t(refl_class_t const&) = default;
