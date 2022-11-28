@@ -8,6 +8,7 @@
 #include <iostream>
 #include <tuple>
 #include <string_view>
+#include <memory>
 
 #include <type_traits>
 
@@ -27,17 +28,19 @@ Test::add(int a, int b)
 int
 main()
 {
-    constexpr auto clazz = refl::refl_class_t::make_reflection<Test>();
-    auto cl              = clazz;
+    auto clazz = Test::reflected_class();
+    auto cl    = clazz;
+    Test* c    = refl::make_reflected<Test>();
 
-    Test* c = new Test;
+    refl_object_t* ptr = c;
+    c                  = nullptr;
 
-    auto pair      = cl.get_function("add");
-    auto prop_pair = cl.get_property("arr");
+    auto pair = cl->get_function("add");
+    auto prop = cl->get_property("arr");
+    auto us   = cl->get_property("us");
 
-    pair->second.invoke<int>(c, 1, 3);
-    std::cout << prop_pair->second.get<int>(c) << '\n';
-    pair->second.invoke<int>(c, 1, 3);
-    std::cout << prop_pair->second.get<int>(c) << '\n';
-    std::cout << c->arr;
+    pair.invoke<int>(ptr, 1, 3);
+    std::cout << prop.get<int>(ptr) << '\n';
+    pair.invoke<int>(ptr, 1, 3);
+    std::cout << prop.get<int>(ptr) << '\n';
 }

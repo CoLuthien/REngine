@@ -16,33 +16,12 @@
 namespace refl
 {
 
-template <template <class, std::size_t> class Info, class Target, std::size_t Index>
-    requires requires { Index > 0; }
-struct to_frozen_map
-{
-    static constexpr auto value = Info<Target, Index - 1>::get_entry();
-
-    static consteval auto make_map()
-    {
-        return to_frozen_map<Info, Target, Index - 1>::recurse(value);
-    }
-
-    template <typename T, typename... Args>
-    static consteval auto recurse(T v, Args... args)
-    {
-        return to_frozen_map<Info, Target, Index - 1>::recurse(value, v, args...);
-    }
-};
-
-template <template <class, std::size_t> class Info, class Target>
-struct to_frozen_map<Info, Target, 0>
-{
-    template <typename... Args>
-    static consteval auto recurse(Args... args)
-    {
-        return frozen::make_unordered_map({args...});
-    }
-};
+template <class Target>
+concept HasReflectedMember =
+    requires {
+        typename Target::template detail_function_reflection<0, Target>;
+        typename Target::template detail_property_reflection<0, Target>;
+    };
 
 template <class T>
 struct type_info
@@ -53,6 +32,7 @@ class refl_class_t
 {
 public:
     constexpr refl_class_t(refl_class_t const&) = default;
+    void* operator new(std::size_t size)        = delete;
 
     constexpr auto get_function(std::string_view const name) const
     {
@@ -65,27 +45,23 @@ public:
     }
 
     template <class Target>
-        requires requires {
-                     Target::detail_function_reflection;
-                     Target::detail_property_reflection;
-                 }
-    static consteval auto make_reflection()
+    static constexpr auto make_reflection()
     {
-
-        return refl_class_t{type_info<Target>{}};
-    }
-
-    template <class Target>
-    static consteval auto make_reflection()
-    {
-        return refl_class_t{};
+        if constexpr (HasReflectedMember<Target>)
+        {
+            return refl_class_t{type_info<Target>{}};
+        }
+        else
+        {
+            return refl_class_t{};
+        }
     }
 
 private:
     template <class Target>
-    consteval refl_class_t(type_info<Target>)
+    constexpr refl_class_t(type_info<Target>)
     {
-        using object_type = refl_class_info_t<Target>;
+        using object_type = member_info_t<Target>;
 
         m_ptr = static_cast<handle_t const*>(object_type::get_instance());
     }
@@ -96,49 +72,51 @@ private:
     {
         using func_pair = std::pair<std::string_view, refl_func_t>;
         using prop_pair = std::pair<std::string_view, refl_prop_t>;
-        virtual func_pair const* get_function(std::string_view name) const noexcept = 0;
-        virtual prop_pair const* get_property(std::string_view name) const noexcept = 0;
+        virtual refl_func_t get_function(std::string_view name) const noexcept = 0;
+        virtual refl_prop_t get_property(std::string_view name) const noexcept = 0;
     };
 
     template <class Target>
-    struct refl_class_info_t : public handle_t
-    {
-        static constinit const refl_class_info_t instance;
-        virtual func_pair const* get_function(
-            std::string_view name) const noexcept override
-        {
-            return m_funcs.find(name);
-        }
-        virtual prop_pair const* get_property(
-            std::string_view name) const noexcept override
-        {
-            return m_props.find(name);
-        }
-        static consteval auto get_instance() { return &instance; }
-
-        static constexpr auto m_funcs =
-            to_frozen_map<function_info, Target, count_functions<Target>>::make_map();
-        static constexpr auto m_props =
-            to_frozen_map<property_info, Target, count_properties<Target>>::make_map();
-        static constexpr auto num_funcs = m_funcs.size();
-        static constexpr auto num_props = m_props.size();
-    };
+    struct member_info_t;
 
 private:
     handle_t const* m_ptr;
 };
+
 template <class Target>
-constinit const refl_class_t::refl_class_info_t<Target>
-    refl_class_t::refl_class_info_t<Target>::instance = {};
+struct refl_class_t::member_info_t : public refl_class_t::handle_t
+{
+    static constinit const member_info_t instance;
+    virtual refl_func_t get_function(std::string_view name) const noexcept override
+    {
+        return m_funcs.at(name);
+    }
+    virtual refl_prop_t get_property(std::string_view name) const noexcept override
+    {
+        return m_props.at(name);
+    }
+    static consteval auto get_instance() { return &instance; }
+
+    static constexpr auto m_funcs =
+        to_frozen_map<function_info, Target, count_functions<Target>>::make_map();
+    static constexpr auto m_props =
+        to_frozen_map<property_info, Target, count_properties<Target>>::make_map();
+    static constexpr auto num_funcs = m_funcs.size();
+    static constexpr auto num_props = m_props.size();
+};
+
+template <class Target>
+constinit const refl_class_t::member_info_t<Target>
+    refl_class_t::member_info_t<Target>::instance = {};
 
 #define REFLECT_CLASS()                                                                  \
     DECLARE_TYPE();                                                                      \
                                                                                          \
 public:                                                                                  \
-    static constexpr auto reflected_class()                                              \
+    static refl::refl_class_t* reflected_class()                                         \
     {                                                                                    \
-        constexpr auto type = refl::refl_class_t::make_reflection<this_type>();          \
-        return type;                                                                     \
+        static constexpr auto type = refl::refl_class_t::make_reflection<this_type>();   \
+        return const_cast<refl::refl_class_t*>(&type);                                   \
     }
 
 } // namespace refl

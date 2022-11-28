@@ -17,7 +17,7 @@ class refl_func_t
 {
 public:
     template <class Target, std::size_t Idx>
-    static consteval auto make_info()
+    static constexpr auto make_info()
     {
         return std::make_pair(get_name<Target, Idx>(),
                               refl_func_t(dummy_t<Target, Idx>{}));
@@ -32,7 +32,7 @@ public:
 
 private:
     template <class Target, std::size_t Index>
-    consteval refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
+    constexpr refl_func_t(dummy_t<Target, Index>) : m_name(func_name_v<Target, Index>)
     {
         using func              = func_type_t<Target, Index>;
         using trait             = method_traits<func>;

@@ -15,7 +15,7 @@ class refl_prop_t
 {
 private:
     template <class Target, std::size_t Index>
-    consteval refl_prop_t(dummy_t<Target, Index>) : m_name(prop_name_v<Target, Index>)
+    constexpr refl_prop_t(dummy_t<Target, Index>) : m_name(prop_name_v<Target, Index>)
     {
         using object_type = prop_object_t<Target, Index>;
         m_ptr             = static_cast<handle_t const*>(object_type::get_instance());
@@ -58,7 +58,7 @@ private:
     template <typename T>
     struct interface_t : public handle_t
     {
-        virtual ~interface_t() = default;
+        virtual ~interface_t()            = default;
         virtual T get(void* object) const = 0;
         virtual void set(void* object, T value) const;
     };

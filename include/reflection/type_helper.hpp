@@ -1,6 +1,7 @@
 
 #pragma once
 #include "detail.hpp"
+#include "frozen/unordered_map.h"
 #include <type_traits>
 
 namespace refl
@@ -46,5 +47,33 @@ template <class Target>
 constexpr std::size_t count_properties =
     detail::index<struct property_counter_tag,
                   Target::template detail_property_reflection>::value;
+
+template <template <class, std::size_t> class Info, class Target, std::size_t Index>
+    requires requires { Index > 0; }
+struct to_frozen_map
+{
+    static constexpr auto value = Info<Target, Index - 1>::get_entry();
+
+    static consteval auto make_map()
+    {
+        return to_frozen_map<Info, Target, Index - 1>::recurse(value);
+    }
+
+    template <typename T, typename... Args>
+    static consteval auto recurse(T v, Args... args)
+    {
+        return to_frozen_map<Info, Target, Index - 1>::recurse(value, v, args...);
+    }
+};
+
+template <template <class, std::size_t> class Info, class Target>
+struct to_frozen_map<Info, Target, 0>
+{
+    template <typename... Args>
+    static consteval auto recurse(Args... args)
+    {
+        return frozen::make_unordered_map({args...});
+    }
+};
 
 } // namespace refl

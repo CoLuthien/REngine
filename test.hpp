@@ -26,6 +26,6 @@ public:
 public:
     REFLECT_MEMBER(int, arr);
     REFLECT_MEMBER(int, arr2);
-    REFLECT_MEMBER(U, inst);
+    REFLECT_MEMBER(U*, us);
 
 };
