@@ -23,7 +23,7 @@
 #ifndef FROZEN_LETITGO_BASIC_TYPES_H
 #define FROZEN_LETITGO_BASIC_TYPES_H
 
-#include "frozen/bits/exceptions.h"
+#include "exceptions.h"
 
 #include <array>
 #include <utility>

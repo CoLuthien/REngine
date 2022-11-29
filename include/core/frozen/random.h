@@ -23,8 +23,8 @@
 #ifndef FROZEN_LETITGO_RANDOM_H
 #define FROZEN_LETITGO_RANDOM_H
 
-#include "frozen/bits/algorithms.h"
-#include "frozen/bits/version.h"
+#include "bits/algorithms.h"
+#include "bits/version.h"
 
 #include <cstdint>
 #include <type_traits>

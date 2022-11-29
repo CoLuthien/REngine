@@ -23,10 +23,10 @@
 #ifndef FROZEN_LETITGO_STRING_H
 #define FROZEN_LETITGO_STRING_H
 
-#include "frozen/bits/elsa.h"
-#include "frozen/bits/hash_string.h"
-#include "frozen/bits/version.h"
-#include "frozen/bits/defines.h"
+#include "bits/elsa.h"
+#include "bits/hash_string.h"
+#include "bits/version.h"
+#include "bits/defines.h"
 
 #include <functional>
 

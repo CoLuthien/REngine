@@ -23,11 +23,11 @@
 #ifndef FROZEN_LETITGO_MAP_H
 #define FROZEN_LETITGO_MAP_H
 
-#include "frozen/bits/algorithms.h"
-#include "frozen/bits/basic_types.h"
-#include "frozen/bits/constexpr_assert.h"
-#include "frozen/bits/exceptions.h"
-#include "frozen/bits/version.h"
+#include "bits/algorithms.h"
+#include "bits/basic_types.h"
+#include "bits/constexpr_assert.h"
+#include "bits/exceptions.h"
+#include "bits/version.h"
 
 #include <utility>
 
