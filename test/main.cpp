@@ -2,7 +2,7 @@
 // in C++17
 #include "test.hpp"
 #include "frozen/unordered_map.h"
-#include <reflection/reflection.hpp>
+#include <Reflection/Reflection.hpp>
 #include <string>
 #include <iostream>
 #include <tuple>
@@ -29,9 +29,9 @@ main()
 {
     auto clazz = Test::reflected_class();
     auto cl    = clazz;
-    Test* c    = refl::make_reflected<Test>();
+    Test* c    = ge::make_reflected<Test>();
 
-    refl_object_t* ptr = c;
+    ge::GObject* ptr = c;
     c                  = nullptr;
 
     auto pair = cl->get_function("add");

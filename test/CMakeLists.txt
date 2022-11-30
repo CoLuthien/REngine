@@ -8,8 +8,8 @@ add_executable(
 )
 
 target_include_directories(${target}
-    ${root_idr}/include
-    ${root_idr}/include/core
+PUBLIC
+    ${root_dir}/include/Core
 )
 
 target_compile_options(${target}
@@ -21,7 +21,10 @@ target_compile_options(${target}
 )
 
 target_link_libraries(${target}
-    PUBLIC
+PUBLIC
+    GREngine-GCLib
+    GREngine-GObject
+
 
     PRIVATE
 

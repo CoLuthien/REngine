@@ -6,24 +6,25 @@
 
 namespace refl
 {
-using index_t = int32_t;
-class refl_class_t;
+class RClass;
+class RField;
+class RFunction;
 
-class refl_object_t
+} // namespace refl
+
+namespace ge
+{
+using index_t = int32_t;
+
+class GObject
 {
 public:
-    using this_type = refl_object_t;
-    refl_object_t() = default;
+    using this_type = GObject;
+    GObject()       = default;
 
 private:
     index_t m_index;
-    class refl_class_t* m_class;
-    class refl_object_t* m_owner;
-};
-
-class g_func_t
-{
-
+    class GClass* m_owner;
 };
 
 template <class T, typename... Args>
@@ -34,4 +35,4 @@ make_reflected(Args... args)
     return ptr;
 }
 
-} // namespace refl
+} // namespace ge

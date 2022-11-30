@@ -1,14 +1,14 @@
 
 #pragma once
-#include <reflection/reflection.hpp>
+#include "GObject/GObject.hpp"
+#include <Reflection/Reflection.hpp>
 
-
-class U : public refl_object_t
+class U : public ge::GObject
 {
-    REFLECT_CLASS();
+public:
 };
 
-class Test : public refl_object_t
+class Test : public ge::GObject
 {
     REFLECT_CLASS();
 
@@ -26,6 +26,5 @@ public:
 public:
     REFLECT_MEMBER(int, arr);
     REFLECT_MEMBER(int, arr2);
-    REFLECT_MEMBER(U*, us);
-
+    REFLECT_MEMBER(U, us);
 };
