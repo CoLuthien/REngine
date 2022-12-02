@@ -26,7 +26,6 @@ constexpr std::size_t function_counts =
     detail::index<struct function_counter_tag,
                   Target::template detail_function_reflection>::value;
 
-
 // helper templates for reflected property class
 template <HasReflectedField Target, std::size_t I>
 using refl_field =

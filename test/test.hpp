@@ -12,6 +12,12 @@ class Test : public ge::GObject
 {
     REFLECT_CLASS();
 
+    Test()
+    {
+        arr = 12;
+        arr2 = 13;
+    }
+
 public:
     REFLECT_FUNCTION(add, int, int);
     int add(int a, int b);

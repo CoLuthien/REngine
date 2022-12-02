@@ -87,14 +87,4 @@ struct RClass::MemberInfo : public RClass::Handle
 template <class Target>
 constinit const RClass::MemberInfo<Target> RClass::MemberInfo<Target>::instance = {};
 
-#define REFLECT_CLASS()                                                                  \
-    DECLARE_TYPE();                                                                      \
-                                                                                         \
-public:                                                                                  \
-    static refl::RClass* reflected_class()                                               \
-    {                                                                                    \
-        static constexpr auto type = refl::RClass::make_reflection<this_type>();         \
-        return const_cast<refl::RClass*>(&type);                                         \
-    }
-
 } // namespace refl

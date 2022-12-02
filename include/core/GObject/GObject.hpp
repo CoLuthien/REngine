@@ -2,6 +2,8 @@
 #pragma once
 
 #include <stdint.h>
+#include <unordered_map>
+#include <string_view>
 #include <cstddef>
 
 namespace refl
@@ -15,16 +17,22 @@ class RFunction;
 namespace ge
 {
 using index_t = int32_t;
+class GObject;
+
+class GObjectContainer
+{
+};
 
 class GObject
 {
 public:
     using this_type = GObject;
-    GObject()       = default;
+
+    class GFunction* find_function(std::string_view const name);
 
 private:
     index_t m_index;
-    class GClass* m_owner;
+    class GClass* m_type;
 };
 
 template <class T, typename... Args>

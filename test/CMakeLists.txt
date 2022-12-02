@@ -9,7 +9,6 @@ add_executable(
 
 target_include_directories(${target}
 PUBLIC
-    ${root_dir}/include/Core
 )
 
 target_compile_options(${target}
@@ -22,7 +21,6 @@ target_compile_options(${target}
 
 target_link_libraries(${target}
 PUBLIC
-    GREngine-GCLib
     GREngine-GObject
 
 

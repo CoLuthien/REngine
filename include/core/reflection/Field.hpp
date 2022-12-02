@@ -16,7 +16,6 @@ class RField
 {
 private:
     template <class Target, std::size_t Index>
-        requires HasReflectedField<Target>
     constexpr RField(dummy_t<Target, Index>) : m_name(field_name_v<Target, Index>)
     {
         using object_type = FieldInformation<Target, Index>;
@@ -82,7 +81,7 @@ struct RField::FieldInformation
 
     static constinit const FieldInformation instance;
     static constexpr FieldInformation const* get_instance() { return &instance; }
-    static constexpr ptr_type ptr          = prop_ptr_v<Target, Index>;  // just an offset
+    static constexpr ptr_type ptr          = prop_ptr_v<Target, Index>; // just an offset
     static constexpr std::string_view name = field_name_v<Target, Index>; // name
 
     constexpr FieldInformation() = default;
