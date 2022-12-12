@@ -17,7 +17,10 @@ struct index_impl
 };
 
 template <std::size_t I, class Tag, template <std::size_t, class> class Type>
-    requires requires { Type<I, Tag>::name; }
+requires requires
+{
+    Type<I, Tag>::name;
+}
 struct index_impl<I, Tag, Type>
 {
     static constexpr std::size_t value = 1 + index_impl<I + 1, Tag, Type>::value;
@@ -52,18 +55,13 @@ template <typename T>
 using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader<T>{}))>;
 
 } // namespace detail
-template <class T, std::size_t Index>
-struct dummy_t
-{
-};
 
 } // namespace refl
 
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
     struct this_type_tag;                                                                \
-    constexpr auto this_type_helper()                                                    \
-        ->decltype(refl::detail::this_type_writer<this_type_tag, decltype(this)>{},      \
-                   void());                                                              \
+    constexpr auto this_type_helper()->decltype(                                         \
+        refl::detail::this_type_writer<this_type_tag, decltype(this)>{}, void());        \
     using super     = this_type;                                                         \
     using this_type = refl::detail::this_type_read<this_type_tag>;
