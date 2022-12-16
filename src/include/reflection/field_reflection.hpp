@@ -92,7 +92,7 @@ struct gather_fields
 
 } // namespace refl
 
-#define REFLECT_FIELD(TYPES, NAME, ...)                                                  \
+#define REFLECT_FIELD(TYPES, NAME)                                                       \
     TYPES NAME{};                                                                        \
     template <std::size_t, class>                                                        \
     struct detail_property_reflection;                                                   \

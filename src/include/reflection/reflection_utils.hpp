@@ -11,23 +11,20 @@ namespace refl
 namespace detail
 {
 template <std::size_t, class, template <std::size_t, class> class>
-struct index_impl
+struct index_impl // base case, 2.
 {
-    static constexpr std::size_t value = 0;
+    static constexpr std::size_t value = 0; // anyway it will not contribute number
 };
 
 template <std::size_t I, class Tag, template <std::size_t, class> class Type>
-requires requires
+    requires requires { Type<I, Tag>::name; } // check **any** specialization
+struct index_impl<I, Tag, Type> // try instanciate , 3.
 {
-    Type<I, Tag>::name;
-}
-struct index_impl<I, Tag, Type>
-{
-    static constexpr std::size_t value = 1 + index_impl<I + 1, Tag, Type>::value;
+    static constexpr std::size_t value = 1 + index_impl<I + 1, Tag, Type>::value; // ok instanciate I + 1 also;
 };
 
 template <class Tag, template <std::size_t, class> class Type>
-struct index
+struct index // entry point, 1.
 {
     static constexpr std::size_t value = index_impl<0, Tag, Type>::value;
 };
@@ -61,7 +58,8 @@ using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
     struct this_type_tag;                                                                \
-    constexpr auto this_type_helper()->decltype(                                         \
-        refl::detail::this_type_writer<this_type_tag, decltype(this)>{}, void());        \
+    constexpr auto this_type_helper()                                                    \
+        ->decltype(refl::detail::this_type_writer<this_type_tag, decltype(this)>{},      \
+                   void());                                                              \
     using super     = this_type;                                                         \
     using this_type = refl::detail::this_type_read<this_type_tag>;
