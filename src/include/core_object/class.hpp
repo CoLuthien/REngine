@@ -58,7 +58,10 @@ private:
 } // namespace hln
 
 #define GENERATE_BODY()                                                                  \
+public:                                                                                  \
     REFLECT_CLASS();                                                                     \
+                                                                                         \
+public:                                                                                  \
     this_type& operator=(this_type const&) = delete;                                     \
     this_type& operator=(this_type&&)      = delete;                                     \
                                                                                          \
@@ -68,4 +71,6 @@ public:                                                                         
         static auto instance =                                                           \
             hln::hclass_t(reflected_class(), reflected_fields(), reflected_functions()); \
         return &instance;                                                                \
-    }
+    }                                                                                    \
+                                                                                         \
+private:

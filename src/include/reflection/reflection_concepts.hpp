@@ -13,7 +13,12 @@ namespace refl
 {
 
 template <typename T>
-concept is_property_reflected = requires { T::template detail_field_reflection; };
+concept is_field_reflected =
+    requires { T::template detail_field_reflection<0, T>::name; };
+
+template <typename T>
+concept is_function_reflected =
+    requires { T::template detail_function_reflection<0, T>::name; };
 
 template <typename T>
 concept is_iterable_type = requires {

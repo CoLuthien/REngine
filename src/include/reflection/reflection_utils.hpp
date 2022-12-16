@@ -54,6 +54,7 @@ using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader
 
 } // namespace refl
 
+
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \
     struct this_type_tag;                                                                \
