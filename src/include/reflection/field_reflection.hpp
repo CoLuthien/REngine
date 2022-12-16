@@ -60,6 +60,7 @@ struct rfield_t::field_info_t : public rfield_t::field_iface_t<field_value_t<Tar
     static constexpr auto name            = field_name_v<Target, I>;
 
     static constexpr auto reflected_info() { return &field_info; }
+    // todo: make type flag that is for making antigen for GC
 
     virtual value_type get(void* obj) const
     {
@@ -71,7 +72,10 @@ struct rfield_t::field_info_t : public rfield_t::field_iface_t<field_value_t<Tar
         {
             return;
         }
-        reinterpret_cast<owner_type*>(obj)->*pointer = value;
+        else
+        {
+            reinterpret_cast<owner_type*>(obj)->*pointer = value;
+        }
     }
 };
 
@@ -92,15 +96,15 @@ struct gather_fields
 
 } // namespace refl
 
-#define REFLECT_FIELD(TYPES, NAME)                                                       \
+#define REFLECT_FIELD(TYPES, NAME, ...)                                                  \
     TYPES NAME{};                                                                        \
     template <std::size_t, class>                                                        \
-    struct detail_property_reflection;                                                   \
-    static constexpr std::size_t detail_##NAME##_property_index =                        \
-        refl::detail::index<struct detail_##NAME##_property_tag,                         \
-                            detail_property_reflection>::value;                          \
+    struct detail_field_reflection;                                                      \
+    struct detail_##NAME##_field_tag;                                                    \
+    static constexpr std::size_t detail_##NAME##_field_index =                           \
+        refl::detail::index<detail_##NAME##_field_tag, detail_field_reflection>::value;  \
     template <class T>                                                                   \
-    struct detail_property_reflection<detail_##NAME##_property_index, T>                 \
+    struct detail_field_reflection<detail_##NAME##_field_index, T>                       \
     {                                                                                    \
         using value_type                       = TYPES;                                  \
         static constexpr std::string_view name = #NAME;                                  \

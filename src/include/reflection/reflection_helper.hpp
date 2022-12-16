@@ -12,7 +12,7 @@ namespace refl
 // field reflection
 template <class Target, std::size_t I>
 using reflected_field =
-    typename Target::template detail_property_reflection<I, struct detail_member_tag>;
+    typename Target::template detail_field_reflection<I, struct detail_member_tag>;
 
 template <class Target, size_t I>
 constexpr auto field_name_v = reflected_field<Target, I>::name;
@@ -29,8 +29,8 @@ constexpr auto field_pointer_v = reflected_field<Target, I>::template pointer_va
 
 template <class Target>
 constexpr std::size_t field_counts =
-    detail::index<struct property_counter_tag,
-                  Target::template detail_property_reflection>::value;
+    detail::index<struct field_counter_tag,
+                  Target::template detail_field_reflection>::value;
 
 // function reflection
 

@@ -11,6 +11,27 @@ namespace refl
 
 class rfunction_t
 {
+public:
+    template <class Target, std::size_t I>
+    static constexpr auto reflect_field()
+    {
+        using trait     = func_traits<func_pointer_t<Target, I>>;
+        using info_type = typename strip_tuple<Target,
+                                               I,
+                                               typename trait::result_type,
+                                               typename trait::args_type>::type;
+        return rfunction_t(info_type::reflected_info());
+    }
+
+    template <typename R, typename... Args>
+    R invoke(void* obj, Args... args)
+    {
+        using type = field_iface_t<R, Args...>;
+        auto ptr   = static_cast<type const*>(m_info);
+
+        return ptr->invoke_impl(obj, args...);
+    }
+
 private:
     struct handle_t;
     template <typename R, typename... Args>
@@ -30,18 +51,6 @@ private:
     {
         using type = field_info_t<Target, I, R, Ts...>;
     };
-
-public:
-    template <class Target, std::size_t I>
-    static constexpr auto reflect_field()
-    {
-        using trait     = func_traits<func_pointer_t<Target, I>>;
-        using info_type = typename strip_tuple<Target,
-                                               I,
-                                               typename trait::result_type,
-                                               typename trait::args_type>::type;
-        return rfunction_t(info_type::reflected_info());
-    }
 };
 
 struct rfunction_t::handle_t
