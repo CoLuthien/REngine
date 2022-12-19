@@ -1,3 +1,2 @@
 
-
-project(HLNGine LANGUAGES CXX)
+project(Invader LANGUAGES CXX)
