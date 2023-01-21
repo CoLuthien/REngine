@@ -15,6 +15,18 @@ public:
     hfield_t(refl::rfield_t* field_info) : m_field(field_info) {}
     // todo: make type flag that is for making antigen for GC
 
+    template <class T>
+    T get(void* ptr) const
+    {
+        return m_field->get<T>(ptr);
+    }
+
+    template <class T>
+    void set(void* ptr, T value) const
+    {
+        return m_field->set<T>(ptr, value);
+    }
+
 private:
     refl::rfield_t* m_field;
 };

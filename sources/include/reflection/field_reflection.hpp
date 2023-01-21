@@ -20,6 +20,20 @@ public:
         return rfield_t(static_cast<handle_t const*>(info_type::reflected_info()));
     }
 
+public:
+    template <class V>
+    V get(void* obj) const
+    {
+        auto ptr = static_cast<field_iface_t<V> const*>(m_info);
+        return ptr->get(obj);
+    }
+    template <class V>
+    void set(void* obj, V value) const
+    {
+        auto ptr = static_cast<field_iface_t<V> const*>(m_info);
+        return ptr->set(obj, value);
+    }
+
 private:
     struct handle_t;
     template <typename V>
