@@ -108,8 +108,6 @@ struct gather_functions
         decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
 
 #define REFLECT_FUNCTION(NAME, ...)                                                      \
-    template <std::size_t, class>                                                        \
-    struct detail_function_reflection;                                                   \
     static constexpr size_t detail_##NAME##_function_index =                             \
         refl::detail::index<struct detail_##NAME##_function_tag,                         \
                             detail_function_reflection>::value;                          \

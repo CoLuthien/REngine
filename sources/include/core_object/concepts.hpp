@@ -1,7 +1,7 @@
 
 #pragma once
 
-namespace hln
+namespace ivd
 {
 
-} // namespace hln
+} // namespace ivd

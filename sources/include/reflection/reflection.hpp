@@ -6,7 +6,6 @@
 #include "class_reflection.hpp"
 #include "reflection_concepts.hpp"
 
-
 #define REFLECT_FUNCTIONS_INFO()                                                         \
     static auto const reflected_functions()                                              \
     {                                                                                    \

@@ -34,26 +34,25 @@ struct index
 // compile time this_type
 namespace detail
 {
-template <typename T>
+template <typename Tag>
 struct this_type_reader
 {
-    friend auto this_type(this_type_reader<T>);
+    friend auto this_type(this_type_reader<Tag>);
 };
 
-template <typename T, typename U>
+template <typename Tag, typename ThisType>
 struct this_type_writer
 {
-    friend auto this_type(this_type_reader<T>) { return U{}; }
+    friend auto this_type(this_type_reader<Tag>) { return ThisType{}; }
 };
 
-template <typename T>
-using this_type_read = std::remove_pointer_t<decltype(this_type(this_type_reader<T>{}))>;
+template <typename Tag>
+using this_type_read =
+    std::remove_pointer_t<decltype(this_type(std::declval<this_type_reader<Tag>>()))>;
 
 } // namespace detail
 
-
 } // namespace refl
-
 
 #define DECLARE_TYPE()                                                                   \
 public:                                                                                  \

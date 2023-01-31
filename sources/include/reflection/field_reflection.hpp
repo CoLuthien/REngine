@@ -112,8 +112,7 @@ struct gather_fields
 
 #define REFLECT_FIELD(TYPES, NAME, ...)                                                  \
     TYPES NAME{};                                                                        \
-    template <std::size_t, class>                                                        \
-    struct detail_field_reflection;                                                      \
+                                                                                         \
     struct detail_##NAME##_field_tag;                                                    \
     static constexpr std::size_t detail_##NAME##_field_index =                           \
         refl::detail::index<detail_##NAME##_field_tag, detail_field_reflection>::value;  \

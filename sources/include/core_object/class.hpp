@@ -6,7 +6,7 @@
 
 #include <unordered_map>
 
-namespace hln
+namespace ivd
 {
 
 class hfield_t : public hobject_t
@@ -67,11 +67,16 @@ private:
     std::unordered_map<std::string_view, hfield_t> const m_fields;
 };
 
-} // namespace hln
+} // namespace ivd
 
 #define GENERATE_BODY()                                                                  \
-public:                                                                                  \
     REFLECT_CLASS();                                                                     \
+                                                                                         \
+public:                                                                                  \
+    template <std::size_t, class>                                                        \
+    struct detail_field_reflection;                                                      \
+    template <std::size_t, class>                                                        \
+    struct detail_function_reflection;                                                   \
                                                                                          \
 public:                                                                                  \
     this_type& operator=(this_type const&) = delete;                                     \
@@ -83,6 +88,4 @@ public:                                                                         
         static auto instance =                                                           \
             hln::hclass_t(reflected_class(), reflected_fields(), reflected_functions()); \
         return &instance;                                                                \
-    }                                                                                    \
-                                                                                         \
-private:
+    }

@@ -4,7 +4,7 @@
 #include "concepts.hpp"
 #include <cstddef>
 
-namespace hln
+namespace ivd
 {
 
 class hobject_t
@@ -26,4 +26,4 @@ private:
     std::size_t obj_idx;
 };
 
-} // namespace hln
+} // namespace ivd

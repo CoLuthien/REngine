@@ -4,7 +4,7 @@
 #include "reflection_utils.hpp"
 #include <type_traits>
 
-namespace hln
+namespace ivd
 {
 class hobject_t;
 }
@@ -29,7 +29,7 @@ concept is_iterable_type = requires {
 template <typename T>
 concept is_supported_iterable =
     requires {
-        std::is_base_of_v<hln::hobject_t, std::decay_t<typename T::value_type>>&&
+        std::is_base_of_v<ivd::hobject_t, std::decay_t<typename T::value_type>>&&
             is_iterable_type<T>;
     };
 

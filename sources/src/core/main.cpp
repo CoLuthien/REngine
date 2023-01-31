@@ -5,34 +5,35 @@
 #include <stdexcept>
 #include <cstdlib>
 
-class HelloTriangleApplication {
+class HelloTriangleApplication
+{
 public:
-    void run() {
+    void run()
+    {
         initVulkan();
         mainLoop();
         cleanup();
     }
 
 private:
-    void initVulkan() {
+    void initVulkan() {}
 
-    }
+    void mainLoop() {}
 
-    void mainLoop() {
-
-    }
-
-    void cleanup() {
-
-    }
+    void cleanup() {}
 };
 
-int main() {
+int
+main()
+{
     HelloTriangleApplication app;
 
-    try {
+    try
+    {
         app.run();
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception& e)
+    {
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
     }
