@@ -3,7 +3,26 @@
 #include <string_view>
 #include <iostream>
 
-class Sample : public hln::hobject_t
+#include <cstddef>
+
+struct S
+{
+public:
+    template <class T, std::size_t I>
+    class A; // S::A is public
+    template <class T, std::size_t I>
+    using Inner = A<T, I>;
+
+private:
+    template <class X>
+    class A<X, 0>
+    {
+    public:
+        static constexpr int x = 1;
+    }; // error: cannot change access
+};
+
+class Sample : public ivd::hobject_t
 {
 public:
     GENERATE_BODY();
@@ -16,7 +35,7 @@ public:
         return a + b;
     }
 
-public:
+private:
     REFLECT_FIELD(int const, x);
     REFLECT_FIELD(int const, y);
     REFLECT_FIELD(int const, z);
@@ -28,10 +47,13 @@ main()
 {
 
     auto* ptr = new Sample{};
-
+    std::cout << "x is: " << S::Inner<S, 0>::x << '\n';
     // ptr->x = ptr->y = ptr->z = 12; # error!
 
     auto* clazz = Sample::static_class();
+
+
+    // auto z = ptr->z;
 
     auto func_add = clazz->find_func("add");
 

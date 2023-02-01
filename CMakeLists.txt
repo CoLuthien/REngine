@@ -7,12 +7,14 @@ set (CMAKE_CXX_STANDARD 20)
 
 project(Invader LANGUAGES CXX)
 
-
-find_package(glm REQUIRED)
-find_package(glfw3 REQUIRED)
 find_package(Vulkan REQUIRED)
 
+include(cmake/graphics.cmake)
+include(cmake/submodule.cmake)
+
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 
 add_subdirectory(sources/src)
 add_subdirectory(example)

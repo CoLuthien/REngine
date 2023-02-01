@@ -83,9 +83,9 @@ public:                                                                         
     this_type& operator=(this_type&&)      = delete;                                     \
                                                                                          \
 public:                                                                                  \
-    static hln::hclass_t* static_class()                                                 \
+    static ivd::hclass_t* static_class()                                                 \
     {                                                                                    \
         static auto instance =                                                           \
-            hln::hclass_t(reflected_class(), reflected_fields(), reflected_functions()); \
+            ivd::hclass_t(reflected_class(), reflected_fields(), reflected_functions()); \
         return &instance;                                                                \
     }

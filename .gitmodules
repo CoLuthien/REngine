@@ -1,0 +1,8 @@
+[submodule "sources/thirdparty/glfw"]
+	path = sources/thirdparty/glfw
+	url = https://github.com/glfw/glfw.git
+	branch = 3.3.8
+[submodule "sources/thirdparty/glm"]
+	path = sources/thirdparty/glm
+	url = https://github.com/g-truc/glm.git
+	branch = 0.9.8
