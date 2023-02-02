@@ -16,7 +16,7 @@ PUBLIC
 
 
 target_link_libraries(core
-    Vulkan::Vulkan
     glfw
     glm
+    Vulkan::Vulkan
 )
