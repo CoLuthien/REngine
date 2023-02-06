@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "class.hpp"
+
 namespace ivd
 {
 
@@ -15,7 +17,7 @@ hobject tree:
        /   \    \
       e     f    g
 
-since we have 
+since we have
 */
 
 } // namespace ivd

@@ -17,6 +17,7 @@ private:
 
 public:
     rclass_t() = delete;
+
     template <typename Target>
     static constexpr auto make_class()
     {
@@ -29,7 +30,6 @@ private:
 
 private:
     constexpr rclass_t(class_iface_t const* ptr) : m_info(ptr) {}
-    void* make_instance() const { return m_info->make_instance(); }
 
     template <class Target, typename... Args>
     Target* make_instance(Args... args) const

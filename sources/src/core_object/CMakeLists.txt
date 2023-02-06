@@ -1,13 +1,15 @@
 
 set(CORE_SRCS
-    ./main.cpp
+    ./object.cpp
+    ./garbage_collection.cpp
 )
 
-add_executable(core
+add_library(core_object
+SHARED
     ${CORE_SRCS}
 )
 
-target_include_directories(core
+target_include_directories(core_object
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
@@ -15,7 +17,7 @@ PUBLIC
 )
 
 
-target_link_libraries(core
+target_link_libraries(core_object
     glfw
     glm
     Vulkan::Vulkan

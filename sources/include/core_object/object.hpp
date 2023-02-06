@@ -11,7 +11,7 @@ class hobject_t
 {
 public:
     using this_type = hobject_t;
-    hobject_t()     = default;
+    hobject_t();
     // need a antigen for GC
 
 public:
