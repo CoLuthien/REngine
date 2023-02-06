@@ -1,6 +1,7 @@
 
+
 add_executable(link_test
-    link_test.cpp
+    vulkan_tutorial.cpp
 )
 
 target_link_libraries(link_test

@@ -17,7 +17,6 @@ hobject tree:
        /   \    \
       e     f    g
 
-since we have
 */
 
 } // namespace ivd
