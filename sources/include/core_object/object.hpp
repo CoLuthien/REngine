@@ -2,12 +2,14 @@
 #pragma once
 
 #include "concepts.hpp"
+
+#include "HAL/Platforms.h"
 #include <cstddef>
 
 namespace ivd
 {
 
-class hobject_t
+class DLLEXPORT hobject_t
 {
 public:
     using this_type = hobject_t;
