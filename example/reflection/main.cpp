@@ -52,7 +52,6 @@ main()
 
     auto* clazz = Sample::static_class();
 
-
     // auto z = ptr->z;
 
     auto func_add = clazz->find_func("add");
