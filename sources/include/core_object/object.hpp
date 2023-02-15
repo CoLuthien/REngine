@@ -3,7 +3,7 @@
 
 #include "concepts.hpp"
 
-#include "HAL/Platforms.h"
+#include "HAL/platforms.hpp"
 #include <cstddef>
 
 namespace ivd

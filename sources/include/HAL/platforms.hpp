@@ -3,11 +3,11 @@
 
 #if defined(_WIN64)
 
-#include "Windows/Platforms.hpp"
+#include "windows/platforms.hpp"
 
 #elif defined(__linux__)
 
-#include "Linux/Platforms.hpp"
+#include "linux/platforms.hpp"
 
 #endif
 
