@@ -9,7 +9,7 @@
 #define REFLECT_FUNCTIONS_INFO()                                                         \
     static auto const reflected_functions()                                              \
     {                                                                                    \
-        if constexpr (refl::is_function_reflected<this_type>)                            \
+        if constexpr (refl::is_reflected_type<this_type>)                            \
         {                                                                                \
             static constexpr auto map =                                                  \
                 refl::to_frozen_map<refl::gather_functions,                              \
@@ -29,7 +29,7 @@
 #define REFLECT_FIELDS_INFO()                                                            \
     static auto const reflected_fields()                                                 \
     {                                                                                    \
-        if constexpr (refl::is_field_reflected<this_type>)                               \
+        if constexpr (refl::is_reflected_type<this_type>)                               \
         {                                                                                \
             static constexpr auto map =                                                  \
                 refl::to_frozen_map<refl::gather_fields,                                 \

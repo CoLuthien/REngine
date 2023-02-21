@@ -29,7 +29,7 @@ constexpr auto field_pointer_v =
     reflected_field<Target, I>::template pointer_value<Target>;
 
 template <class Target>
-    requires is_field_reflected<Target>
+    requires is_reflected_type<Target>
 constexpr std::size_t field_counts =
     detail::index<struct field_counter_tag,
                   Target::template detail_field_reflection>::value;
@@ -50,7 +50,7 @@ template <class Target, std::size_t I>
 constexpr auto func_pointer_v = reflected_func<Target, I>::template pointer_v<Target>;
 
 template <class Target>
-    requires is_function_reflected<Target>
+    requires is_reflected_type<Target>
 constexpr std::size_t func_counts =
     detail::index<struct function_counter_tag,
                   Target::template detail_function_reflection>::value;
