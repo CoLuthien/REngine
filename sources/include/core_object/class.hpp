@@ -58,8 +58,16 @@ public:
     }
 
 public:
-    hfunction_t const* find_func(std::string_view name) { return &m_functions.at(name); }
-    hfield_t const* find_field(std::string_view name) { return &m_fields.at(name); }
+    hfunction_t const* find_func(std::string_view name)
+    {
+        auto iter = m_functions.find(name);
+        return iter == m_functions.end() ? nullptr : &iter->second;
+    }
+    hfield_t const* find_field(std::string_view name)
+    {
+        auto iter = m_fields.find(name);
+        return iter == m_fields.end() ? nullptr : &iter->second;
+    }
 
 private:
     refl::rclass_t const* m_class;
