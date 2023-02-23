@@ -6,24 +6,27 @@
 #include "class_reflection.hpp"
 #include "reflection_concepts.hpp"
 #include "meta/type_list.hpp"
+#include "frozen/unordered_map.h"
 
 #define REFLECT_FUNCTIONS_INFO()                                                         \
     static auto const reflected_functions()                                              \
     {                                                                                    \
-        static constexpr auto map =                                                      \
-            refl::to_frozen_map<refl::gather_functions,                                  \
-                                this_type,                                               \
-                                refl::func_counts<this_type>>::make_map();               \
+        static constexpr auto result =                                                   \
+            refl::reflect_all_t<pedigree_list,                                           \
+                                refl::gather_functions,                                  \
+                                refl::function_counter>::entry();                        \
+        static constexpr auto map = frozen::make_unordered_map(result);                  \
         return &map;                                                                     \
     }
 
 #define REFLECT_FIELDS_INFO()                                                            \
     static auto const reflected_fields()                                                 \
     {                                                                                    \
-        static constexpr auto map =                                                      \
-            refl::to_frozen_map<refl::gather_fields,                                     \
-                                this_type,                                               \
-                                refl::field_counts<this_type>>::make_map();              \
+        static constexpr auto result =                                                   \
+            refl::reflect_all_t<pedigree_list,                                           \
+                                refl::gather_fields,                                     \
+                                refl::field_counter>::entry();                           \
+        static constexpr auto map = frozen::make_unordered_map(result);                  \
         return &map;                                                                     \
     }
 
