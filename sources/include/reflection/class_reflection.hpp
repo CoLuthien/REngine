@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "reflection_helper.hpp"
 namespace refl
 {
 
@@ -43,9 +44,10 @@ private:
 template <class Target>
 struct rclass_t::class_info_t : rclass_t::class_iface_t
 {
+public:
     static constinit class_info_t const class_info;
+public:
     static constexpr auto reflected_info() { return &class_info; }
-
     virtual void* make_instance() const override { return new Target{}; }
     template <typename... Args>
     Target* make_instance(Args... args) const
