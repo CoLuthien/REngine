@@ -2,6 +2,7 @@
 set(CORE_SRCS
     ./object.cpp
     ./garbage_collection.cpp
+    ./class.cpp
 )
 
 add_library(core_object
@@ -13,9 +14,9 @@ target_include_directories(core_object
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
+    ${CMAKE_SOURCE_DIR}/sources/include/core_object
 )
 
 
 target_link_libraries(core_object
-
 )

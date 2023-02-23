@@ -4,7 +4,8 @@ add_executable(reflection_example
 )
 
 target_link_libraries(reflection_example
-core_object
+
+    core_object
 )
 target_include_directories(reflection_example
 PUBLIC

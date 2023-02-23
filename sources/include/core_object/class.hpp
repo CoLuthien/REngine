@@ -41,59 +41,34 @@ public:
     {
         return m_func->invoke<R>(obj, args...);
     }
-
     // implement invocation
 private:
     refl::rfunction_t* m_func;
 };
 
-class hclass_t : public hobject_t
+class DLLEXPORT hclass_t : public hobject_t
 {
 public:
     template <class Ps, class Fs>
-    hclass_t(refl::rclass_t const* rclass, Ps const* field_map, Fs const* func_map)
-        : m_class(rclass), m_fields(field_map->begin(), field_map->end()),
-          m_functions(func_map->begin(), func_map->end())
+    hclass_t(refl::rclass_t const* self_class,
+             hclass_t* super_class,
+             Ps const&& field_map,
+             Fs const&& func_map)
+        : m_self(self_class), m_super(super_class),
+          m_fields(field_map.begin(), field_map.end()),
+          m_functions(func_map.begin(), func_map.end())
     {
     }
 
 public:
-    hfunction_t const* find_func(std::string_view name)
-    {
-        auto iter = m_functions.find(name);
-        return iter == m_functions.end() ? nullptr : &iter->second;
-    }
-    hfield_t const* find_field(std::string_view name)
-    {
-        auto iter = m_fields.find(name);
-        return iter == m_fields.end() ? nullptr : &iter->second;
-    }
+    hfunction_t const* DLLEXPORT find_func(std::string_view name);
+    hfield_t const* DLLEXPORT find_field(std::string_view name);
 
 private:
-    refl::rclass_t const* m_class;
+    hclass_t* m_super;
+    refl::rclass_t const* m_self;
     std::unordered_map<std::string_view, hfunction_t> const m_functions;
     std::unordered_map<std::string_view, hfield_t> const m_fields;
 };
 
 } // namespace ivd
-
-#define GENERATE_BODY()                                                                  \
-    REFLECT_CLASS();                                                                     \
-                                                                                         \
-public:                                                                                  \
-    template <std::size_t, class>                                                        \
-    struct detail_field_reflection;                                                      \
-    template <std::size_t, class>                                                        \
-    struct detail_function_reflection;                                                   \
-                                                                                         \
-public:                                                                                  \
-    this_type& operator=(this_type const&) = delete;                                     \
-    this_type& operator=(this_type&&)      = delete;                                     \
-                                                                                         \
-public:                                                                                  \
-    static ivd::hclass_t* static_class()                                                 \
-    {                                                                                    \
-        static auto instance =                                                           \
-            ivd::hclass_t(reflected_class(), reflected_fields(), reflected_functions()); \
-        return &instance;                                                                \
-    }

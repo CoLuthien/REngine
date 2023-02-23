@@ -18,10 +18,4 @@ concept is_reflected_type = requires {
                                 typename T::template detail_function_reflection<0, T>;
                             };
 
-template <typename T>
-concept is_iterable_type = requires {
-                               typename T::iterator;
-                               typename T::const_iterator;
-                           };
-
 } // namespace refl

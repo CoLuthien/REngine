@@ -73,7 +73,7 @@ struct rfield_t::field_info_t : public rfield_t::field_iface_t<field_value_t<Tar
     static constexpr pointer_type pointer = field_pointer_v<Target, I>;
     static constexpr auto name            = field_name_v<Target, I>;
 
-    static constexpr auto reflected_info() { return &field_info; }
+    static consteval auto reflected_info() { return &field_info; }
     // todo: make type flag that is for making antigen for GC
 
     virtual value_type get(void* obj) const

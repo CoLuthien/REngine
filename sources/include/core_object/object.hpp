@@ -2,33 +2,40 @@
 #pragma once
 
 #include "concepts.hpp"
-#include "meta/type_list.hpp"
+#include "object_enums.hpp"
+#include "reflection/reflection.hpp"
 
+#include "meta/type_list.hpp"
 #include "HAL/platforms.hpp"
 #include <cstddef>
 
+enum eobject_flag
+{
+    REFL_TYPE    = 1 << 0,
+    UNREACHABLE  = 1 << 1,
+    PENDING_KILL = 1 << 2,
+    ROOT_OBJECT  = 1 << 3,
+};
 namespace ivd
 {
 
+class hclass_t;
 class DLLEXPORT hobject_t
 {
 public:
-    using super = std::nullptr_t;
-    using this_type = hobject_t;
-
-    using pedigree_list = meta::typelist<super>;
+    GENERATE_HOBJECT_BODY();
+public:
     hobject_t();
 
 public:
-    // delete copy;
-    hobject_t& operator=(hobject_t const&) = delete;
-    hobject_t(hobject_t const&)            = delete;
-    // delete move
-    hobject_t& operator=(hobject_t&&) = delete;
-    hobject_t(hobject_t&&)            = delete;
+    hclass_t* get_class();
+
 
 private:
-    std::size_t obj_idx;
+    eobject_flag m_flag;
+
+private:
+    std::size_t m_gcidx;
 };
 
 } // namespace ivd
