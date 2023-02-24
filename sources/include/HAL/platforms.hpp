@@ -11,9 +11,5 @@
 
 #endif
 
-#ifndef DLLEXPORT
+#include "attributes.hpp"
 
-#define DLLEXPORT
-#define DLLIMPORT
-
-#endif
