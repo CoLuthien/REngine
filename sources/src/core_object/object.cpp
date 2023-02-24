@@ -8,11 +8,10 @@ namespace ivd
 {
 hobject_t::hobject_t() = default;
 
-hclass_t* 
+hclass_t*
 hobject_t::static_class()
 {
     return nullptr; // todo
 }
-
 
 } // namespace ivd

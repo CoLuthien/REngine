@@ -52,7 +52,7 @@ class DLLEXPORT hclass_t : public hobject_t
 {
 public:
     template <class Ps, class Fs>
-    hclass_t(refl::rclass_t const* self_class,
+    hclass_t(refl::rclass_t const&& self_class,
              hclass_t* super_class,
              Ps const&& field_map,
              Fs const&& func_map)
@@ -68,7 +68,7 @@ public:
 
 private:
     hclass_t* m_super;
-    refl::rclass_t const* m_self;
+    refl::rclass_t m_self;
     std::unordered_map<std::string_view, hfunction_t> const m_functions;
     std::unordered_map<std::string_view, hfield_t> const m_fields;
 };

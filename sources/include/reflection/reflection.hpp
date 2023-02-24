@@ -20,31 +20,25 @@ class hclass_t;
 } // namespace ivd
 
 #define REFLECT_FUNCTIONS_INFO()                                                         \
-    static constexpr auto reflected_functions()                                          \
+    static consteval auto reflected_functions()                                          \
     {                                                                                    \
-        constexpr auto result =                                                          \
-            refl::to_array<refl::gather_functions,                                       \
-                           this_type,                                                    \
-                           refl::func_counts<this_type>>::entry_point();                 \
-        constexpr auto map = frozen::make_unordered_map(result);                         \
-        return map;                                                                      \
+        return refl::to_array<refl::gather_functions,                                    \
+                              this_type,                                                 \
+                              refl::func_counts<this_type>>::entry_point();              \
     }
 
 #define REFLECT_FIELDS_INFO()                                                            \
-    static constexpr auto reflected_fields()                                             \
+    static consteval auto reflected_fields()                                             \
     {                                                                                    \
-        constexpr auto result = refl::reflect_all_t<this_type::pedigree_list,            \
-                                                    refl::gather_fields,                 \
-                                                    refl::field_counter>::entry();       \
-        constexpr auto map    = frozen::make_unordered_map(result);                      \
-        return map;                                                                      \
+        return refl::reflect_all_t<this_type::pedigree_list,                             \
+                                   refl::gather_fields,                                  \
+                                   refl::field_counter>::entry();                        \
     }
 
 #define REFLECT_CLASS_INFO()                                                             \
-    static auto reflected_class()                                                        \
+    static consteval auto reflected_class()                                              \
     {                                                                                    \
-        static constexpr auto info = refl::rclass_t::make_class<this_type>();            \
-        return &info;                                                                    \
+        return refl::rclass_t::make_class<this_type>();                                  \
     }
 
 #define REFLECT_CLASS()                                                                  \
