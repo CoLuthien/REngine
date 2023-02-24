@@ -2,7 +2,6 @@
 #pragma once
 
 #include "concepts.hpp"
-#include "object_enums.hpp"
 #include "reflection/reflection.hpp"
 
 #include "meta/type_list.hpp"

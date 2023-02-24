@@ -1,6 +1,8 @@
 
 #pragma once
 
+
+#include "reflection_types.hpp"
 #include "reflection_concepts.hpp"
 #include "reflection_utils.hpp"
 #include "reflection_helper.hpp"
@@ -10,7 +12,7 @@
 namespace refl
 {
 
-class rfield_t
+class rfield_t final
 {
 public:
     template <class Target, std::size_t I>
@@ -34,6 +36,8 @@ public:
         return ptr->set(obj, value);
     }
 
+    inline efield_type get_type() const;
+
 private:
     struct handle_t;
     template <typename V>
@@ -51,8 +55,15 @@ private:
 
 struct rfield_t::handle_t
 {
-    virtual ~handle_t() = default;
+    virtual ~handle_t()                  = default;
+    virtual efield_type get_type() const = 0;
 };
+
+efield_type
+rfield_t::get_type() const
+{
+    return m_info->get_type();
+}
 
 template <typename V>
 struct rfield_t::field_iface_t : public rfield_t::handle_t
@@ -63,7 +74,8 @@ struct rfield_t::field_iface_t : public rfield_t::handle_t
 };
 
 template <class Target, std::size_t I>
-struct rfield_t::field_info_t : public rfield_t::field_iface_t<field_value_t<Target, I>>
+struct rfield_t::field_info_t final
+    : public rfield_t::field_iface_t<field_value_t<Target, I>>
 {
     using owner_type   = Target;
     using value_type   = field_value_t<Target, I>;
@@ -72,15 +84,16 @@ struct rfield_t::field_info_t : public rfield_t::field_iface_t<field_value_t<Tar
     static constinit field_info_t const field_info;
     static constexpr pointer_type pointer = field_pointer_v<Target, I>;
     static constexpr auto name            = field_name_v<Target, I>;
+    static constexpr auto field_type      = field_type_e<Target, I>();
 
     static consteval auto reflected_info() { return &field_info; }
-    // todo: make type flag that is for making antigen for GC
+    virtual efield_type get_type() const override { return field_type; }
 
-    virtual value_type get(void* obj) const
+    virtual value_type get(void* obj) const override
     {
         return reinterpret_cast<owner_type*>(obj)->*pointer;
     }
-    virtual void set(void* obj, value_type value) const
+    virtual void set(void* obj, value_type value) const override
     {
         if constexpr (std::is_const_v<value_type>)
         {

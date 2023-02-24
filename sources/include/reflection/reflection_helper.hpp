@@ -32,6 +32,26 @@ template <class Target, std::size_t I>
 constexpr auto field_pointer_v =
     reflected_field<Target, I>::template pointer_value<Target>;
 
+template <class Target, size_t I>
+static inline constexpr auto
+field_type_e()
+{
+    using type = std::remove_pointer_t<std::decay_t<field_value_t<Target, I>>>;
+
+    if constexpr (is_reflected_type<type>)
+    {
+        return efield_type::REFLECTED;
+    }
+    else if constexpr (std::is_fundamental_v<type>)
+    {
+        return efield_type::PRIM;
+    }
+    else
+    {
+        return efield_type::REGULAR;
+    }
+}
+
 template <class Target>
     requires is_reflected_type<Target>
 constexpr std::size_t field_counts =

@@ -9,7 +9,7 @@
 namespace ivd
 {
 
-class hfield_t : public hobject_t
+class DLLEXPORT hfield_t : public hobject_t
 {
 public:
     hfield_t(refl::rfield_t* field_info) : m_field(field_info) {}
@@ -27,11 +27,13 @@ public:
         return m_field->set<T>(ptr, value);
     }
 
+    refl::efield_type get_type() const noexcept { return m_field->get_type(); }
+
 private:
     refl::rfield_t* m_field;
 };
 
-class hfunction_t : public hobject_t
+class DLLEXPORT hfunction_t : public hobject_t
 {
 public:
     hfunction_t(refl::rfunction_t* func_info) : m_func(func_info){};
