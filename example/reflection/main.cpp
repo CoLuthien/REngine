@@ -5,21 +5,18 @@
 
 #include <cstddef>
 
-struct S
+class T1 : public ivd::hobject_t
 {
 public:
-    template <class T, std::size_t I>
-    class A; // S::A is public
-    template <class T, std::size_t I>
-    using Inner = A<T, I>;
+    GENERATE_BODY()
 
-private:
-    template <class X>
-    class A<X, 0>
-    {
-    public:
-        static constexpr int x = 1;
-    }; // error: cannot change access
+};
+
+class T2 : public ivd::hobject_t
+{
+public:
+    GENERATE_BODY()
+
 };
 
 class Sample : public ivd::hobject_t
@@ -47,10 +44,12 @@ main()
 {
 
     auto* ptr = new Sample{};
-    std::cout << "x is: " << S::Inner<S, 0>::x << '\n';
     // ptr->x = ptr->y = ptr->z = 12; # error!
+    auto* ptr2 = new Sample{};
 
     auto* clazz = Sample::static_class();
+
+    std::cout << ptr->is_a(ptr2) << '\n';
 
     // auto z = ptr->z;
 

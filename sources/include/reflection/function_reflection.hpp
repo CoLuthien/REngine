@@ -100,6 +100,14 @@ struct gather_functions
     }
 };
 
+template <class Target>
+struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
+{
+    static consteval std::pair<std::string_view, refl::rfunction_t*> get_entry()
+    {
+        return std::pair<std::string_view, refl::rfunction_t*>{};
+    }
+};
 } // namespace refl
 
 #define INFER_FUNC_TYPE(NAME)                                                            \

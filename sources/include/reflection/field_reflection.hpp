@@ -1,7 +1,6 @@
 
 #pragma once
 
-
 #include "reflection_types.hpp"
 #include "reflection_concepts.hpp"
 #include "reflection_utils.hpp"
@@ -118,6 +117,15 @@ struct gather_fields
     static consteval std::pair<std::string_view, refl::rfield_t*> get_entry()
     {
         return std::make_pair(name, const_cast<rfield_t*>(&instance));
+    }
+};
+
+template <class Target>
+struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
+{
+    static consteval std::pair<std::string_view, refl::rfield_t*> get_entry()
+    {
+        return {};
     }
 };
 

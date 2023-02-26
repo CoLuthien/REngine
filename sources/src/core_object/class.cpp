@@ -7,7 +7,7 @@ namespace ivd
 {
 
 hfunction_t const* DLLEXPORT
-hclass_t::find_func(std::string_view name)
+hclass_t::find_func(std::string_view name) const
 {
     auto iter = m_functions.find(name);
     if (iter == m_functions.end())
@@ -18,7 +18,7 @@ hclass_t::find_func(std::string_view name)
     return &(iter->second);
 }
 hfield_t const* DLLEXPORT
-hclass_t::find_field(std::string_view name)
+hclass_t::find_field(std::string_view name) const
 {
     auto const iter = m_fields.find(name);
     return iter == m_fields.end() ? nullptr : &(iter->second);

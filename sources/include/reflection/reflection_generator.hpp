@@ -32,7 +32,12 @@ struct to_array
 template <template <class, std::size_t> class Info, class Target>
 struct to_array<Info, Target, 0>
 {
-    static consteval auto entry_point() { return nullptr; }
+    static consteval auto entry_point()
+    {
+        using type =
+            decltype(Info<Target, std::numeric_limits<std::size_t>::max()>::get_entry());
+        return std::array<type, 1>{};
+    }
     template <typename... Args>
     static consteval auto recurse(Args... args)
     {
@@ -59,6 +64,7 @@ struct reflect_all_t
 template <template <class, std::size_t> class R, template <class> class C>
 struct reflect_all_t<meta::null_list, R, C>
 {
+    static inline consteval auto entry() { return recurse(); }
     static inline consteval auto recurse() { return nullptr; }
 };
 } // namespace refl
