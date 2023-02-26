@@ -66,7 +66,7 @@ public:
     hfunction_t const* find_func(std::string_view name) const;
     hfield_t const* find_field(std::string_view name) const;
 
-    hclass_t const* get_super() const { return m_super; }
+    hclass_t const* get_super() const noexcept { return m_super; }
 
 private:
     hclass_t const* m_super;

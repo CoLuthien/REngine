@@ -44,7 +44,7 @@ class hclass_t;
 #define REFLECT_CLASS()                                                                  \
     DECLARE_TYPE();                                                                      \
     using pedigree_list = meta::list::push_front<super::pedigree_list, this_type>;       \
-    virtual ivd::hclass_t const* get_class() const override                              \
+    virtual ivd::hclass_t const* get_class() const noexcept override                     \
     {                                                                                    \
         return this_type::static_class();                                                \
     }                                                                                    \

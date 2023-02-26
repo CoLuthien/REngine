@@ -15,7 +15,7 @@ hobject_t::static_class()
 }
 
 hclass_t const*
-hobject_t::get_class() const
+hobject_t::get_class() const noexcept
 {
     return static_class();
 }
@@ -23,7 +23,7 @@ hobject_t::get_class() const
 bool
 hobject_t::is_child_of(hclass_t const* this_class, hclass_t const* other_class)
 {
-    for (auto* next = this_class; next; next = next->get_super())
+    for (auto const* next = this_class; next; next = next->get_super())
     {
         if (next == other_class)
         {

@@ -1,5 +1,6 @@
 
 #pragma once
+#include <iostream>
 
 #include "templates/concepts.hpp"
 #include "reflection/reflection.hpp"
@@ -28,18 +29,16 @@ public:
 public:
     hobject_t();
 
-    virtual hclass_t const* get_class() const;
+    virtual hclass_t const* get_class() const noexcept;
 
 public: // safe fast runtime cast impl starts
-    template <hobject_type T>
+    template <typename T>
     inline bool is_a()
     {
         return is_child_of(get_class(), T::static_class());
     }
 
-    inline bool is_a(hclass_t* other) { return get_class() == other; }
-
-    template <hobject_type T>
+    template <typename T>
     inline bool is_a(T* other)
     {
         if (other == nullptr)
