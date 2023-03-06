@@ -3,7 +3,7 @@
 #include <iostream>
 
 #include "templates/concepts.hpp"
-#include "reflection/reflection.hpp"
+#include "object_macros.hpp"
 
 #include "meta/type_list.hpp"
 #include "HAL/platforms.hpp"
@@ -18,8 +18,13 @@ enum eobject_flag
 };
 namespace ivd
 {
-
 class hclass_t;
+class hobject_t;
+
+} // namespace ivd
+
+namespace ivd
+{
 
 class DLLEXPORT hobject_t
 {
@@ -27,9 +32,11 @@ public:
     GENERATE_HOBJECT_BODY();
 
 public:
-    hobject_t();
+    hobject_t()          = default;
+    virtual ~hobject_t() = default;
 
-    virtual hclass_t const* get_class() const noexcept;
+    void init_property(hclass_t* in_class);
+    hclass_t const* get_class() const noexcept { return self_class; }
 
 public: // safe fast runtime cast impl starts
     template <typename T>
@@ -57,9 +64,7 @@ private:
 
 private:
     eobject_flag m_flag;
-
-private:
-    std::size_t m_gcidx;
+    hclass_t* self_class;
 };
 
 } // namespace ivd

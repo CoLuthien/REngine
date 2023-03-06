@@ -1,27 +1,22 @@
 
 
-#include "core/core.hpp"
-#include <string_view>
-#include <iostream>
+#pragma once
 
-#include <cstddef>
+#include "test.h"
+#include "core/core.hpp"
 
 class T1 : public ivd::hobject_t
 {
 public:
-    GENERATE_BODY()
+    GENERATE_BODY();
+    virtual ~T1() = default;
 };
 
-class T2 : public ivd::hobject_t
-{
-public:
-    GENERATE_BODY()
-};
-
-class Sample : public T2
+class Sample : public T1
 {
 public:
     GENERATE_BODY();
+    virtual ~Sample() = default;
 
 public:
     REFLECT_FUNCTION(add, int, int);
@@ -43,15 +38,4 @@ class T3 : public Sample
     GENERATE_BODY();
 };
 
-int
-main()
-{
-    auto* sample = new Sample{};
-
-    auto* ptr = cast<T2>(sample);
-    if (ptr == nullptr)
-    {
-        std::cout << "fuck";
-    }
-
-}
+T1* get_object();
