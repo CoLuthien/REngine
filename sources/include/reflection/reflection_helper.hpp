@@ -36,13 +36,21 @@ template <class Target, size_t I>
 static inline constexpr auto
 field_type_e()
 {
-    using type = std::remove_pointer_t<std::decay_t<field_value_t<Target, I>>>;
+    using type      = std::decay_t<field_value_t<Target, I>>;
+    using real_type = std::remove_pointer_t<type>;
 
-    if constexpr (is_reflected_type<type>)
+    if constexpr (is_reflected_type<real_type>)
     {
-        return efield_type::REFLECTED;
+        if constexpr (std::is_pointer_v<type>)
+        {
+            return efield_type::REFLECTED_PTR;
+        }
+        else
+        {
+            return efield_type::REFLECTED;
+        }
     }
-    else if constexpr (std::is_fundamental_v<type>)
+    else if constexpr (std::is_fundamental_v<real_type>)
     {
         return efield_type::PRIM;
     }

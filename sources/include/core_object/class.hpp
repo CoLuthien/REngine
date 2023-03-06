@@ -51,6 +51,8 @@ private:
 class DLLEXPORT hclass_t : public hobject_t
 {
 public:
+    using field_iter = std::unordered_map<std::string_view, hfield_t>::const_iterator;
+    using func_iter  = std::unordered_map<std::string_view, hfunction_t>::const_iterator;
     template <class Ps, class Fs>
     hclass_t(refl::rclass_t const&& self_class,
              hclass_t const* super_class,
@@ -64,7 +66,10 @@ public:
 
 public:
     hfunction_t const* find_func(std::string_view name) const;
+
     hfield_t const* find_field(std::string_view name) const;
+    field_iter field_begin() { return m_fields.begin(); }
+    field_iter field_end() { return m_fields.end(); }
 
     hclass_t const* get_super() const noexcept { return m_super; }
 

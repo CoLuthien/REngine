@@ -6,18 +6,16 @@
 
 namespace ivd
 {
-hobject_t::hobject_t() = default;
-
 hclass_t*
 hobject_t::static_class()
 {
     return nullptr; // todo
 }
 
-hclass_t const*
-hobject_t::get_class() const noexcept
+void 
+hobject_t::init_property(hclass_t* in_class)
 {
-    return static_class();
+    self_class = in_class;
 }
 
 bool

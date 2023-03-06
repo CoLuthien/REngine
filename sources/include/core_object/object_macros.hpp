@@ -1,35 +1,45 @@
 
 #pragma once
 
+#include "reflection/reflection.hpp"
 
-
-#define ENUM_ENTRY(NAME)                                                                 \
-    struct detail_##NAME##_enum_tag;                                                     \
-    static constexpr std::size_t NAME =                                                  \
-        refl::detail::index<detail_##NAME##_enum_tag, detail_field_reflection>::value;   \
-    template <class T>                                                                   \
-    struct detail_field_reflection<detail_##NAME##_field_index, T>                       \
+#define GENERATE_BODY()                                                                  \
+    REFLECT_CLASS();                                                                     \
+                                                                                         \
+public:                                                                                  \
+    this_type& operator=(this_type const&) = delete;                                     \
+    this_type& operator=(this_type&&)      = delete;                                     \
+                                                                                         \
+public:                                                                                  \
+    inline static ivd::hclass_t* static_class()                                          \
     {                                                                                    \
-        using value_type                       = TYPES;                                  \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using pointer_type = value_type U::*;                                            \
-        template <class U>                                                               \
-        static constexpr value_type U::*pointer_value = &U::NAME;                        \
-    };
+        static auto instance = ivd::hclass_t(reflected_class(),                          \
+                                             super::static_class(),                      \
+                                             reflected_fields(),                         \
+                                             reflected_functions());                     \
+        return &instance;                                                                \
+    }
 
-#define ENUM_ENTRY_BITFIELD(NAME)                                                        \
-    struct detail_##NAME##_enum_tag;                                                     \
-    static constexpr std::size_t NAME =                                                  \
-        1 << refl::detail::index<detail_##NAME##_enum_tag,                               \
-                                 detail_field_reflection>::value;                        \
-    template <class T>                                                                   \
-    struct detail_field_reflection<detail_##NAME##_field_index, T>                       \
-    {                                                                                    \
-        using value_type                       = TYPES;                                  \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using pointer_type = value_type U::*;                                            \
-        template <class U>                                                               \
-        static constexpr value_type U::*pointer_value = &U::NAME;                        \
-    };
+#define GENERATE_HOBJECT_BODY()                                                          \
+public:                                                                                  \
+    using super         = std::nullptr_t;                                                \
+    using this_type     = hobject_t;                                                     \
+    using pedigree_list = meta::typelist<super>;                                         \
+    static ivd::hclass_t* static_class();                                                \
+                                                                                         \
+private:                                                                                 \
+    REFLECT_CLASS_INFO();                                                                \
+    REFLECT_FIELDS_INFO();                                                               \
+    REFLECT_FUNCTIONS_INFO();                                                            \
+                                                                                         \
+public:                                                                                  \
+    template <std::size_t, class>                                                        \
+    struct detail_field_reflection;                                                      \
+    template <std::size_t, class>                                                        \
+    struct detail_function_reflection;                                                   \
+                                                                                         \
+public:                                                                                  \
+    hobject_t& operator=(hobject_t const&) = delete;                                     \
+    hobject_t(hobject_t const&)            = delete;                                     \
+    hobject_t& operator=(hobject_t&&)      = delete;                                     \
+    hobject_t(hobject_t&&)                 = delete;

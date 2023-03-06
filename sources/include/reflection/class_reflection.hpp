@@ -10,7 +10,6 @@ class rclass_t
 private:
     struct class_iface_t
     {
-        virtual void* make_instance() const = 0;
     };
 
     template <class Target>
@@ -31,14 +30,6 @@ private:
 
 private:
     constexpr rclass_t(class_iface_t const* ptr) : m_info(ptr) {}
-
-    template <class Target, typename... Args>
-    Target* make_instance(Args... args) const
-    {
-        using type = class_info_t<Target>;
-        return static_cast<type const*>(m_info)->make_instance(
-            std::forward<Args>(args)...);
-    }
 };
 
 template <class Target>
@@ -46,9 +37,9 @@ struct rclass_t::class_info_t : rclass_t::class_iface_t
 {
 public:
     static constinit class_info_t const class_info;
+
 public:
     static constexpr auto reflected_info() { return &class_info; }
-    virtual void* make_instance() const override { return new Target{}; }
     template <typename... Args>
     Target* make_instance(Args... args) const
     {
