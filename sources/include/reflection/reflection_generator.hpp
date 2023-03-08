@@ -36,7 +36,7 @@ struct to_array<Info, Target, 0>
     {
         using type =
             decltype(Info<Target, std::numeric_limits<std::size_t>::max()>::get_entry());
-        return std::array<type, 1>{};
+        return std::array<type, 0>{};
     }
     template <typename... Args>
     static consteval auto recurse(Args... args)

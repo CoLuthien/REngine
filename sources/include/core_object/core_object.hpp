@@ -5,3 +5,4 @@
 #include "class.hpp"
 #include "object_allocators.hpp"
 #include "templates/casts.hpp"
+#include "object_array.hpp"

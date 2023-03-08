@@ -6,7 +6,7 @@
 
 namespace ivd
 {
-class hobject_t;
+class hobject;
 }
 
 namespace refl

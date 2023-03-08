@@ -1,25 +1,9 @@
 
-#include "core_object/class.hpp"
+#include "core/core.hpp"
 #include <string_view>
 #include <iostream>
 
-#include <cstddef>
-
-class T1 : public ivd::hobject_t
-{
-public:
-    GENERATE_BODY()
-
-};
-
-class T2 : public ivd::hobject_t
-{
-public:
-    GENERATE_BODY()
-
-};
-
-class Sample : public ivd::hobject_t
+class Sample : public ivd::hobject
 {
 public:
     GENERATE_BODY();
@@ -32,26 +16,30 @@ public:
         return a + b;
     }
 
-private:
-    REFLECT_FIELD(int const, x);
-    REFLECT_FIELD(int const, y);
-    REFLECT_FIELD(int const, z);
+public:
+    REFLECT_FIELD(int, x);
     REFLECT_FIELD(int, w);
+};
+
+class Test : public Sample 
+{
+public:
+    GENERATE_BODY();
+
+};
+
+class Test2 : public Test
+{
+public:
+    GENERATE_BODY();
+
 };
 
 int
 main()
 {
-
-    auto* ptr = new Sample{};
-    // ptr->x = ptr->y = ptr->z = 12; # error!
-    auto* ptr2 = new Sample{};
-
+    auto* ptr   = new_object<Sample>(nullptr);
     auto* clazz = Sample::static_class();
-
-    std::cout << ptr->is_a(ptr2) << '\n';
-
-    // auto z = ptr->z;
 
     auto func_add = clazz->find_func("add");
 
@@ -60,26 +48,14 @@ main()
         int x = func_add->invoke<int>(ptr, 1, 2);
     }
 
-    auto prop_x = clazz->find_field("x");
-    if (prop_x != nullptr)
-    {
-        std::cout << "field name: x found, value is: " << prop_x->get<int>(ptr) << '\n';
-
-        std::cout << "field name: x, try set value as: 12\n";
-        prop_x->set<int>(ptr, 12);
-
-        std::cout << "field name: x, setted value is: " << prop_x->get<int>(ptr) << '\n';
-    }
+    ptr->w = 0;
 
     auto prop_w = clazz->find_field("w");
     if (prop_w != nullptr)
     {
-        std::cout << "field name: w found, value is: " << prop_x->get<int>(ptr) << '\n';
-
-        std::cout << "field name: w, try set value as: 12\n";
-        prop_w->set<int>(ptr, 12);
-
-        std::cout << "field name: w, setted value is: " << prop_w->get<int>(ptr) << '\n';
+        int value = prop_w->get<int>(ptr); // 0
+        prop_w->set<int>(ptr, 12);         // set to 12
+        value = prop_w->get<int>(ptr);     // 12
     }
 
     return 0;

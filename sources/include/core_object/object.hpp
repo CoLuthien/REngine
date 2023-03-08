@@ -1,42 +1,42 @@
 
 #pragma once
-#include <iostream>
 
 #include "templates/concepts.hpp"
 #include "object_macros.hpp"
-
-#include "meta/type_list.hpp"
-#include "HAL/platforms.hpp"
+#include "object_globals.hpp"
 #include <cstddef>
 
-enum eobject_flag
-{
-    REFL_TYPE    = 1 << 0,
-    UNREACHABLE  = 1 << 1,
-    PENDING_KILL = 1 << 2,
-    ROOT_OBJECT  = 1 << 3,
-};
 namespace ivd
 {
-class hclass_t;
-class hobject_t;
+class hclass;
+class hobject;
 
 } // namespace ivd
 
 namespace ivd
 {
 
-class DLLEXPORT hobject_t
+class DLLEXPORT hobject
 {
+    friend class hobject_array;
+    friend class garbage_collector;
+
 public:
     GENERATE_HOBJECT_BODY();
 
 public:
-    hobject_t()          = default;
-    virtual ~hobject_t() = default;
+    hobject();
+    virtual ~hobject();
 
-    void init_property(hclass_t* in_class);
-    hclass_t const* get_class() const noexcept { return self_class; }
+public:
+    void init_property(hclass* in_class);
+    hclass* get_class() const noexcept { return self_class; }
+
+public:
+    static bool is_valid(hobject* ptr);
+    void set_flags(object_flag const flag) { m_flag = m_flag | flag; }
+    void clear_flags(object_flag const flag) { m_flag = m_flag & ~flag; }
+    object_flag get_flag() const { return m_flag; }
 
 public: // safe fast runtime cast impl starts
     template <typename T>
@@ -60,11 +60,12 @@ public: // safe fast runtime cast impl starts
     }
 
 private:
-    bool is_child_of(hclass_t const* this_class, hclass_t const* other_class);
+    bool is_child_of(hclass const* this_class, hclass const* other_class);
 
 private:
-    eobject_flag m_flag;
-    hclass_t* self_class;
+    std::size_t m_idx;
+    object_flag m_flag = eobject_flag::UNREACHABLE;
+    hclass* self_class;
 };
 
 } // namespace ivd

@@ -9,11 +9,13 @@
 namespace ivd
 {
 
-class DLLEXPORT hfield_t : public hobject_t
+class DLLEXPORT hfield : public hobject
 {
 public:
-    hfield_t(refl::rfield_t* field_info) : m_field(field_info) {}
-    // todo: make type flag that is for making antigen for GC
+    hfield(refl::rfield_t* field_info) : m_field(field_info)
+    {
+        assert(m_field != nullptr);
+    }
 
     template <class T>
     T get(void* ptr) const
@@ -24,19 +26,27 @@ public:
     template <class T>
     void set(void* ptr, T value) const
     {
-        return m_field->set<T>(ptr, value);
+        m_field->set<T>(ptr, value);
     }
 
-    refl::efield_type get_type() const noexcept { return m_field->get_type(); }
+    refl::efield_type get_type() const noexcept
+    {
+        if (m_field)
+        {
+            return m_field->get_type();
+        }
+        
+        return refl::efield_type::INVALID;
+    }
 
 private:
     refl::rfield_t* m_field;
 };
 
-class DLLEXPORT hfunction_t : public hobject_t
+class DLLEXPORT hfunction : public hobject
 {
 public:
-    hfunction_t(refl::rfunction_t* func_info) : m_func(func_info){};
+    hfunction(refl::rfunction_t* func_info) : m_func(func_info){};
 
     template <typename R, typename... Args>
     R invoke(void* obj, Args... args) const
@@ -48,16 +58,15 @@ private:
     refl::rfunction_t* m_func;
 };
 
-class DLLEXPORT hclass_t : public hobject_t
+class DLLEXPORT hclass : public hobject
 {
 public:
-    using field_iter = std::unordered_map<std::string_view, hfield_t>::const_iterator;
-    using func_iter  = std::unordered_map<std::string_view, hfunction_t>::const_iterator;
+    using field_iter = std::unordered_map<std::string_view, hfield>::const_iterator;
     template <class Ps, class Fs>
-    hclass_t(refl::rclass_t const&& self_class,
-             hclass_t const* super_class,
-             Ps const&& field_map,
-             Fs const&& func_map)
+    hclass(refl::rclass const&& self_class,
+           hclass const* super_class,
+           Ps const&& field_map,
+           Fs const&& func_map)
         : m_self(self_class), m_super(super_class),
           m_fields(field_map.begin(), field_map.end()),
           m_functions(func_map.begin(), func_map.end())
@@ -65,19 +74,17 @@ public:
     }
 
 public:
-    hfunction_t const* find_func(std::string_view name) const;
+    hfunction const* find_func(std::string_view name) const;
 
-    hfield_t const* find_field(std::string_view name) const;
-    field_iter field_begin() { return m_fields.begin(); }
-    field_iter field_end() { return m_fields.end(); }
-
-    hclass_t const* get_super() const noexcept { return m_super; }
+    hfield const* find_field(std::string_view name) const;
+    hclass const* get_super() const noexcept { return m_super; }
+    auto const& get_fields() { return m_fields; }
 
 private:
-    hclass_t const* m_super;
-    refl::rclass_t m_self;
-    std::unordered_map<std::string_view, hfunction_t> const m_functions;
-    std::unordered_map<std::string_view, hfield_t> const m_fields;
+    hclass const* m_super;
+    refl::rclass m_self;
+    std::unordered_map<std::string_view, hfunction> const m_functions;
+    std::unordered_map<std::string_view, hfield> const m_fields;
 };
 
 } // namespace ivd

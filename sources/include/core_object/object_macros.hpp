@@ -10,22 +10,31 @@ public:                                                                         
     this_type& operator=(this_type const&) = delete;                                     \
     this_type& operator=(this_type&&)      = delete;                                     \
                                                                                          \
-public:                                                                                  \
-    inline static ivd::hclass_t* static_class()                                          \
+private:                                                                                 \
+    template <ivd::hobject_type T, typename... Args>                                     \
+    friend T* new_object(ivd::hobject* outer, Args... args);                             \
+                                                                                         \
+    static void* operator new(std::size_t count)                                         \
     {                                                                                    \
-        static auto instance = ivd::hclass_t(reflected_class(),                          \
-                                             super::static_class(),                      \
-                                             reflected_fields(),                         \
-                                             reflected_functions());                     \
+        return ::operator new(count);                                                    \
+    }                                                                                    \
+                                                                                         \
+public:                                                                                  \
+    inline static ivd::hclass* static_class()                                            \
+    {                                                                                    \
+        static auto instance = ivd::hclass(reflected_class(),                            \
+                                           super::static_class(),                        \
+                                           reflected_fields(),                           \
+                                           reflected_functions());                       \
         return &instance;                                                                \
     }
 
 #define GENERATE_HOBJECT_BODY()                                                          \
 public:                                                                                  \
     using super         = std::nullptr_t;                                                \
-    using this_type     = hobject_t;                                                     \
+    using this_type     = hobject;                                                       \
     using pedigree_list = meta::typelist<super>;                                         \
-    static ivd::hclass_t* static_class();                                                \
+    static ivd::hclass* static_class();                                                  \
                                                                                          \
 private:                                                                                 \
     REFLECT_CLASS_INFO();                                                                \
@@ -39,7 +48,7 @@ public:                                                                         
     struct detail_function_reflection;                                                   \
                                                                                          \
 public:                                                                                  \
-    hobject_t& operator=(hobject_t const&) = delete;                                     \
-    hobject_t(hobject_t const&)            = delete;                                     \
-    hobject_t& operator=(hobject_t&&)      = delete;                                     \
-    hobject_t(hobject_t&&)                 = delete;
+    hobject& operator=(hobject const&) = delete;                                         \
+    hobject(hobject const&)            = delete;                                         \
+    hobject& operator=(hobject&&)      = delete;                                         \
+    hobject(hobject&&)                 = delete;

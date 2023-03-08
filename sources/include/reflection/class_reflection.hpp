@@ -5,7 +5,7 @@
 namespace refl
 {
 
-class rclass_t
+class rclass
 {
 private:
     struct class_iface_t
@@ -16,24 +16,24 @@ private:
     struct class_info_t;
 
 public:
-    rclass_t() = delete;
+    rclass() = delete;
 
     template <typename Target>
     static constexpr auto make_class()
     {
         using type = class_info_t<Target>;
-        return rclass_t(type::reflected_info());
+        return rclass(type::reflected_info());
     }
 
 private:
     class_iface_t const* m_info;
 
 private:
-    constexpr rclass_t(class_iface_t const* ptr) : m_info(ptr) {}
+    constexpr rclass(class_iface_t const* ptr) : m_info(ptr) {}
 };
 
 template <class Target>
-struct rclass_t::class_info_t : rclass_t::class_iface_t
+struct rclass::class_info_t : rclass::class_iface_t
 {
 public:
     static constinit class_info_t const class_info;
@@ -48,7 +48,7 @@ public:
 };
 
 template <class Target>
-constinit rclass_t::class_info_t<Target> const
-    rclass_t::class_info_t<Target>::class_info = {};
+constinit rclass::class_info_t<Target> const
+    rclass::class_info_t<Target>::class_info = {};
 
 } // namespace refl

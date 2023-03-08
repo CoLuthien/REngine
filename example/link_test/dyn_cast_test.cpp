@@ -11,11 +11,10 @@
 
 #include <frozen/set.h>
 
-
 int
 main()
 {
-    ivd::hobject_t* test[10000] = {};
+    ivd::hobject* test[10000] = {};
 
     for (int i = 0; i < 10000; i++)
     {

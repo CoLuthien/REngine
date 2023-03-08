@@ -1,8 +1,10 @@
 
 set(CORE_SRCS
-    ./object.cpp
-    ./garbage_collection.cpp
-    ./class.cpp
+    object.cpp
+    class.cpp
+    object_array.cpp
+    object_allocators.cpp
+
 )
 
 add_library(core_object

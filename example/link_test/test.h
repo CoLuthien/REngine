@@ -5,7 +5,7 @@
 #include "test.h"
 #include "core/core.hpp"
 
-class T1 : public ivd::hobject_t
+class T1 : public ivd::hobject
 {
 public:
     GENERATE_BODY();
@@ -22,7 +22,6 @@ public:
     REFLECT_FUNCTION(add, int, int);
     int add(int a, int b)
     {
-        std::cout << "add " << a << " and " << b << '\n';
         return a + b;
     }
 

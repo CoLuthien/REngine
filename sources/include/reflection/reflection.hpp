@@ -15,7 +15,7 @@
 
 namespace ivd
 {
-class hclass_t;
+class hclass;
 
 } // namespace ivd
 
@@ -38,7 +38,7 @@ class hclass_t;
 #define REFLECT_CLASS_INFO()                                                             \
     static consteval auto reflected_class()                                              \
     {                                                                                    \
-        return refl::rclass_t::make_class<this_type>();                                  \
+        return refl::rclass::make_class<this_type>();                                  \
     }
 
 #define REFLECT_CLASS()                                                                  \

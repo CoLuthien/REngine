@@ -3,7 +3,7 @@
 
 namespace ivd
 {
-    class hclass_t;
+    class hclass;
 }
 
-ivd::hclass_t* get_another();
+ivd::hclass* get_another();

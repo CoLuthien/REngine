@@ -10,6 +10,7 @@ enum class efield_type : unsigned int
     REGULAR       = 1,
     REFLECTED     = 2,
     REFLECTED_PTR = 3,
+    INVALID,
 };
 
 } // namespace refl

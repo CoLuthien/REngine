@@ -4,7 +4,7 @@
 
 #include <core/core.hpp>
 
-ivd::hclass_t*
+ivd::hclass*
 get_another()
 {
     return Sample::static_class();
