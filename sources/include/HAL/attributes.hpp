@@ -10,9 +10,8 @@
 
 #endif
 
-#ifndef DLLEXPORT
+#ifndef IVDAPI
 
-#define DLLEXPORT
-#define DLLIMPORT
+#define IVDAPI
 
 #endif

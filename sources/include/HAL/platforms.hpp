@@ -1,6 +1,5 @@
 
 #pragma once
-
 #if defined(_WIN64)
 
 #include "windows/platforms.hpp"
@@ -12,4 +11,7 @@
 #endif
 
 #include "attributes.hpp"
+
+#define GLFW_INCLUDE_VULKAN
+
 

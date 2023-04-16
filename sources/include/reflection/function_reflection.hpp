@@ -4,12 +4,12 @@
 #include "reflection_utils.hpp"
 #include "reflection_concepts.hpp"
 #include "reflection_helper.hpp"
-#include "traits/func_traits.hpp"
+#include "meta/func_traits.hpp"
 
 namespace refl
 {
 
-class rfunction_t
+class rfunction
 {
 public:
     template <class Target, std::size_t I>
@@ -20,7 +20,7 @@ public:
                                                I,
                                                typename trait::result_type,
                                                typename trait::args_type>::type;
-        return rfunction_t(info_type::reflected_info());
+        return rfunction(info_type::reflected_info());
     }
 
     template <typename R, typename... Args>
@@ -42,7 +42,7 @@ private:
     handle_t const* m_info;
 
 private:
-    constexpr rfunction_t(handle_t const* handle) : m_info(handle) {}
+    constexpr rfunction(handle_t const* handle) : m_info(handle) {}
     template <typename Target, std::size_t I, typename R, typename Tuple>
     struct strip_tuple;
 
@@ -53,20 +53,20 @@ private:
     };
 };
 
-struct rfunction_t::handle_t
+struct rfunction::handle_t
 {
     virtual ~handle_t() = default;
 };
 
 template <typename R, typename... Args>
-struct rfunction_t::field_iface_t : public rfunction_t::handle_t
+struct rfunction::field_iface_t : public rfunction::handle_t
 {
     virtual ~field_iface_t()                                = default;
     virtual R invoke_impl(void* object, Args... args) const = 0;
 };
 
 template <class Target, std::size_t I, typename R, typename... Args>
-struct rfunction_t::field_info_t : public rfunction_t::field_iface_t<R, Args...>
+struct rfunction::field_info_t : public rfunction::field_iface_t<R, Args...>
 {
     using owner_type   = Target;
     using pointer_type = func_pointer_t<Target, I>;
@@ -86,26 +86,26 @@ struct rfunction_t::field_info_t : public rfunction_t::field_iface_t<R, Args...>
 };
 
 template <class Target, std::size_t I, typename R, typename... Args>
-constinit rfunction_t::field_info_t<Target, I, R, Args...> const
-    rfunction_t::field_info_t<Target, I, R, Args...>::field_info = {};
+constinit rfunction::field_info_t<Target, I, R, Args...> const
+    rfunction::field_info_t<Target, I, R, Args...>::field_info = {};
 
 template <class Target, std::size_t Index>
 struct gather_functions
 {
-    static constexpr auto instance = refl::rfunction_t::reflect_field<Target, Index>();
+    static constexpr auto instance = refl::rfunction::reflect_field<Target, Index>();
     static constexpr auto name     = func_name_v<Target, Index>;
-    static consteval std::pair<std::string_view, refl::rfunction_t*> get_entry()
+    static consteval std::pair<std::string_view, refl::rfunction*> get_entry()
     {
-        return std::make_pair(name, const_cast<rfunction_t*>(&instance));
+        return std::make_pair(name, const_cast<rfunction*>(&instance));
     }
 };
 
 template <class Target>
 struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
 {
-    static consteval std::pair<std::string_view, refl::rfunction_t*> get_entry()
+    static consteval std::pair<std::string_view, refl::rfunction*> get_entry()
     {
-        return std::pair<std::string_view, refl::rfunction_t*>{};
+        return std::pair<std::string_view, refl::rfunction*>{};
     }
 };
 } // namespace refl

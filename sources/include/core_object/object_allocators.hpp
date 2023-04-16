@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-void DLLEXPORT new_object_internal(ivd::hobject* self);
+IVDAPI void new_object_internal(ivd::hobject* self);
 
 template <ivd::hobject_type T, typename... Args>
 T*

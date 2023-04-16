@@ -16,7 +16,7 @@ class hobject;
 namespace ivd
 {
 
-class DLLEXPORT hobject
+class IVDAPI hobject
 {
     friend class hobject_array;
     friend class garbage_collector;

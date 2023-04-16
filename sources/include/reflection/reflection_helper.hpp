@@ -3,6 +3,7 @@
 
 #include "reflection_utils.hpp"
 #include "reflection_concepts.hpp"
+#include "reflection_types.hpp"
 #include "meta/type_list.hpp"
 #include "meta/array.hpp"
 

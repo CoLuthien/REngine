@@ -3,11 +3,12 @@
 
 #include "core_object/object.hpp"
 #include "core_object/object_array.hpp"
-#include <iostream>
+#include <algorithm>
 
 namespace ivd
 {
-static hobject_array* object_array = hobject_array::instance();
+
+static inline hobject_array* object_array = hobject_array::instance();
 
 static void
 mark(hobject* object)
@@ -22,7 +23,6 @@ mark(hobject* object)
     auto const& fields = cls->get_fields();
 
     object->clear_flags(eobject_flag::UNREACHABLE);
-
     for (auto& [name, field] : fields)
     {
         auto const type = field.get_type();
@@ -41,6 +41,7 @@ mark(hobject* object)
 void
 garbage_collector::mark_objects()
 {
+    // loop over by rootset
     for (auto const idx : m_rootset)
     {
         hobject* cur = object_array->idx_to_object(idx);
@@ -54,7 +55,7 @@ garbage_collector::mark_objects()
 void
 garbage_collector::sweep_objects()
 {
-    auto const& idxs = object_array->get_objects();
+    auto const& idxs = object_array->get_idxs();
     std::vector<std::size_t> idx_to_remove{};
 
     for (auto idx : idxs)

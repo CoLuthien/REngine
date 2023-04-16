@@ -11,7 +11,7 @@
 namespace ivd
 {
 
-class DLLEXPORT hobject_array
+class IVDAPI hobject_array
 {
     friend class hobject;
 
@@ -27,7 +27,7 @@ public:
     void insert_object(hobject* object);
     void delete_object(hobject* object);
 
-    auto const& get_objects() { return idx_used; }
+    auto const& get_idxs() { return idx_used; }
 
 public:
     void return_index(std::size_t idx);
@@ -37,6 +37,7 @@ public:
 
 private:
     [[nodiscard]] std::size_t get_index();
+
 private:
     std::vector<hobject*> m_objects;
 

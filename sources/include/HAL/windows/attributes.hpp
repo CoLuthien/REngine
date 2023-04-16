@@ -1,5 +1,12 @@
 
 #pragma once
 
-#define DLLEXPORT __declspec(dllexport)
-#define DLLIMPORT __declspec(dllimport)
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+
+#if defined(IVD_BUILD_DLL)
+#define IVDAPI __declspec(dllexport)
+
+#else
+
+#define IVDAPI __declspec(dllimport)
+#endif

@@ -1,13 +1,15 @@
 
 add_executable(vulkan_tutorial
-vulkan_tutorial.cpp
+    application.cpp
+    vulkan_tutorial.cpp
 )
 
 target_link_libraries(vulkan_tutorial
+PUBLIC
+    core_object
     Vulkan::Vulkan
     glfw
     glm
-    core_object
 )
 
 target_include_directories(vulkan_tutorial

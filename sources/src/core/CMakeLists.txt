@@ -15,6 +15,9 @@ PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
 )
 
+target_compile_definitions(core 
+    PRIVATE IVD_BUILD_DLL
+)
 
 target_link_libraries(core
     core_object

@@ -9,10 +9,10 @@
 namespace ivd
 {
 
-class DLLEXPORT hfield : public hobject
+class IVDAPI hfield : public hobject
 {
 public:
-    hfield(refl::rfield_t* field_info) : m_field(field_info)
+    hfield(refl::rfield* field_info) : m_field(field_info)
     {
         assert(m_field != nullptr);
     }
@@ -40,13 +40,13 @@ public:
     }
 
 private:
-    refl::rfield_t* m_field;
+    refl::rfield* m_field;
 };
 
-class DLLEXPORT hfunction : public hobject
+class IVDAPI hfunction : public hobject
 {
 public:
-    hfunction(refl::rfunction_t* func_info) : m_func(func_info){};
+    hfunction(refl::rfunction* func_info) : m_func(func_info){};
 
     template <typename R, typename... Args>
     R invoke(void* obj, Args... args) const
@@ -55,10 +55,10 @@ public:
     }
     // implement invocation
 private:
-    refl::rfunction_t* m_func;
+    refl::rfunction* m_func;
 };
 
-class DLLEXPORT hclass : public hobject
+class IVDAPI hclass : public hobject
 {
 public:
     using field_iter = std::unordered_map<std::string_view, hfield>::const_iterator;

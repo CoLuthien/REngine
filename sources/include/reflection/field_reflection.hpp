@@ -11,14 +11,14 @@
 namespace refl
 {
 
-class rfield_t final
+class rfield final
 {
 public:
     template <class Target, std::size_t I>
     static constexpr auto reflect_field()
     {
         using info_type = field_info_t<Target, I>;
-        return rfield_t(static_cast<handle_t const*>(info_type::reflected_info()));
+        return rfield(static_cast<handle_t const*>(info_type::reflected_info()));
     }
 
 public:
@@ -46,26 +46,26 @@ private:
     struct field_info_t;
 
 private:
-    constexpr rfield_t(handle_t const* handle) : m_info(handle) {}
+    constexpr rfield(handle_t const* handle) : m_info(handle) {}
 
 private:
     handle_t const* m_info;
 };
 
-struct rfield_t::handle_t
+struct rfield::handle_t
 {
     virtual ~handle_t()                  = default;
     virtual efield_type get_type() const = 0;
 };
 
 efield_type
-rfield_t::get_type() const
+rfield::get_type() const
 {
     return m_info->get_type();
 }
 
 template <typename V>
-struct rfield_t::field_iface_t : public rfield_t::handle_t
+struct rfield::field_iface_t : public rfield::handle_t
 {
     virtual ~field_iface_t()                   = default;
     virtual V get(void* obj) const             = 0;
@@ -73,8 +73,8 @@ struct rfield_t::field_iface_t : public rfield_t::handle_t
 };
 
 template <class Target, std::size_t I>
-struct rfield_t::field_info_t final
-    : public rfield_t::field_iface_t<field_value_t<Target, I>>
+struct rfield::field_info_t final
+    : public rfield::field_iface_t<field_value_t<Target, I>>
 {
     using owner_type   = Target;
     using value_type   = field_value_t<Target, I>;
@@ -106,24 +106,24 @@ struct rfield_t::field_info_t final
 };
 
 template <class Target, std::size_t I>
-constinit rfield_t::field_info_t<Target, I> const
-    rfield_t::field_info_t<Target, I>::field_info = {};
+constinit rfield::field_info_t<Target, I> const
+    rfield::field_info_t<Target, I>::field_info = {};
 
 template <class Target, std::size_t Index>
 struct gather_fields
 {
-    static constexpr auto instance = refl::rfield_t::reflect_field<Target, Index>();
+    static constexpr auto instance = refl::rfield::reflect_field<Target, Index>();
     static constexpr std::string_view name = field_name_v<Target, Index>;
-    static consteval std::pair<std::string_view, refl::rfield_t*> get_entry()
+    static consteval std::pair<std::string_view, refl::rfield*> get_entry()
     {
-        return std::make_pair(name, const_cast<rfield_t*>(&instance));
+        return std::make_pair(name, const_cast<rfield*>(&instance));
     }
 };
 
 template <class Target>
 struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
 {
-    static consteval std::pair<std::string_view, refl::rfield_t*> get_entry()
+    static consteval std::pair<std::string_view, refl::rfield*> get_entry()
     {
         return {};
     }

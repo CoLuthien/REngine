@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "reflection_utils.hpp"
 #include "reflection_types.hpp"
 #include "reflection_concepts.hpp"
 #include "reflection_helper.hpp"
@@ -38,7 +39,7 @@ class hclass;
 #define REFLECT_CLASS_INFO()                                                             \
     static consteval auto reflected_class()                                              \
     {                                                                                    \
-        return refl::rclass::make_class<this_type>();                                  \
+        return refl::rclass::make_class<this_type>();                                    \
     }
 
 #define REFLECT_CLASS()                                                                  \

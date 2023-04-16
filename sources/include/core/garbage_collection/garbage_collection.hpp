@@ -11,7 +11,7 @@ namespace ivd
 
 class hobject;
 
-class DLLEXPORT garbage_collector
+class IVDAPI garbage_collector
 {
 public:
     garbage_collector() = default;

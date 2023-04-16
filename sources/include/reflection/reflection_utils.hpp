@@ -43,6 +43,7 @@ struct this_type_reader
 template <typename Tag, typename ThisType>
 struct this_type_writer
 {
+    // inline friend function declaration to exploit ThisType from template x(
     friend auto this_type(this_type_reader<Tag>) { return ThisType{}; }
 };
 

@@ -1,7 +1,17 @@
 
 #pragma once
 
-#define DLLEXPORT __attribute__((visibility("default")))
-#define DLLIMPORT __attribute__((visibility("default")))
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#define FORCE_INLINE __attribute__((always_inline))
 
-#define INLINE __attribute__((always_inline))
+#if defined(IVD_BUILD_DLL)
+
+#define IVDAPI __attribute__((visibility("default")))
+
+
+#else 
+
+#define IVDAPI __attribute__((visibility("default")))
+
+
+#endif
