@@ -37,7 +37,7 @@ hobject::init_property(hclass* in_class)
     self_class = in_class;
 }
 
-bool
+COREOBJECT_API bool
 hobject::is_child_of(hclass const* this_class, hclass const* other_class)
 {
     for (auto const* next = this_class; next; next = next->get_super())

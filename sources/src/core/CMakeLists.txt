@@ -16,7 +16,7 @@ PUBLIC
 )
 
 target_compile_definitions(core 
-    PRIVATE IVD_BUILD_DLL
+    PRIVATE CORE_BUILD
 )
 
 target_link_libraries(core

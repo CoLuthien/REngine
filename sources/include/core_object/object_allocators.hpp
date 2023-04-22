@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-IVDAPI void new_object_internal(ivd::hobject* self);
+COREOBJECT_API void new_object_internal(ivd::hobject* self);
 
 template <ivd::hobject_type T, typename... Args>
 T*

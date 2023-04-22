@@ -3,10 +3,11 @@
 
 #define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
 
+#define DLLIMPORT __declspec(dllimport)
+#define DLLEXPORT __declspec(dllexport)
+
 #if defined(IVD_BUILD_DLL)
-#define IVDAPI __declspec(dllexport)
-
+#define IVDAPI DLLEXPORT
 #else
-
-#define IVDAPI __declspec(dllimport)
+#define IVDAPI DLLIMPORT
 #endif

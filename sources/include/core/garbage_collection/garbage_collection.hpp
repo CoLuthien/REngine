@@ -2,6 +2,7 @@
 #pragma once
 
 #include "HAL/attributes.hpp"
+#include "core/definitions.hpp"
 
 #include <vector>
 #include <unordered_set>
@@ -11,7 +12,7 @@ namespace ivd
 
 class hobject;
 
-class IVDAPI garbage_collector
+class CORE_API garbage_collector
 {
 public:
     garbage_collector() = default;

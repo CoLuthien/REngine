@@ -3,6 +3,7 @@
 
 #include "HAL/attributes.hpp"
 #include <cstddef>
+#include <cstdint>
 
 namespace ivd
 {

@@ -4,6 +4,7 @@
 
 #include "object.hpp"
 #include "class.hpp"
+#include "core_object/definitions.hpp"
 #include <vector>
 #include <unordered_set>
 #include <atomic>
@@ -11,7 +12,7 @@
 namespace ivd
 {
 
-class IVDAPI hobject_array
+class COREOBJECT_API hobject_array
 {
     friend class hobject;
 

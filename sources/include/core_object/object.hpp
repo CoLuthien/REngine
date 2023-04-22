@@ -4,6 +4,7 @@
 #include "templates/concepts.hpp"
 #include "object_macros.hpp"
 #include "object_globals.hpp"
+#include "core_object/definitions.hpp"
 #include <cstddef>
 
 namespace ivd
@@ -16,7 +17,7 @@ class hobject;
 namespace ivd
 {
 
-class IVDAPI hobject
+class COREOBJECT_API hobject
 {
     friend class hobject_array;
     friend class garbage_collector;

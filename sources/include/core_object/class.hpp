@@ -3,19 +3,17 @@
 
 #include "object.hpp"
 #include "reflection/reflection.hpp"
+#include "definitions.hpp"
 
 #include <unordered_map>
 
 namespace ivd
 {
 
-class IVDAPI hfield : public hobject
+class COREOBJECT_API hfield : public hobject
 {
 public:
-    hfield(refl::rfield* field_info) : m_field(field_info)
-    {
-        assert(m_field != nullptr);
-    }
+    hfield(refl::rfield* field_info) : m_field(field_info) { assert(m_field != nullptr); }
 
     template <class T>
     T get(void* ptr) const
@@ -35,7 +33,7 @@ public:
         {
             return m_field->get_type();
         }
-        
+
         return refl::efield_type::INVALID;
     }
 
@@ -43,7 +41,7 @@ private:
     refl::rfield* m_field;
 };
 
-class IVDAPI hfunction : public hobject
+class COREOBJECT_API hfunction : public hobject
 {
 public:
     hfunction(refl::rfunction* func_info) : m_func(func_info){};
@@ -58,7 +56,7 @@ private:
     refl::rfunction* m_func;
 };
 
-class IVDAPI hclass : public hobject
+class COREOBJECT_API hclass : public hobject
 {
 public:
     using field_iter = std::unordered_map<std::string_view, hfield>::const_iterator;

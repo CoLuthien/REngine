@@ -6,7 +6,7 @@
 namespace ivd
 {
 
-IVDAPI hfunction const*
+COREOBJECT_API hfunction const*
 hclass::find_func(std::string_view name) const
 {
     auto iter = m_functions.find(name);
@@ -17,7 +17,7 @@ hclass::find_func(std::string_view name) const
 
     return &(iter->second);
 }
-IVDAPI hfield const*
+COREOBJECT_API hfield const*
 hclass::find_field(std::string_view name) const
 {
     auto const iter = m_fields.find(name);

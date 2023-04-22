@@ -7,6 +7,7 @@ set(CORE_SRCS
 
 )
 
+
 add_library(core_object
 SHARED
     ${CORE_SRCS}
@@ -20,7 +21,7 @@ PUBLIC
 )
 
 target_compile_definitions(core_object
-    PRIVATE IVD_BUILD_DLL
+    PRIVATE COREOBJECT_BUILD
 )
 
 target_link_libraries(core_object

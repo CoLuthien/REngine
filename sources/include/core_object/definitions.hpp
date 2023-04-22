@@ -1,0 +1,8 @@
+
+#pragma once
+
+#ifdef COREOBJECT_BUILD
+#define COREOBJECT_API DLLEXPORT
+#else
+#define COREOBJECT_API DLLIMPORT
+#endif
