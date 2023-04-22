@@ -6,10 +6,9 @@
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
 
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
-
 #include <vulkan/vulkan_raii.hpp>
+#include <GLFW/glfw3.h>
+
 
 #include <fstream>
 #include <cstdint>   // Necessary for uint32_t
