@@ -10,6 +10,7 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
     return VK_FALSE;
 }
+
 static std::vector<std::byte>
 readFile(const std::string& filename)
 {
@@ -32,9 +33,9 @@ SwapChainSupportDetails
 HelloTriangleApplication::querySwapChainSupport(vk::raii::PhysicalDevice const& device)
 {
     SwapChainSupportDetails details;
-    details.capabilities = device.getSurfaceCapabilitiesKHR(**surface);
-    details.formats      = device.getSurfaceFormatsKHR(**surface);
-    details.presentModes = device.getSurfacePresentModesKHR(**surface);
+    details.capabilities = device.getSurfaceCapabilitiesKHR(*surface);
+    details.formats      = device.getSurfaceFormatsKHR(*surface);
+    details.presentModes = device.getSurfacePresentModesKHR(*surface);
 
     return details;
 }
@@ -70,13 +71,13 @@ HelloTriangleApplication::createSurface()
 {
     VkSurfaceKHR _surface;
     if (glfwCreateWindowSurface(
-            static_cast<VkInstance>(**instance), window, nullptr, &_surface))
+            static_cast<VkInstance>(*instance), window, nullptr, &_surface))
     {
         std::cerr << "Failed to create window surface :(\n";
         exit(-1);
     }
 
-    surface = std::make_unique<vk::raii::SurfaceKHR>(*instance, _surface);
+    surface = vk::raii::SurfaceKHR(instance, _surface);
 }
 void
 HelloTriangleApplication::createInstance()
@@ -123,7 +124,47 @@ HelloTriangleApplication::createInstance()
                       .ppEnabledExtensionNames = extensions.data()};
     }
 
-    instance = std::make_unique<vk::raii::Instance>(context, createInfo);
+    instance = vk::raii::Instance{context, createInfo};
+}
+
+void
+HelloTriangleApplication::createRenderPass()
+{
+    vk::SubpassDependency dependency{
+        .srcSubpass    = VK_SUBPASS_EXTERNAL,
+        .dstSubpass    = 0,
+        .srcStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+        .dstStageMask  = vk::PipelineStageFlagBits::eColorAttachmentOutput,
+        .srcAccessMask = vk::AccessFlagBits::eNoneKHR,
+        .dstAccessMask = vk::AccessFlagBits::eColorAttachmentWrite,
+    };
+    vk::AttachmentDescription colorAttachment{
+        .format         = imageFormat,
+        .samples        = vk::SampleCountFlagBits::e1,
+        .loadOp         = vk::AttachmentLoadOp::eClear,
+        .storeOp        = vk::AttachmentStoreOp::eStore,
+        .stencilLoadOp  = vk::AttachmentLoadOp::eDontCare,
+        .stencilStoreOp = vk::AttachmentStoreOp::eDontCare,
+        .initialLayout  = vk::ImageLayout::eUndefined,
+        .finalLayout    = vk::ImageLayout::ePresentSrcKHR};
+
+    vk::AttachmentReference colorAttachmentRef{
+        .attachment = 0,
+        .layout     = vk::ImageLayout::eColorAttachmentOptimal,
+    };
+
+    vk::SubpassDescription subpass{.pipelineBindPoint = vk::PipelineBindPoint::eGraphics,
+                                   .colorAttachmentCount = 1,
+                                   .pColorAttachments    = &colorAttachmentRef};
+
+    vk::RenderPassCreateInfo renderPassInfo{.attachmentCount = 1,
+                                            .pAttachments    = &colorAttachment,
+                                            .subpassCount    = 1,
+                                            .pSubpasses      = &subpass,
+                                            .dependencyCount = 1,
+                                            .pDependencies   = &dependency};
+
+    renderPass = vk::raii::RenderPass(device, renderPassInfo);
 }
 
 vk::SurfaceFormatKHR
@@ -156,6 +197,7 @@ HelloTriangleApplication::checkDeviceExtensionSupport(
 
     return requiredExtensions.empty();
 }
+
 bool
 HelloTriangleApplication::isDeviceSuitable(vk::raii::PhysicalDevice const& device)
 {
@@ -222,7 +264,7 @@ HelloTriangleApplication::chooseSwapExtent(vk::SurfaceCapabilitiesKHR const& cap
 void
 HelloTriangleApplication::createSwapChain()
 {
-    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(*physicalDevice);
+    SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
     vk::SurfaceFormatKHR surfaceFormat =
         chooseSwapSurfaceFormat(swapChainSupport.formats);
@@ -235,14 +277,14 @@ HelloTriangleApplication::createSwapChain()
     {
         imageCount = swapChainSupport.capabilities.maxImageCount;
     }
-    QueueFamilyIndices indices    = findQueueFamilies(*physicalDevice);
+    QueueFamilyIndices indices    = findQueueFamilies(physicalDevice);
     uint32_t queueFamilyIndices[] = {indices.graphicsFamily.value(),
                                      indices.presentFamily.value()};
     vk::SwapchainCreateInfoKHR createInfo;
 
     if (indices.graphicsFamily != indices.presentFamily)
     {
-        createInfo = {.surface               = **surface,
+        createInfo = {.surface               = *surface,
                       .minImageCount         = imageCount,
                       .imageFormat           = surfaceFormat.format,
                       .imageColorSpace       = surfaceFormat.colorSpace,
@@ -255,7 +297,7 @@ HelloTriangleApplication::createSwapChain()
     }
     else
     {
-        createInfo = {.surface               = **surface,
+        createInfo = {.surface               = *surface,
                       .minImageCount         = imageCount,
                       .imageFormat           = surfaceFormat.format,
                       .imageColorSpace       = surfaceFormat.colorSpace,
@@ -272,11 +314,8 @@ HelloTriangleApplication::createSwapChain()
     createInfo.setClipped(VK_TRUE);
     createInfo.setOldSwapchain(nullptr);
 
-    swapChain =
-        std::make_unique<vk::raii::SwapchainKHR>(device->createSwapchainKHR(createInfo));
-    assert(swapChain != nullptr);
-
-    auto images = swapChain->getImages();
+    swapChain   = device.createSwapchainKHR(createInfo);
+    auto images = swapChain.getImages();
 
     swapImages  = images;
     imageFormat = surfaceFormat.format;
@@ -303,7 +342,7 @@ HelloTriangleApplication::createImageViews()
                                  .layerCount     = 1},
         };
 
-        swapImageViews.emplace_back(device->createImageView(createInfo));
+        swapImageViews.emplace_back(device.createImageView(createInfo));
     }
 }
 
@@ -315,7 +354,7 @@ HelloTriangleApplication::createShaderModule(std::vector<std::byte> const& bytec
         .pCode    = reinterpret_cast<uint32_t const*>(bytecode.data()),
     };
 
-    return std::move(device->createShaderModule(createInfo));
+    return device.createShaderModule(createInfo);
 }
 void
 HelloTriangleApplication::createGraphicsPipeline()
@@ -323,8 +362,8 @@ HelloTriangleApplication::createGraphicsPipeline()
     auto vertshader = readFile("shaders/example/shader.vert.spv");
     auto fragshader = readFile("shaders/example/shader.frag.spv");
 
-    auto vertModule = createShaderModule(vertshader);
-    auto fragModule = createShaderModule(fragshader);
+    auto vertModule{createShaderModule(vertshader)};
+    auto fragModule{createShaderModule(fragshader)};
 
     vk::PipelineShaderStageCreateInfo createVertShaderInfo{
         .stage               = vk::ShaderStageFlagBits::eVertex,
@@ -338,16 +377,102 @@ HelloTriangleApplication::createGraphicsPipeline()
         .pName               = "main",
         .pSpecializationInfo = nullptr,
     };
-    vk::PipelineShaderStageCreateInfo shaderStages[] = {
+
+    std::vector<vk::PipelineShaderStageCreateInfo> shaderStages = {
         createVertShaderInfo,
         createFragShaderInfo,
     };
+
+    std::vector<vk::DynamicState> dynamicStates = {
+        vk::DynamicState::eViewport,
+        vk::DynamicState::eScissor,
+    };
+
+    vk::PipelineDynamicStateCreateInfo dynamicStatesCreateInfo{
+        .dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
+        .pDynamicStates    = dynamicStates.data(),
+    };
+
+    vk::PipelineVertexInputStateCreateInfo vertexInputInfo{
+        .vertexBindingDescriptionCount   = 0,
+        .pVertexBindingDescriptions      = nullptr,
+        .vertexAttributeDescriptionCount = 0,
+        .pVertexAttributeDescriptions    = nullptr};
+
+    vk::PipelineInputAssemblyStateCreateInfo inputAssembly{
+        .topology               = vk::PrimitiveTopology::eTriangleList,
+        .primitiveRestartEnable = false};
+
+    vk::Viewport viewport{.x        = 0.f,
+                          .y        = 0.f,
+                          .width    = (float)imageExtent.width,
+                          .height   = (float)imageExtent.height,
+                          .minDepth = 0.f,
+                          .maxDepth = 1.f};
+    vk::Rect2D scissor{
+        .offset = {.x = 0, .y = 0},
+        .extent = imageExtent,
+    };
+
+    vk::PipelineViewportStateCreateInfo viewportState{.viewportCount = 1,
+                                                      .scissorCount  = 1};
+
+    vk::PipelineRasterizationStateCreateInfo rasterizer{
+        .depthClampEnable = false,
+        .polygonMode      = vk::PolygonMode::eFill,
+        .cullMode         = vk::CullModeFlagBits::eBack,
+        .frontFace        = vk::FrontFace::eClockwise,
+        .depthBiasEnable  = false,
+        .lineWidth        = 1.0f,
+    };
+
+    vk::PipelineMultisampleStateCreateInfo multisampleing{
+        .rasterizationSamples = vk::SampleCountFlagBits::e1,
+        .sampleShadingEnable  = false,
+    };
+
+    vk::PipelineColorBlendAttachmentState colorBlendAttachment{
+        .blendEnable    = false,
+        .colorWriteMask = vk::ColorComponentFlagBits::eR |
+                          vk::ColorComponentFlagBits::eG |
+                          vk::ColorComponentFlagBits::eB | vk::ColorComponentFlagBits::eA,
+    };
+
+    vk::PipelineColorBlendStateCreateInfo colorBlending{
+        .logicOpEnable   = false,
+        .logicOp         = vk::LogicOp::eCopy,
+        .attachmentCount = 1,
+        .pAttachments    = &colorBlendAttachment,
+    };
+
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
+    pipelineLayout = device.createPipelineLayout(pipelineLayoutInfo);
+
+    vk::GraphicsPipelineCreateInfo pipelineInfo{
+        .stageCount          = 2,
+        .pStages             = shaderStages.data(),
+        .pVertexInputState   = &vertexInputInfo,
+        .pInputAssemblyState = &inputAssembly,
+        .pViewportState      = &viewportState,
+        .pRasterizationState = &rasterizer,
+        .pMultisampleState   = &multisampleing,
+        .pColorBlendState    = &colorBlending,
+        .pDynamicState       = &dynamicStatesCreateInfo,
+        .layout              = *pipelineLayout,
+        .renderPass          = *renderPass,
+        .subpass             = 0,
+        .basePipelineHandle  = nullptr,
+        .basePipelineIndex   = -1,
+    };
+
+    graphicsPipeline =
+        device.createGraphicsPipeline(vk::raii::PipelineCache{nullptr}, pipelineInfo);
 }
 void
 HelloTriangleApplication::pickPhysicalDevice()
 {
     uint32_t deviceCount = 0;
-    auto phys_devices    = instance->enumeratePhysicalDevices();
+    auto phys_devices    = instance.enumeratePhysicalDevices();
 
     if (phys_devices.size() == 0)
     {
@@ -358,13 +483,11 @@ HelloTriangleApplication::pickPhysicalDevice()
     {
         if (isDeviceSuitable(device))
         {
-            physicalDevice =
-                std::make_unique<vk::raii::PhysicalDevice>(std::move(device));
-            break;
+            physicalDevice = device;
+            return;
         }
     }
 
-    if (physicalDevice == nullptr)
     {
         std::cerr << "failed to find GPU with required functionalities\n";
     }
@@ -383,7 +506,7 @@ HelloTriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& devi
         {
             indices.graphicsFamily = i;
         }
-        if (device.getSurfaceSupportKHR(i, **surface))
+        if (device.getSurfaceSupportKHR(i, *surface))
         {
             indices.presentFamily = i;
         }
@@ -399,7 +522,7 @@ HelloTriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& devi
 void
 HelloTriangleApplication::createLogicalDevice()
 {
-    auto indices   = findQueueFamilies(*physicalDevice);
+    auto indices   = findQueueFamilies(physicalDevice);
     float priority = 1.f;
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
@@ -439,11 +562,10 @@ HelloTriangleApplication::createLogicalDevice()
         };
     }
 
-    device        = std::make_unique<vk::raii::Device>(*physicalDevice, deviceCreateInfo);
-    graphicsQueue = std::make_unique<vk::raii::Queue>(
-        device->getQueue(indices.graphicsFamily.value(), 0));
-    presentQueue = std::make_unique<vk::raii::Queue>(
-        device->getQueue(indices.presentFamily.value(), 0));
+    device = vk::raii::Device(physicalDevice, deviceCreateInfo);
+
+    graphicsQueue = vk::raii::Queue(device.getQueue(indices.graphicsFamily.value(), 0));
+    presentQueue  = vk::raii::Queue(device.getQueue(indices.presentFamily.value(), 0));
 }
 
 bool
@@ -472,4 +594,145 @@ HelloTriangleApplication::checkValidationLayerSupport()
     }
 
     return true;
+}
+
+void
+HelloTriangleApplication::createFramebuffers()
+{
+    swapchainFramebuffers.reserve(swapImageViews.size());
+
+    for (std::size_t i = 0; i < swapImageViews.size(); i++)
+    {
+        vk::FramebufferCreateInfo framebufferInfo{.renderPass      = *renderPass,
+                                                  .attachmentCount = 1,
+                                                  .pAttachments = &(*swapImageViews[i]),
+                                                  .width        = imageExtent.width,
+                                                  .height       = imageExtent.height,
+                                                  .layers       = 1};
+        swapchainFramebuffers.emplace_back(device, framebufferInfo, nullptr);
+    }
+}
+
+void
+HelloTriangleApplication::createCommandPool()
+{
+    auto indices = findQueueFamilies(physicalDevice);
+
+    vk::CommandPoolCreateInfo poolInfo{
+        .flags            = vk::CommandPoolCreateFlagBits::eResetCommandBuffer,
+        .queueFamilyIndex = indices.graphicsFamily.value()};
+
+    commandPool = device.createCommandPool(poolInfo);
+}
+
+void
+HelloTriangleApplication::createCommandBuffer()
+{
+
+    vk::CommandBufferAllocateInfo allocInfo{
+        .commandPool        = *commandPool,
+        .level              = vk::CommandBufferLevel::ePrimary,
+        .commandBufferCount = 1,
+    };
+    vk::CommandBuffer buffer;
+    auto buffers  = device.allocateCommandBuffers(allocInfo);
+    commandBuffer = std::move(buffers[0]);
+}
+void
+HelloTriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
+                                              uint32_t imageIndex)
+{
+    vk::CommandBufferBeginInfo beginInfo{
+        .flags            = {},
+        .pInheritanceInfo = nullptr,
+    };
+
+    buffer.begin(beginInfo);
+
+    vk::ClearValue clearColor;
+    clearColor.setColor({0.f, 0.f, 0.f, 1.f});
+    vk::RenderPassBeginInfo renderPassInfo{
+        .renderPass  = *renderPass,
+        .framebuffer = *swapchainFramebuffers[imageIndex],
+        .renderArea =
+            {
+                .offset = {0, 0},
+                .extent = imageExtent,
+            },
+        .clearValueCount = 1,
+        .pClearValues    = &clearColor,
+    };
+
+    buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
+
+    buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
+
+    vk::Viewport viewport{.x        = 0.f,
+                          .y        = 0.f,
+                          .width    = (float)imageExtent.width,
+                          .height   = (float)imageExtent.height,
+                          .minDepth = 0.f,
+                          .maxDepth = 1.f};
+    vk::ArrayProxy<vk::Viewport> proxy{viewport};
+
+    buffer.setViewport(0, proxy);
+
+    vk::ArrayProxy scissors{vk::Rect2D{.offset = {0, 0}, .extent = imageExtent}};
+
+    buffer.setScissor(0, scissors);
+
+    buffer.draw(3, 1, 0, 0);
+
+    buffer.endRenderPass();
+
+    buffer.end();
+}
+
+void
+HelloTriangleApplication::drawFrame()
+{
+    device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
+    device.resetFences({*inFlight});
+
+    uint32_t imageIndex;
+    commandBuffer.reset();
+    {
+        vkAcquireNextImageKHR(
+            *device, *swapChain, UINT64_MAX, *imageAvailable, nullptr, &imageIndex);
+        recordCommandBuffer(commandBuffer, imageIndex);
+    }
+
+    vk::PipelineStageFlags waitStages[] = {
+        vk::PipelineStageFlagBits::eColorAttachmentOutput};
+
+    vk::SubmitInfo submitInfo{.waitSemaphoreCount   = 1,
+                              .pWaitSemaphores      = &(*imageAvailable),
+                              .pWaitDstStageMask    = waitStages,
+                              .commandBufferCount   = 1,
+                              .pCommandBuffers      = &(*commandBuffer),
+                              .signalSemaphoreCount = 1,
+                              .pSignalSemaphores    = &(*renderFinished)};
+
+    graphicsQueue.submit({submitInfo}, *inFlight);
+
+    vk::PresentInfoKHR presentInfo{.waitSemaphoreCount = 1,
+                                   .pWaitSemaphores    = &(*renderFinished),
+                                   .swapchainCount     = 1,
+                                   .pSwapchains        = &(*swapChain),
+                                   .pImageIndices      = &imageIndex,
+                                   .pResults           = nullptr};
+
+    presentQueue.presentKHR(presentInfo);
+}
+
+void
+HelloTriangleApplication::createSyncObjects()
+{
+    vk::SemaphoreCreateInfo semaphoreInfo{};
+
+    vk::FenceCreateInfo fenceInfo{.flags = vk::FenceCreateFlagBits::eSignaled};
+
+    imageAvailable = vk::raii::Semaphore(device, semaphoreInfo);
+    renderFinished = vk::raii::Semaphore(device, semaphoreInfo);
+    inFlight       = vk::raii::Fence(device, fenceInfo);
 }

@@ -9,7 +9,6 @@
 #include <vulkan/vulkan_raii.hpp>
 #include <GLFW/glfw3.h>
 
-
 #include <fstream>
 #include <cstdint>   // Necessary for uint32_t
 #include <limits>    // Necessary for std::numeric_limits
@@ -53,21 +52,31 @@ struct SwapChainSupportDetails
 
 class HelloTriangleApplication
 {
+public:
 private:
-    std::unique_ptr<vk::raii::Instance> instance;
-    std::unique_ptr<vk::raii::PhysicalDevice> physicalDevice;
-    std::unique_ptr<vk::raii::Device> device;
-    std::unique_ptr<vk::raii::Queue> graphicsQueue;
-    std::unique_ptr<vk::raii::Queue> presentQueue;
-    std::unique_ptr<vk::raii::SurfaceKHR> surface;
+    GLFWwindow* window;
 
-    std::unique_ptr<vk::raii::SwapchainKHR> swapChain;
     vk::Extent2D imageExtent;
     vk::Format imageFormat;
-
+    
+    vk::raii::Instance instance{nullptr};
+    vk::raii::PhysicalDevice physicalDevice{nullptr};
+    vk::raii::SurfaceKHR surface{nullptr};
+    vk::raii::Device device{nullptr};
+    vk::raii::Queue graphicsQueue{nullptr};
+    vk::raii::Queue presentQueue{nullptr};
+    vk::raii::SwapchainKHR swapChain{nullptr};
     std::vector<vk::Image> swapImages;
     std::vector<vk::raii::ImageView> swapImageViews;
-    GLFWwindow* window;
+    vk::raii::RenderPass renderPass{nullptr};
+    vk::raii::PipelineLayout pipelineLayout{nullptr};
+    vk::raii::Pipeline graphicsPipeline{nullptr};
+    std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
+    vk::raii::CommandPool commandPool{nullptr};
+    vk::raii::CommandBuffer commandBuffer{nullptr};
+    vk::raii::Fence inFlight{nullptr};
+    vk::raii::Semaphore imageAvailable{nullptr};
+    vk::raii::Semaphore renderFinished{nullptr};
 
 public:
     void run()
@@ -88,9 +97,20 @@ private:
         createLogicalDevice();
         createSwapChain();
         createImageViews();
+        createRenderPass();
         createGraphicsPipeline();
+        createFramebuffers();
+        createCommandPool();
+        createCommandBuffer();
+        createSyncObjects();
     }
 
+    void createSyncObjects();
+    void recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex);
+    void createCommandBuffer();
+    void createCommandPool();
+    void createFramebuffers();
+    void createRenderPass();
     void createImageViews();
     void createSurface();
     void createSwapChain();
@@ -122,8 +142,12 @@ private:
         while (!glfwWindowShouldClose(window))
         {
             glfwPollEvents();
+            drawFrame();
         }
+        device.waitIdle();
     }
+
+    void drawFrame();
 
     void cleanup()
     {
