@@ -16,8 +16,7 @@ namespace refl
 
 // field reflection
 template <class Target, std::size_t I>
-using reflected_field =
-    typename Target::template detail_field_reflection<I, struct detail_member_tag>;
+using reflected_field = typename Target::template detail_field_reflection<I>;
 
 template <class Target, size_t I>
 constexpr auto field_name_v = reflected_field<Target, I>::name;
@@ -75,8 +74,7 @@ using field_counter =
 // function reflection
 
 template <class Target, std::size_t I>
-using reflected_func =
-    typename Target::template detail_function_reflection<I, struct detail_function_tag>;
+using reflected_func = typename Target::template detail_function_reflection<I>;
 
 template <class Target, std::size_t I>
 constexpr auto func_name_v = reflected_func<Target, I>::name;

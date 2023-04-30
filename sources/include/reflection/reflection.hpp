@@ -48,9 +48,9 @@ public:                                                                         
     using pedigree_list = meta::list::push_front<super::pedigree_list, this_type>;       \
                                                                                          \
 public:                                                                                  \
-    template <std::size_t, class>                                                        \
+    template <std::size_t>                                                        \
     struct detail_field_reflection;                                                      \
-    template <std::size_t, class>                                                        \
+    template <std::size_t>                                                        \
     struct detail_function_reflection;                                                   \
                                                                                          \
 private:                                                                                 \

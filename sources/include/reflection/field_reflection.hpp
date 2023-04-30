@@ -73,8 +73,7 @@ struct rfield::field_iface_t : public rfield::handle_t
 };
 
 template <class Target, std::size_t I>
-struct rfield::field_info_t final
-    : public rfield::field_iface_t<field_value_t<Target, I>>
+struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<Target, I>>
 {
     using owner_type   = Target;
     using value_type   = field_value_t<Target, I>;
@@ -112,7 +111,7 @@ constinit rfield::field_info_t<Target, I> const
 template <class Target, std::size_t Index>
 struct gather_fields
 {
-    static constexpr auto instance = refl::rfield::reflect_field<Target, Index>();
+    static constexpr auto instance         = refl::rfield::reflect_field<Target, Index>();
     static constexpr std::string_view name = field_name_v<Target, Index>;
     static consteval std::pair<std::string_view, refl::rfield*> get_entry()
     {
@@ -123,10 +122,7 @@ struct gather_fields
 template <class Target>
 struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
 {
-    static consteval std::pair<std::string_view, refl::rfield*> get_entry()
-    {
-        return {};
-    }
+    static consteval std::pair<std::string_view, refl::rfield*> get_entry() { return {}; }
 };
 
 } // namespace refl
@@ -137,8 +133,8 @@ struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
     struct detail_##NAME##_field_tag;                                                    \
     static constexpr std::size_t detail_##NAME##_field_index =                           \
         refl::detail::index<detail_##NAME##_field_tag, detail_field_reflection>::value;  \
-    template <class T>                                                                   \
-    struct detail_field_reflection<detail_##NAME##_field_index, T>                       \
+    template <>                                                                          \
+    struct detail_field_reflection<detail_##NAME##_field_index>                          \
     {                                                                                    \
         using value_type                       = TYPES;                                  \
         static constexpr std::string_view name = #NAME;                                  \

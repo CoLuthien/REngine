@@ -119,8 +119,8 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
     static constexpr size_t detail_##NAME##_function_index =                             \
         refl::detail::index<struct detail_##NAME##_function_tag,                         \
                             detail_function_reflection>::value;                          \
-    template <class T>                                                                   \
-    struct detail_function_reflection<detail_##NAME##_function_index, T>                 \
+    template <>                                                                          \
+    struct detail_function_reflection<detail_##NAME##_function_index>                    \
     {                                                                                    \
         INFER_FUNC_TYPE(NAME);                                                           \
         static constexpr std::string_view name = #NAME;                                  \

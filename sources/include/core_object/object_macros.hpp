@@ -42,9 +42,9 @@ private:                                                                        
     REFLECT_FUNCTIONS_INFO();                                                            \
                                                                                          \
 public:                                                                                  \
-    template <std::size_t, class>                                                        \
+    template <std::size_t>                                                               \
     struct detail_field_reflection;                                                      \
-    template <std::size_t, class>                                                        \
+    template <std::size_t>                                                               \
     struct detail_function_reflection;                                                   \
                                                                                          \
 public:                                                                                  \
