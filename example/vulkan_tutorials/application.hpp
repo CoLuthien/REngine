@@ -27,7 +27,7 @@ const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
 #ifdef NDEBUG
-constexpr bool enableValidationLayers = false;
+constexpr bool enableValidationLayers = true;
 #else
 constexpr bool enableValidationLayers = true;
 #endif
@@ -58,7 +58,9 @@ private:
 
     vk::Extent2D imageExtent;
     vk::Format imageFormat;
-    
+    vk::Viewport viewport;
+    vk::Rect2D scissor;
+
     vk::raii::Instance instance{nullptr};
     vk::raii::PhysicalDevice physicalDevice{nullptr};
     vk::raii::SurfaceKHR surface{nullptr};
@@ -143,6 +145,7 @@ private:
         {
             glfwPollEvents();
             drawFrame();
+            break;
         }
         device.waitIdle();
     }

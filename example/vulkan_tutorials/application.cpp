@@ -58,7 +58,7 @@ HelloTriangleApplication::getRequiredExtensions()
     std::vector<const char*> extensions(glfwExtensions,
                                         glfwExtensions + glfwExtensionCount);
 
-    if (enableValidationLayers)
+    if constexpr (enableValidationLayers)
     {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
@@ -88,18 +88,18 @@ HelloTriangleApplication::createInstance()
         std::cout << "validation layers requested, but not available!\n";
         exit(-1);
     }
-    vk::raii::Context context;
 
-    vk::ApplicationInfo appInfo{.pApplicationName   = "Hello Triangle",
+    vk::ApplicationInfo appInfo{.pNext              = nullptr,
+                                .pApplicationName   = "Hello Triangle",
                                 .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
                                 .pEngineName        = "No Engine",
                                 .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
                                 .apiVersion         = VK_API_VERSION_1_0};
 
     auto extensions = getRequiredExtensions();
-    vk::InstanceCreateInfo createInfo;
     if (enableValidationLayers)
     {
+        vk::InstanceCreateInfo createInfo;
         vk::DebugUtilsMessengerCreateInfoEXT createDebugInfo{
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
                                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
@@ -110,21 +110,24 @@ HelloTriangleApplication::createInstance()
             .pfnUserCallback = &debugCallback,
             .pUserData       = nullptr};
 
-        createInfo = {.pNext             = &createDebugInfo,
-                      .pApplicationInfo  = &appInfo,
+        createInfo = {.pNext = &(VkDebugUtilsMessengerCreateInfoEXT&)createDebugInfo,
                       .enabledLayerCount = static_cast<uint32_t>(validationLayers.size()),
                       .ppEnabledLayerNames     = validationLayers.data(),
                       .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
                       .ppEnabledExtensionNames = extensions.data()};
+
+        vk::raii::Context context;
+        instance = vk::raii::Instance{context, createInfo};
     }
     else
     {
+        vk::InstanceCreateInfo createInfo;
         createInfo = {.pApplicationInfo        = &appInfo,
                       .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
                       .ppEnabledExtensionNames = extensions.data()};
+        vk::raii::Context context;
+        instance = vk::raii::Instance{context, createInfo};
     }
-
-    instance = vk::raii::Instance{context, createInfo};
 }
 
 void
@@ -403,19 +406,23 @@ HelloTriangleApplication::createGraphicsPipeline()
         .topology               = vk::PrimitiveTopology::eTriangleList,
         .primitiveRestartEnable = false};
 
-    vk::Viewport viewport{.x        = 0.f,
-                          .y        = 0.f,
-                          .width    = (float)imageExtent.width,
-                          .height   = (float)imageExtent.height,
-                          .minDepth = 0.f,
-                          .maxDepth = 1.f};
-    vk::Rect2D scissor{
-        .offset = {.x = 0, .y = 0},
-        .extent = imageExtent,
+    viewport = vk::Viewport{.x        = 0.f,
+                            .y        = 0.f,
+                            .width    = 800.f,
+                            .height   = 600.f,
+                            .minDepth = 0.f,
+                            .maxDepth = 1.f};
+    scissor  = vk::Rect2D{
+         .offset = {.x = 0, .y = 0},
+         .extent = imageExtent,
     };
 
-    vk::PipelineViewportStateCreateInfo viewportState{.viewportCount = 1,
-                                                      .scissorCount  = 1};
+    vk::PipelineViewportStateCreateInfo viewportState{
+        .viewportCount = 1,
+        .pViewports    = &viewport,
+        .scissorCount  = 1,
+        .pScissors     = &scissor,
+    };
 
     vk::PipelineRasterizationStateCreateInfo rasterizer{
         .depthClampEnable = false,
@@ -630,12 +637,14 @@ HelloTriangleApplication::createCommandBuffer()
 {
 
     vk::CommandBufferAllocateInfo allocInfo{
+        .pNext              = nullptr,
         .commandPool        = *commandPool,
         .level              = vk::CommandBufferLevel::ePrimary,
         .commandBufferCount = 1,
     };
     vk::CommandBuffer buffer;
-    auto buffers  = device.allocateCommandBuffers(allocInfo);
+    auto buffers = device.allocateCommandBuffers(allocInfo);
+
     commandBuffer = std::move(buffers[0]);
 }
 void
@@ -643,6 +652,7 @@ HelloTriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
                                               uint32_t imageIndex)
 {
     vk::CommandBufferBeginInfo beginInfo{
+        .pNext            = nullptr,
         .flags            = {},
         .pInheritanceInfo = nullptr,
     };
@@ -667,17 +677,11 @@ HelloTriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
 
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
 
-    vk::Viewport viewport{.x        = 0.f,
-                          .y        = 0.f,
-                          .width    = (float)imageExtent.width,
-                          .height   = (float)imageExtent.height,
-                          .minDepth = 0.f,
-                          .maxDepth = 1.f};
-    vk::ArrayProxy<vk::Viewport> proxy{viewport};
+    vk::ArrayProxy proxy{viewport};
 
     buffer.setViewport(0, proxy);
 
-    vk::ArrayProxy scissors{vk::Rect2D{.offset = {0, 0}, .extent = imageExtent}};
+    vk::ArrayProxy scissors{scissor};
 
     buffer.setScissor(0, scissors);
 
@@ -691,7 +695,8 @@ HelloTriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
 void
 HelloTriangleApplication::drawFrame()
 {
-    device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
+    auto fence =
+        device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
     device.resetFences({*inFlight});
 
     uint32_t imageIndex;
@@ -722,7 +727,7 @@ HelloTriangleApplication::drawFrame()
                                    .pImageIndices      = &imageIndex,
                                    .pResults           = nullptr};
 
-    presentQueue.presentKHR(presentInfo);
+    auto result = presentQueue.presentKHR(presentInfo);
 }
 
 void

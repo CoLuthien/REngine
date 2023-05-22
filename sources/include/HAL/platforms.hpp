@@ -12,6 +12,5 @@
 
 #include "attributes.hpp"
 
-#define GLFW_INCLUDE_VULKAN
 
 
