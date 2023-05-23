@@ -111,6 +111,7 @@ HelloTriangleApplication::createInstance()
             .pUserData       = nullptr};
 
         createInfo = {.pNext = &(VkDebugUtilsMessengerCreateInfoEXT&)createDebugInfo,
+                      .pApplicationInfo  = &appInfo,
                       .enabledLayerCount = static_cast<uint32_t>(validationLayers.size()),
                       .ppEnabledLayerNames     = validationLayers.data(),
                       .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
@@ -677,13 +678,9 @@ HelloTriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
 
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
 
-    vk::ArrayProxy proxy{viewport};
+    buffer.setViewport(0, {viewport});
 
-    buffer.setViewport(0, proxy);
-
-    vk::ArrayProxy scissors{scissor};
-
-    buffer.setScissor(0, scissors);
+    buffer.setScissor(0, {scissor});
 
     buffer.draw(3, 1, 0, 0);
 

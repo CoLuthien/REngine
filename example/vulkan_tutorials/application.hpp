@@ -145,7 +145,6 @@ private:
         {
             glfwPollEvents();
             drawFrame();
-            break;
         }
         device.waitIdle();
     }
