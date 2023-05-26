@@ -2,6 +2,7 @@
 add_executable(vulkan_tutorial
     application.cpp
     vulkan_tutorial.cpp
+    init.cpp
 )
 
 target_link_libraries(vulkan_tutorial

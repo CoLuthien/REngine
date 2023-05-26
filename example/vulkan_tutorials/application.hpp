@@ -50,7 +50,7 @@ struct SwapChainSupportDetails
     std::vector<vk::PresentModeKHR> presentModes;
 };
 
-class HelloTriangleApplication
+class TriangleApplication
 {
 public:
 private:
