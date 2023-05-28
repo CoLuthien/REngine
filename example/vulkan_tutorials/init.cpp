@@ -8,7 +8,7 @@ debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
               void* pUserData)
 {
     std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-    return VK_FALSE;
+    return false;
 }
 
 static std::vector<std::byte>
@@ -48,10 +48,12 @@ TriangleApplication::createInstance()
                                 .apiVersion         = VK_API_VERSION_1_0};
 
     auto extensions = getRequiredExtensions();
+    vk::raii::Context context;
+    vk::InstanceCreateInfo createInfo;
+    vk::DebugUtilsMessengerCreateInfoEXT createDebugInfo;
     if (enableValidationLayers)
     {
-        vk::InstanceCreateInfo createInfo;
-        vk::DebugUtilsMessengerCreateInfoEXT createDebugInfo{
+        createDebugInfo = {
             .messageSeverity = vk::DebugUtilsMessageSeverityFlagBitsEXT::eError |
                                vk::DebugUtilsMessageSeverityFlagBitsEXT::eWarning |
                                vk::DebugUtilsMessageSeverityFlagBitsEXT::eVerbose,
@@ -67,19 +69,17 @@ TriangleApplication::createInstance()
                       .ppEnabledLayerNames     = validationLayers.data(),
                       .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
                       .ppEnabledExtensionNames = extensions.data()};
-
-        vk::raii::Context context;
-        instance = vk::raii::Instance{context, createInfo};
     }
     else
     {
-        vk::InstanceCreateInfo createInfo;
-        createInfo = {.pApplicationInfo        = &appInfo,
+        createInfo = {.pNext                   = nullptr,
+                      .pApplicationInfo        = &appInfo,
+                      .enabledLayerCount       = 0,
+                      .ppEnabledLayerNames     = nullptr,
                       .enabledExtensionCount   = static_cast<uint32_t>(extensions.size()),
                       .ppEnabledExtensionNames = extensions.data()};
-        vk::raii::Context context;
-        instance = vk::raii::Instance{context, createInfo};
     }
+    instance = vk::raii::Instance{context, createInfo};
 }
 
 void
@@ -157,10 +157,12 @@ TriangleApplication::createLogicalDevice()
     else
     {
         deviceCreateInfo = {
-            .queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size()),
-            .pQueueCreateInfos    = queueCreateInfos.data(),
-            .enabledLayerCount    = 0,
-            .pEnabledFeatures     = &physDeviceFeatures,
+            .queueCreateInfoCount    = static_cast<uint32_t>(queueCreateInfos.size()),
+            .pQueueCreateInfos       = queueCreateInfos.data(),
+            .enabledLayerCount       = 0,
+            .enabledExtensionCount   = static_cast<uint32_t>(deviceExtensions.size()),
+            .ppEnabledExtensionNames = deviceExtensions.data(),
+            .pEnabledFeatures        = &physDeviceFeatures,
         };
     }
 
@@ -220,7 +222,7 @@ TriangleApplication::createSwapChain()
     createInfo.setPreTransform(swapChainSupport.capabilities.currentTransform);
     createInfo.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
     createInfo.setPresentMode(presentMode);
-    createInfo.setClipped(VK_TRUE);
+    createInfo.setClipped(true);
     createInfo.setOldSwapchain(nullptr);
 
     swapChain   = device.createSwapchainKHR(createInfo);

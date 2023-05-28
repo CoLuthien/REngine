@@ -1,7 +1,6 @@
 
 #include "application.hpp"
 
-
 SwapChainSupportDetails
 TriangleApplication::querySwapChainSupport(vk::raii::PhysicalDevice const& device)
 {
@@ -31,15 +30,13 @@ TriangleApplication::getRequiredExtensions()
     std::vector<const char*> extensions(glfwExtensions,
                                         glfwExtensions + glfwExtensionCount);
 
-    if constexpr (enableValidationLayers)
+    if (enableValidationLayers)
     {
         extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     }
 
     return extensions;
 }
-
-
 
 vk::SurfaceFormatKHR
 TriangleApplication::chooseSwapSurfaceFormat(
@@ -247,13 +244,10 @@ TriangleApplication::drawFrame()
         device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
     device.resetFences({*inFlight});
 
-    uint32_t imageIndex;
     commandBuffer.reset();
-    {
-        vkAcquireNextImageKHR(
-            *device, *swapChain, UINT64_MAX, *imageAvailable, nullptr, &imageIndex);
-        recordCommandBuffer(commandBuffer, imageIndex);
-    }
+    auto [acquireResult, imageIndex] =
+        swapChain.acquireNextImage(std::numeric_limits<uint64_t>::max(), *imageAvailable);
+    recordCommandBuffer(commandBuffer, imageIndex);
 
     vk::PipelineStageFlags waitStages[] = {
         vk::PipelineStageFlagBits::eColorAttachmentOutput};
