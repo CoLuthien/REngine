@@ -19,6 +19,11 @@ PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
 )
 
+target_compile_options(vulkan_tutorial
+PUBLIC
+    ${DEFAULT_COMPILE_OPTIONS}
+)
+
 add_shader(
     vulkan_tutorial
     example/shader.frag

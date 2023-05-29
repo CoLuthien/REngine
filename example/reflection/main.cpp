@@ -46,6 +46,7 @@ main()
     if (func_add != nullptr)
     {
         int x = func_add->invoke<int>(ptr, 1, 2);
+        std::cout << x << '\n';
     }
 
     ptr->w = 0;
@@ -56,6 +57,7 @@ main()
         int value = prop_w->get<int>(ptr); // 0
         prop_w->set<int>(ptr, 12);         // set to 12
         value = prop_w->get<int>(ptr);     // 12
+        std::cout << value << '\n';
     }
 
     return 0;

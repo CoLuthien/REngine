@@ -40,12 +40,12 @@ TriangleApplication::createInstance()
         exit(-1);
     }
 
-    vk::ApplicationInfo appInfo{.pNext              = nullptr,
-                                .pApplicationName   = "Hello Triangle",
-                                .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-                                .pEngineName        = "No Engine",
-                                .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
-                                .apiVersion         = VK_API_VERSION_1_0};
+    vk::ApplicationInfo appInfo = {.pNext              = nullptr,
+                                   .pApplicationName   = "Hello Triangle",
+                                   .applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+                                   .pEngineName        = "No Engine",
+                                   .engineVersion      = VK_MAKE_VERSION(1, 0, 0),
+                                   .apiVersion         = VK_API_VERSION_1_0};
 
     auto extensions = getRequiredExtensions();
     vk::raii::Context context;
@@ -99,8 +99,7 @@ TriangleApplication::createSurface()
 void
 TriangleApplication::pickPhysicalDevice()
 {
-    uint32_t deviceCount = 0;
-    auto phys_devices    = instance.enumeratePhysicalDevices();
+    auto phys_devices = instance.enumeratePhysicalDevices();
 
     if (phys_devices.size() == 0)
     {
@@ -124,8 +123,7 @@ TriangleApplication::pickPhysicalDevice()
 void
 TriangleApplication::createLogicalDevice()
 {
-    auto indices   = findQueueFamilies(physicalDevice);
-    float priority = 1.f;
+    auto indices = findQueueFamilies(physicalDevice);
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(),
@@ -451,12 +449,9 @@ TriangleApplication::createCommandBuffer()
         .pNext              = nullptr,
         .commandPool        = *commandPool,
         .level              = vk::CommandBufferLevel::ePrimary,
-        .commandBufferCount = 1,
+        .commandBufferCount = ConcurrentFrames,
     };
-    vk::CommandBuffer buffer;
-    auto buffers = device.allocateCommandBuffers(allocInfo);
-
-    commandBuffer = std::move(buffers[0]);
+    commandBuffers = device.allocateCommandBuffers(allocInfo);
 }
 
 void
@@ -466,7 +461,13 @@ TriangleApplication::createSyncObjects()
 
     vk::FenceCreateInfo fenceInfo{.flags = vk::FenceCreateFlagBits::eSignaled};
 
-    imageAvailable = vk::raii::Semaphore(device, semaphoreInfo);
-    renderFinished = vk::raii::Semaphore(device, semaphoreInfo);
-    inFlight       = vk::raii::Fence(device, fenceInfo);
+    for (auto i = 0; i < ConcurrentFrames; i++)
+    {
+        imageAvailables.emplace_back(device, semaphoreInfo);
+        renderFinishes.emplace_back(device, semaphoreInfo);
+        inFlights.emplace_back(device, fenceInfo);
+    }
+
+    // renderFinished = vk::raii::Semaphore(device, semaphoreInfo);
+    // inFlight       = vk::raii::Fence(device, fenceInfo);
 }

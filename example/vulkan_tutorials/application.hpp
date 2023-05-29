@@ -20,8 +20,9 @@
 #include <set>
 #include <memory>
 
-static constexpr auto WIDTH  = 800;
-static constexpr auto HEIGHT = 600;
+static constexpr auto WIDTH            = 800;
+static constexpr auto HEIGHT           = 600;
+static constexpr auto ConcurrentFrames = 2;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
@@ -53,6 +54,7 @@ struct SwapChainSupportDetails
 class TriangleApplication
 {
 public:
+    bool framebufferResized = false;
 private:
     GLFWwindow* window;
 
@@ -75,10 +77,13 @@ private:
     vk::raii::Pipeline graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
     vk::raii::CommandPool commandPool{nullptr};
-    vk::raii::CommandBuffer commandBuffer{nullptr};
-    vk::raii::Fence inFlight{nullptr};
-    vk::raii::Semaphore imageAvailable{nullptr};
-    vk::raii::Semaphore renderFinished{nullptr};
+
+    std::vector<vk::raii::CommandBuffer> commandBuffers;
+    std::vector<vk::raii::Fence> inFlights;
+    std::vector<vk::raii::Semaphore> imageAvailables;
+    std::vector<vk::raii::Semaphore> renderFinishes;
+
+    uint32_t currentFrameIdx = 0;
 
 public:
     void run()
@@ -153,7 +158,11 @@ private:
 
     void cleanup()
     {
+        cleanupSwapChain();
+
         glfwDestroyWindow(window);
         glfwTerminate();
     }
+    void recreateSwapChain();
+    void cleanupSwapChain();
 };

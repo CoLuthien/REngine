@@ -29,6 +29,7 @@
 
 #include <array>
 #include <limits>
+#include <cstdint>
 
 namespace frozen {
 

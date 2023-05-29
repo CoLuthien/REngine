@@ -11,6 +11,14 @@ TriangleApplication::querySwapChainSupport(vk::raii::PhysicalDevice const& devic
 
     return details;
 }
+
+static void
+framebufferResizeCallback(GLFWwindow* window, int width, int height)
+{
+    auto app = reinterpret_cast<TriangleApplication*>(glfwGetWindowUserPointer(window));
+    app->framebufferResized = true;
+}
+
 void
 TriangleApplication::initWindow()
 {
@@ -18,6 +26,8 @@ TriangleApplication::initWindow()
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
 }
 
 std::vector<const char*>
@@ -238,15 +248,52 @@ TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
 }
 
 void
+TriangleApplication::recreateSwapChain()
+{
+    device.waitIdle();
+    cleanupSwapChain();
+    createSwapChain();
+    createImageViews();
+    createFramebuffers();
+}
+void
+TriangleApplication::cleanupSwapChain()
+{
+    swapchainFramebuffers.clear();
+    swapImageViews.clear();
+    swapChain.clear();
+}
+
+void
 TriangleApplication::drawFrame()
 {
-    auto fence =
+    auto& inFlight       = inFlights[currentFrameIdx];
+    auto& imageAvailable = imageAvailables[currentFrameIdx];
+    auto& commandBuffer  = commandBuffers[currentFrameIdx];
+    auto& renderFinished = renderFinishes[currentFrameIdx];
+
+    auto waitResult =
         device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
-    device.resetFences({*inFlight});
+    if (waitResult != vk::Result::eSuccess)
+    {
+        throw std::runtime_error{"Failed to wait in flight fence"};
+    }
 
     commandBuffer.reset();
     auto [acquireResult, imageIndex] =
         swapChain.acquireNextImage(std::numeric_limits<uint64_t>::max(), *imageAvailable);
+
+    if (acquireResult == vk::Result::eErrorOutOfDateKHR)
+    {
+        recreateSwapChain();
+        return;
+    }
+    else if (acquireResult != vk::Result::eSuccess &&
+             acquireResult != vk::Result::eSuboptimalKHR)
+    {
+        throw std::runtime_error("failed to acquire swap chain image!");
+    }
+    device.resetFences({*inFlight});
     recordCommandBuffer(commandBuffer, imageIndex);
 
     vk::PipelineStageFlags waitStages[] = {
@@ -262,12 +309,24 @@ TriangleApplication::drawFrame()
 
     graphicsQueue.submit({submitInfo}, *inFlight);
 
-    vk::PresentInfoKHR presentInfo{.waitSemaphoreCount = 1,
-                                   .pWaitSemaphores    = &(*renderFinished),
-                                   .swapchainCount     = 1,
-                                   .pSwapchains        = &(*swapChain),
-                                   .pImageIndices      = &imageIndex,
-                                   .pResults           = nullptr};
+    vk::PresentInfoKHR presentInfo{
+        .pNext              = nullptr,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores    = &(*renderFinished),
+        .swapchainCount     = 1,
+        .pSwapchains        = &(*swapChain),
+        .pImageIndices      = &imageIndex,
+    };
 
-    auto result = presentQueue.presentKHR(presentInfo);
+    try
+    {
+        auto result = presentQueue.presentKHR(presentInfo);
+
+    }
+    catch (vk::OutOfDateKHRError& err)
+    {
+        recreateSwapChain();
+    }
+
+    currentFrameIdx = (currentFrameIdx + 1) % ConcurrentFrames;
 }
