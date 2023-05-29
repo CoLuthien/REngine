@@ -15,6 +15,11 @@ PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
 )
 
+target_compile_options(core
+PUBLIC
+    ${DEFAULT_COMPILE_OPTIONS}
+)
+
 target_compile_definitions(core 
     PRIVATE CORE_BUILD
 )

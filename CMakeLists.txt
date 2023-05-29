@@ -8,8 +8,9 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${PROJECT_SOURCE_DIR}/cmake")
 project(Invader LANGUAGES CXX)
 set (CMAKE_CXX_STANDARD 20)
 
-set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++20")
 find_package(Vulkan REQUIRED)
+
+include(cmake/CompileOptions.cmake)
 
 include(cmake/Graphics.cmake)
 include(cmake/submodule.cmake)

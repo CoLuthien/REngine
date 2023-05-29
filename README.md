@@ -25,3 +25,6 @@ sudo apt install vulkan-sdk
 ```
 
 unlike vulkan tutorials, glfw and glm is not required.
+
+## Citation
+[CubbyFlow](https://github.com/CubbyFlow/CubbyFlow)

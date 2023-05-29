@@ -65,7 +65,7 @@ public:
            hclass const* super_class,
            Ps const&& field_map,
            Fs const&& func_map)
-        : m_self(self_class), m_super(super_class),
+        : m_super(super_class), m_self(self_class),
           m_fields(field_map.begin(), field_map.end()),
           m_functions(func_map.begin(), func_map.end())
     {
@@ -81,8 +81,8 @@ public:
 private:
     hclass const* m_super;
     refl::rclass m_self;
-    std::unordered_map<std::string_view, hfunction> const m_functions;
     std::unordered_map<std::string_view, hfield> const m_fields;
+    std::unordered_map<std::string_view, hfunction> const m_functions;
 };
 
 } // namespace ivd
