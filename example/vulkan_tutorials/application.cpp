@@ -235,6 +235,7 @@ TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
     buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
+    buffer.bindVertexBuffers(0, *vertexBuffer, {0});
 
     buffer.setViewport(0, viewport);
 
@@ -251,6 +252,15 @@ void
 TriangleApplication::recreateSwapChain()
 {
     device.waitIdle();
+
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window, &width, &height);
+    while (width == 0 || height == 0)
+    {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents();
+    }
+
     cleanupSwapChain();
     createSwapChain();
     createImageViews();
@@ -321,7 +331,6 @@ TriangleApplication::drawFrame()
     try
     {
         auto result = presentQueue.presentKHR(presentInfo);
-
     }
     catch (vk::OutOfDateKHRError& err)
     {

@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "primitives.hpp"
+
 #include "HAL/platforms.hpp"
 
 #include <glm/vec4.hpp>
@@ -26,6 +28,10 @@ static constexpr auto ConcurrentFrames = 2;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+std::vector<Vertex> const vertices{{{0.0f, -0.5f}, {0.2f, 0.0f, 0.0f}},
+                                   {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
+                                   {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -55,6 +61,7 @@ class TriangleApplication
 {
 public:
     bool framebufferResized = false;
+
 private:
     GLFWwindow* window;
 
@@ -77,6 +84,9 @@ private:
     vk::raii::Pipeline graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
     vk::raii::CommandPool commandPool{nullptr};
+
+    vk::raii::Buffer vertexBuffer{nullptr};
+    vk::raii::DeviceMemory vertexBufferMemory{nullptr};
 
     std::vector<vk::raii::CommandBuffer> commandBuffers;
     std::vector<vk::raii::Fence> inFlights;
@@ -108,12 +118,15 @@ private:
         createGraphicsPipeline();
         createFramebuffers();
         createCommandPool();
+        createVertexBuffer();
         createCommandBuffer();
         createSyncObjects();
     }
+    uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties);
 
     void createSyncObjects();
     void recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex);
+    void createVertexBuffer();
     void createCommandBuffer();
     void createCommandPool();
     void createFramebuffers();

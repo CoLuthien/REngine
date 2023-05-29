@@ -1,6 +1,8 @@
 
 #include "application.hpp"
 
+#include "meta/vulkan_traits.hpp"
+
 static VKAPI_ATTR vk::Bool32 VKAPI_CALL
 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
               VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -332,11 +334,14 @@ TriangleApplication::createGraphicsPipeline()
         .pDynamicStates    = dynamicStates.data(),
     };
 
+    auto bindingDescription    = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo{
-        .vertexBindingDescriptionCount   = 0,
-        .pVertexBindingDescriptions      = nullptr,
-        .vertexAttributeDescriptionCount = 0,
-        .pVertexAttributeDescriptions    = nullptr};
+        .vertexBindingDescriptionCount   = 1,
+        .pVertexBindingDescriptions      = &bindingDescription,
+        .vertexAttributeDescriptionCount = attributeDescriptions.size(),
+        .pVertexAttributeDescriptions    = attributeDescriptions.data()};
 
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly{
         .topology               = vk::PrimitiveTopology::eTriangleList,
@@ -440,7 +445,58 @@ TriangleApplication::createCommandPool()
 
     commandPool = device.createCommandPool(poolInfo);
 }
+uint32_t
+TriangleApplication::findMemoryType(uint32_t typeFilter,
+                                    vk::MemoryPropertyFlagBits properties)
+{
+    auto memProperties = physicalDevice.getMemoryProperties();
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) &&
+            (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
 
+    throw std::runtime_error("failed to find suitable memory type!");
+}
+void
+TriangleApplication::createVertexBuffer()
+{
+    vk::BufferCreateInfo bufferInfo{.size        = sizeof(vertices[0]) * vertices.size(),
+                                    .usage       = vk::BufferUsageFlagBits::eVertexBuffer,
+                                    .sharingMode = vk::SharingMode::eExclusive};
+    try
+    {
+        vertexBuffer = device.createBuffer(bufferInfo);
+    }
+    catch (std::exception const& e)
+    {
+        throw std::runtime_error{"failed to allocate vertex buffer"};
+    }
+
+    auto memRequirements = vertexBuffer.getMemoryRequirements();
+
+    vk::Flags<vk::MemoryPropertyFlagBits> flags;
+    auto bits = (vk::MemoryPropertyFlagBits::eHostVisible |
+                 vk::MemoryPropertyFlagBits::eHostCoherent);
+
+    vk::MemoryAllocateInfo allocInfo{
+        .allocationSize = memRequirements.size,
+        .memoryTypeIndex =
+            findMemoryType(memRequirements.memoryTypeBits,
+                           (meta::mask_as_enum<vk::MemoryPropertyFlagBits>(bits))),
+    };
+
+    vertexBufferMemory = device.allocateMemory(allocInfo);
+
+    vertexBuffer.bindMemory(*vertexBufferMemory, 0);
+
+    auto* data = vertexBufferMemory.mapMemory(0, bufferInfo.size);
+    memcpy(data, vertices.data(), (size_t)bufferInfo.size);
+    vertexBufferMemory.unmapMemory();
+}
 void
 TriangleApplication::createCommandBuffer()
 {
