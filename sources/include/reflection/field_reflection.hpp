@@ -15,7 +15,7 @@ class rfield final
 {
 public:
     template <class Target, std::size_t I>
-    static constexpr auto reflect_field()
+    static consteval auto reflect_field()
     {
         using info_type = field_info_t<Target, I>;
         return rfield(static_cast<handle_t const*>(info_type::reflected_info()));
@@ -84,14 +84,14 @@ struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<T
     static constexpr auto name            = field_name_v<Target, I>;
     static constexpr auto field_type      = field_type_e<Target, I>();
 
-    static consteval auto reflected_info() { return &field_info; }
-    virtual efield_type get_type() const override { return field_type; }
+    inline static consteval auto reflected_info() { return &field_info; }
+    inline virtual efield_type get_type() const override { return field_type; }
 
-    virtual value_type get(void* obj) const override
+    inline virtual value_type get(void* obj) const override
     {
         return reinterpret_cast<owner_type*>(obj)->*pointer;
     }
-    virtual void set(void* obj, value_type value) const override
+    inline virtual void set(void* obj, value_type value) const override
     {
         if constexpr (std::is_const_v<value_type>)
         {

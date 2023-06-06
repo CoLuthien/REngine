@@ -60,11 +60,11 @@ class COREOBJECT_API hclass : public hobject
 {
 public:
     using field_iter = std::unordered_map<std::string_view, hfield>::const_iterator;
-    template <class Ps, class Fs>
+    template <std::size_t N, std::size_t M>
     hclass(refl::rclass const&& self_class,
            hclass const* super_class,
-           Ps const&& field_map,
-           Fs const&& func_map)
+           std::array<std::pair<std::string_view, refl::rfield*>, N>&& field_map,
+           std::array<std::pair<std::string_view, refl::rfunction*>, M>&& func_map)
         : m_super(super_class), m_self(self_class),
           m_fields(field_map.begin(), field_map.end()),
           m_functions(func_map.begin(), func_map.end())

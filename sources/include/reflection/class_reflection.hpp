@@ -48,7 +48,7 @@ public:
 };
 
 template <class Target>
-constinit rclass::class_info_t<Target> const
-    rclass::class_info_t<Target>::class_info = {};
+constinit rclass::class_info_t<Target> const rclass::class_info_t<Target>::class_info =
+    {};
 
 } // namespace refl

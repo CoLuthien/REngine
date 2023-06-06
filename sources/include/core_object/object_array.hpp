@@ -2,9 +2,10 @@
 #pragma once
 #include "HAL/attributes.hpp"
 
+#include "core_object/definitions.hpp"
 #include "object.hpp"
 #include "class.hpp"
-#include "core_object/definitions.hpp"
+
 #include <vector>
 #include <unordered_set>
 #include <atomic>

@@ -13,7 +13,7 @@ class rfunction
 {
 public:
     template <class Target, std::size_t I>
-    static constexpr auto reflect_field()
+    static consteval auto reflect_field()
     {
         using trait     = func_traits<func_pointer_t<Target, I>>;
         using info_type = typename strip_tuple<Target,
