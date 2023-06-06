@@ -164,6 +164,12 @@ TriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& device)
         {
             indices.graphicsFamily = i;
         }
+        if (family.queueFlags & vk::QueueFlagBits::eTransfer &&
+            !(family.queueFlags & vk::QueueFlagBits::eGraphics) )
+        {
+            indices.transferFamily = i;
+        }
+
         if (device.getSurfaceSupportKHR(i, *surface))
         {
             indices.presentFamily = i;

@@ -21,6 +21,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <span>
 
 static constexpr auto WIDTH            = 800;
 static constexpr auto HEIGHT           = 600;
@@ -42,11 +43,13 @@ constexpr bool enableValidationLayers = true;
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> transferFamily;
     std::optional<uint32_t> presentFamily;
 
     bool isComplete() const
     {
-        return graphicsFamily.has_value() && presentFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value() &&
+               transferFamily.has_value();
     }
 };
 
@@ -63,6 +66,16 @@ public:
     bool framebufferResized = false;
 
 private:
+    vk::raii::Buffer createBuffer(vk::DeviceSize size,
+                                  vk::BufferUsageFlagBits usage,
+                                  vk::MemoryPropertyFlagBits properties,
+                                  vk::raii::DeviceMemory& bufferMemory,
+                                  std::span<uint32_t> sharedIndices);
+    void copyBuffer(vk::raii::Buffer& fromBuffer,
+                    vk::raii::Buffer& toBuffer,
+                    vk::DeviceSize size);
+
+private:
     GLFWwindow* window;
 
     vk::Extent2D imageExtent;
@@ -76,6 +89,7 @@ private:
     vk::raii::Device device{nullptr};
     vk::raii::Queue graphicsQueue{nullptr};
     vk::raii::Queue presentQueue{nullptr};
+    vk::raii::Queue transferQueue{nullptr};
     vk::raii::SwapchainKHR swapChain{nullptr};
     std::vector<vk::Image> swapImages;
     std::vector<vk::raii::ImageView> swapImageViews;
@@ -84,6 +98,7 @@ private:
     vk::raii::Pipeline graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
     vk::raii::CommandPool commandPool{nullptr};
+    vk::raii::CommandPool transferCommands{nullptr};
 
     vk::raii::Buffer vertexBuffer{nullptr};
     vk::raii::DeviceMemory vertexBufferMemory{nullptr};
