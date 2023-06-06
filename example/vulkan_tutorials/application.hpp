@@ -30,9 +30,12 @@ static constexpr auto ConcurrentFrames = 2;
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
-std::vector<Vertex> const vertices{{{0.0f, -0.5f}, {0.2f, 0.0f, 0.0f}},
-                                   {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}},
-                                   {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}}};
+const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                      {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+                                      {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+                                      {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -103,6 +106,9 @@ private:
     vk::raii::Buffer vertexBuffer{nullptr};
     vk::raii::DeviceMemory vertexBufferMemory{nullptr};
 
+    vk::raii::Buffer indexBuffer{nullptr};
+    vk::raii::DeviceMemory indexBufferMemory{nullptr};
+
     std::vector<vk::raii::CommandBuffer> commandBuffers;
     std::vector<vk::raii::Fence> inFlights;
     std::vector<vk::raii::Semaphore> imageAvailables;
@@ -134,6 +140,7 @@ private:
         createFramebuffers();
         createCommandPool();
         createVertexBuffer();
+        createIndexBuffer();
         createCommandBuffer();
         createSyncObjects();
     }
@@ -141,6 +148,7 @@ private:
 
     void createSyncObjects();
     void recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex);
+    void createIndexBuffer();
     void createVertexBuffer();
     void createCommandBuffer();
     void createCommandPool();

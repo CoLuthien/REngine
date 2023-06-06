@@ -165,7 +165,7 @@ TriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& device)
             indices.graphicsFamily = i;
         }
         if (family.queueFlags & vk::QueueFlagBits::eTransfer &&
-            !(family.queueFlags & vk::QueueFlagBits::eGraphics) )
+            !(family.queueFlags & vk::QueueFlagBits::eGraphics))
         {
             indices.transferFamily = i;
         }
@@ -242,12 +242,13 @@ TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
 
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
     buffer.bindVertexBuffers(0, *vertexBuffer, {0});
+    buffer.bindIndexBuffer(*indexBuffer, 0, vk::IndexType::eUint16);
 
     buffer.setViewport(0, viewport);
 
     buffer.setScissor(0, scissor);
 
-    buffer.draw(3, 1, 0, 0);
+    buffer.drawIndexed(indices.size(), 1, 0, 0, 0);
 
     buffer.endRenderPass();
 

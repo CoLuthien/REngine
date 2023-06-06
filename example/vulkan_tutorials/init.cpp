@@ -549,6 +549,41 @@ TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
     transferQueue.waitIdle();
     transferCommands.clear();
 }
+
+void
+TriangleApplication::createIndexBuffer()
+{
+
+    auto familyIndices = findQueueFamilies(physicalDevice);
+
+    auto bufferSize = sizeof(indices[0]) * indices.size();
+
+    vk::raii::DeviceMemory stagingMemory{nullptr};
+    std::array stageIndices = {familyIndices.graphicsFamily.value(),
+                               familyIndices.transferFamily.value()};
+
+    auto stagingBuffer = createBuffer(bufferSize,
+                                      vk::BufferUsageFlagBits::eTransferSrc,
+                                      meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
+                                          vk::MemoryPropertyFlagBits::eHostVisible |
+                                          vk::MemoryPropertyFlagBits::eHostCoherent),
+                                      stagingMemory,
+                                      {stageIndices.data(), 2});
+
+    auto* data = stagingMemory.mapMemory(0, bufferSize);
+    std::memcpy(data, indices.data(), bufferSize);
+    stagingMemory.unmapMemory();
+
+    indexBuffer = createBuffer(bufferSize,
+                               meta::mask_as_enum<vk::BufferUsageFlagBits>(
+                                   vk::BufferUsageFlagBits::eTransferDst |
+                                   vk::BufferUsageFlagBits::eIndexBuffer),
+                               vk::MemoryPropertyFlagBits::eDeviceLocal,
+                               indexBufferMemory,
+                               {&familyIndices.graphicsFamily.value(), 1});
+
+    copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+}
 void
 TriangleApplication::createVertexBuffer()
 {
