@@ -440,7 +440,10 @@ TriangleApplication::createGraphicsPipeline()
         .pAttachments    = &colorBlendAttachment,
     };
 
-    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{
+        .setLayoutCount = 1,
+        .pSetLayouts    = &*descriptorSetLayout,
+    };
     pipelineLayout = device.createPipelineLayout(pipelineLayoutInfo);
 
     vk::GraphicsPipelineCreateInfo pipelineInfo{
@@ -548,6 +551,68 @@ TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
     transferQueue.submit(submitInfo);
     transferQueue.waitIdle();
     transferCommands.clear();
+}
+
+void
+TriangleApplication::createDescriptorPool()
+{
+    vk::DescriptorPoolSize poolSize         = {.descriptorCount = ConcurrentFrames};
+    vk::DescriptorPoolCreateInfo createInfo = {
+        .maxSets       = static_cast<uint32_t>(ConcurrentFrames),
+        .poolSizeCount = 1,
+        .pPoolSizes    = &poolSize,
+    };
+}
+void
+TriangleApplication::createDescriptorSetLayout()
+{
+    vk::DescriptorSetLayoutBinding uboLayout = {
+        .binding            = 0,
+        .descriptorType     = vk::DescriptorType::eUniformBuffer,
+        .descriptorCount    = 1,
+        .stageFlags         = vk::ShaderStageFlagBits::eVertex,
+        .pImmutableSamplers = nullptr,
+    };
+    vk::DescriptorSetLayoutCreateInfo createInfo = {
+        .bindingCount = 1,
+        .pBindings    = &uboLayout,
+    };
+
+    try
+    {
+        descriptorSetLayout = device.createDescriptorSetLayout(createInfo);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "failed to create descriptor layout!" << '\n';
+        throw std::runtime_error{e.what()};
+    }
+}
+
+void
+TriangleApplication::createUniformBuffers()
+{
+    static constexpr auto bufferSize = sizeof(UniformBufferObject);
+
+    auto familyIndices = findQueueFamilies(physicalDevice);
+
+    for (std::size_t i = 0; i < ConcurrentFrames; ++i)
+    {
+        vk::raii::DeviceMemory memory{nullptr};
+        auto buffer = createBuffer(bufferSize,
+                                   vk::BufferUsageFlagBits::eUniformBuffer,
+                                   meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
+                                       vk::MemoryPropertyFlagBits::eHostVisible |
+                                       vk::MemoryPropertyFlagBits::eHostCoherent),
+                                   memory,
+                                   {&familyIndices.graphicsFamily.value(), 1});
+
+        auto* mappedMemory = memory.mapMemory(0, bufferSize);
+
+        uniformBuffers.emplace_back(std::move(buffer));
+        uniformBuffersMemory.emplace_back(std::move(memory));
+        uniformBuffersMapped.emplace_back(std::move(mappedMemory));
+    }
 }
 
 void

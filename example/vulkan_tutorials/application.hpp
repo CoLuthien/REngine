@@ -7,6 +7,11 @@
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
 
 #include <vulkan/vulkan_raii.hpp>
 #include <GLFW/glfw3.h>
@@ -36,6 +41,13 @@ const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
                                       {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
 
 const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+
+struct UniformBufferObject
+{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -97,6 +109,8 @@ private:
     std::vector<vk::Image> swapImages;
     std::vector<vk::raii::ImageView> swapImageViews;
     vk::raii::RenderPass renderPass{nullptr};
+    vk::raii::DescriptorSetLayout descriptorSetLayout{nullptr};
+    vk::raii::DescriptorPool descriptorPool{nullptr};
     vk::raii::PipelineLayout pipelineLayout{nullptr};
     vk::raii::Pipeline graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
@@ -108,6 +122,10 @@ private:
 
     vk::raii::Buffer indexBuffer{nullptr};
     vk::raii::DeviceMemory indexBufferMemory{nullptr};
+
+    std::vector<vk::raii::Buffer> uniformBuffers;
+    std::vector<vk::raii::DeviceMemory> uniformBuffersMemory;
+    std::vector<void*> uniformBuffersMapped;
 
     std::vector<vk::raii::CommandBuffer> commandBuffers;
     std::vector<vk::raii::Fence> inFlights;
@@ -135,16 +153,27 @@ private:
         createLogicalDevice();
         createSwapChain();
         createImageViews();
+
+        createDescriptorSetLayout();
         createRenderPass();
         createGraphicsPipeline();
         createFramebuffers();
         createCommandPool();
         createVertexBuffer();
         createIndexBuffer();
+        createUniformBuffers();
+        createDescriptorPool();
+
         createCommandBuffer();
         createSyncObjects();
     }
+    void updateUniformBuffer(uint32_t frameIdx);
+
+    void createDescriptorPool();
     uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties);
+
+    void createDescriptorSetLayout();
+    void createUniformBuffers();
 
     void createSyncObjects();
     void recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex);
