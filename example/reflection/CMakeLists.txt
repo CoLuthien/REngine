@@ -3,6 +3,9 @@ add_executable(reflection_example
     main.cpp
 )
 
+add_dependencies(reflection_example
+    core_object
+)
 target_link_libraries(reflection_example
     core_object
 )

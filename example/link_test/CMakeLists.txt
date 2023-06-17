@@ -8,6 +8,9 @@ add_executable(link_cast_test
 target_link_libraries(link_cast_test
     core_object
 )
+add_dependencies(link_cast_test
+    core_object
+)
 target_include_directories(link_cast_test
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include

@@ -20,8 +20,13 @@ hclass::find_func(std::string_view name) const
 COREOBJECT_API hfield const*
 hclass::find_field(std::string_view name) const
 {
-    auto const iter = m_fields.find(name);
-    return iter == m_fields.end() ? nullptr : &(iter->second);
+    auto iter = m_fields.find(name);
+    if (iter == m_fields.end())
+    {
+        return m_super == nullptr ? nullptr : m_super->find_field(name);
+    }
+
+    return &(iter->second);
 }
 
 } // namespace ivd

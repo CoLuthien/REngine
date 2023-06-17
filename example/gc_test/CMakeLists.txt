@@ -3,6 +3,11 @@ add_executable(gc_test
     main.cpp
 )
 
+add_dependencies(gc_test
+    core
+    core_object
+)
+
 target_link_libraries(gc_test
     core
     core_object

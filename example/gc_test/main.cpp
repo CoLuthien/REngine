@@ -58,7 +58,6 @@ test(T1* ptr)
 int
 main()
 {
-
     auto collector = ivd::garbage_collector::instance();
     auto* ptr2 = new_object<Sample>(nullptr);
     auto* ptr  = new_object<T1>(nullptr);

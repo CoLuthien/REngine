@@ -23,17 +23,17 @@ class hclass;
 #define REFLECT_FUNCTIONS_INFO()                                                         \
     static consteval auto reflected_functions()                                          \
     {                                                                                    \
-        return refl::to_array<refl::gather_functions,                                    \
-                              this_type,                                                 \
-                              refl::func_counts<this_type>>::entry_point();              \
+        return refl::as_initializer_list<refl::gather_functions,                         \
+                                         this_type,                                      \
+                                         refl::func_counts<this_type>>::entry_point();   \
     }
 
 #define REFLECT_FIELDS_INFO()                                                            \
     static consteval auto reflected_fields()                                             \
     {                                                                                    \
-        return refl::reflect_all_t<this_type::pedigree_list,                             \
-                                   refl::gather_fields,                                  \
-                                   refl::field_counter>::entry();                        \
+        return refl::as_initializer_list<refl::gather_fields,                            \
+                                         this_type,                                      \
+                                         refl::field_counts<this_type>>::entry_point();  \
     }
 
 #define REFLECT_CLASS_INFO()                                                             \
@@ -48,9 +48,9 @@ public:                                                                         
     using pedigree_list = meta::list::push_front<super::pedigree_list, this_type>;       \
                                                                                          \
 public:                                                                                  \
-    template <std::size_t>                                                        \
+    template <std::size_t>                                                               \
     struct detail_field_reflection;                                                      \
-    template <std::size_t>                                                        \
+    template <std::size_t>                                                               \
     struct detail_function_reflection;                                                   \
                                                                                          \
 private:                                                                                 \

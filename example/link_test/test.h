@@ -4,6 +4,7 @@
 
 #include "test.h"
 #include "core/core.hpp"
+#include "core_object/core_object.hpp"
 
 class T1 : public ivd::hobject
 {

@@ -1,5 +1,6 @@
 
 #include "core/core.hpp"
+#include "core_object/core_object.hpp"
 #include <string_view>
 #include <iostream>
 
