@@ -113,9 +113,10 @@ struct gather_fields
 {
     static constexpr auto instance         = refl::rfield::reflect_field<Target, Index>();
     static constexpr std::string_view name = field_name_v<Target, Index>;
-    static consteval std::pair<std::string_view, refl::rfield*> get_entry()
+    static constexpr auto pair = std::make_pair(name, const_cast<rfield*>(&instance));
+    static consteval std::pair<std::string_view, refl::rfield*> const& get_entry()
     {
-        return std::make_pair(name, const_cast<rfield*>(&instance));
+        return pair;
     }
 };
 

@@ -94,9 +94,10 @@ struct gather_functions
 {
     static constexpr auto instance = refl::rfunction::reflect_field<Target, Index>();
     static constexpr auto name     = func_name_v<Target, Index>;
-    static consteval std::pair<std::string_view, refl::rfunction*> get_entry()
+    static constexpr auto pair = std::make_pair(name, const_cast<rfunction*>(&instance));
+    static consteval std::pair<std::string_view, refl::rfunction*> const& get_entry()
     {
-        return std::make_pair(name, const_cast<rfunction*>(&instance));
+        return pair;
     }
 };
 

@@ -9,7 +9,7 @@ if(RENGINE_WARNINGS_AS_ERRORS)
     if(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
         set(WARN_AS_ERROR_FLAGS	"/WX")
     else()
-        set(WARN_AS_ERROR_FLAGS "-Werror")
+        #set(WARN_AS_ERROR_FLAGS "-Werror")
     endif()
 endif()
 

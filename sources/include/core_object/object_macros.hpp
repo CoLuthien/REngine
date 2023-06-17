@@ -2,6 +2,7 @@
 #pragma once
 
 #include "reflection/reflection.hpp"
+#include <span>
 
 #define GENERATE_BODY()                                                                  \
     REFLECT_CLASS();                                                                     \
@@ -22,10 +23,13 @@ private:                                                                        
 public:                                                                                  \
     inline static ivd::hclass* static_class()                                            \
     {                                                                                    \
+        static constexpr auto fields = reflected_fields();                               \
+        static constexpr auto funcs  = reflected_functions();                            \
+                                                                                         \
         static auto instance = ivd::hclass(reflected_class(),                            \
                                            super::static_class(),                        \
-                                           reflected_fields(),                           \
-                                           reflected_functions());                       \
+                                           std::span{fields.data(), fields.size()},      \
+                                           std::span{funcs.data(), funcs.size()});       \
         return &instance;                                                                \
     }
 

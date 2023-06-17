@@ -6,6 +6,7 @@
 #include "definitions.hpp"
 
 #include <unordered_map>
+#include <span>
 
 namespace ivd
 {
@@ -59,11 +60,10 @@ private:
 class COREOBJECT_API hclass : public hobject
 {
 public:
-    hclass(
-        refl::rclass&& self_class,
-        hclass const* super_class,
-        std::initializer_list<std::pair<std::string_view, refl::rfield*>>&& field_map,
-        std::initializer_list<std::pair<std::string_view, refl::rfunction*>>&& func_map)
+    hclass(refl::rclass&& self_class,
+           hclass const* super_class,
+           std::span<std::pair<std::string_view, refl::rfield*> const> field_map,
+           std::span<std::pair<std::string_view, refl::rfunction*> const> func_map)
         : m_super(super_class), m_self(self_class),
           m_fields(field_map.begin(), field_map.end()),
           m_functions(func_map.begin(), func_map.end())

@@ -9,7 +9,6 @@
 
 #include <array>
 #include <vector>
-#include <frozen/unordered_map.h>
 #include <type_traits>
 
 namespace refl
@@ -24,7 +23,7 @@ struct as_initializer_list
     static consteval auto entry_point() { return recurse(); }
 
     template <typename... Args>
-    static consteval auto recurse(Args... args)
+    static consteval auto recurse(Args const&... args)
     {
         return as_initializer_list<Info, Target, Index - 1>::recurse(value, args...);
     }
@@ -33,16 +32,14 @@ struct as_initializer_list
 template <template <class, std::size_t> class Info, class Target>
 struct as_initializer_list<Info, Target, 0>
 {
-    static consteval auto entry_point()
-    {
-        using type =
-            decltype(Info<Target, std::numeric_limits<std::size_t>::max()>::get_entry());
-        return std::initializer_list<type>{};
-    }
+
+    using type =
+        decltype(Info<Target, std::numeric_limits<std::size_t>::max()>::get_entry());
+    static consteval auto entry_point() { return std::array<type, 0>{}; }
     template <typename... Args>
-    static consteval auto recurse(Args... args)
+    static consteval auto recurse(Args const&... args)
     {
-        return std::initializer_list{args...};
+        return std::array{args...};
     }
 };
 
