@@ -164,6 +164,12 @@ TriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& device)
         {
             indices.graphicsFamily = i;
         }
+        if (family.queueFlags & vk::QueueFlagBits::eTransfer &&
+            !(family.queueFlags & vk::QueueFlagBits::eGraphics))
+        {
+            indices.transferFamily = i;
+        }
+
         if (device.getSurfaceSupportKHR(i, *surface))
         {
             indices.presentFamily = i;
@@ -235,12 +241,14 @@ TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
     buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
 
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
+    buffer.bindVertexBuffers(0, *vertexBuffer, {0});
+    buffer.bindIndexBuffer(*indexBuffer, 0, vk::IndexType::eUint16);
 
     buffer.setViewport(0, viewport);
 
     buffer.setScissor(0, scissor);
 
-    buffer.draw(3, 1, 0, 0);
+    buffer.drawIndexed(indices.size(), 1, 0, 0, 0);
 
     buffer.endRenderPass();
 
@@ -251,10 +259,43 @@ void
 TriangleApplication::recreateSwapChain()
 {
     device.waitIdle();
+
+    int width = 0, height = 0;
+    glfwGetFramebufferSize(window, &width, &height);
+    while (width == 0 || height == 0)
+    {
+        glfwGetFramebufferSize(window, &width, &height);
+        glfwWaitEvents();
+    }
+
     cleanupSwapChain();
     createSwapChain();
     createImageViews();
     createFramebuffers();
+}
+
+void
+TriangleApplication::updateUniformBuffer(uint32_t frameIdx)
+{
+    static auto startTime = std::chrono::high_resolution_clock::now();
+
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime -
+                                                                            startTime)
+                     .count();
+    UniformBufferObject ubo{};
+    ubo.model = glm::rotate(
+        glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
+                           glm::vec3(0.0f, 0.0f, 0.0f),
+                           glm::vec3(0.0f, 0.0f, 1.0f));
+
+    ubo.proj = glm::perspective(
+        glm::radians(45.0f), imageExtent.width / (float)imageExtent.height, 0.1f, 10.0f);
+    ubo.proj[1][1] *= -1;
+
+    std::memcpy(uniformBuffersMapped[frameIdx], &ubo, sizeof(ubo));
 }
 void
 TriangleApplication::cleanupSwapChain()
@@ -296,9 +337,10 @@ TriangleApplication::drawFrame()
     device.resetFences({*inFlight});
     recordCommandBuffer(commandBuffer, imageIndex);
 
+    updateUniformBuffer(currentFrameIdx);
+
     vk::PipelineStageFlags waitStages[] = {
         vk::PipelineStageFlagBits::eColorAttachmentOutput};
-
     vk::SubmitInfo submitInfo{.waitSemaphoreCount   = 1,
                               .pWaitSemaphores      = &(*imageAvailable),
                               .pWaitDstStageMask    = waitStages,
@@ -321,7 +363,6 @@ TriangleApplication::drawFrame()
     try
     {
         auto result = presentQueue.presentKHR(presentInfo);
-
     }
     catch (vk::OutOfDateKHRError& err)
     {

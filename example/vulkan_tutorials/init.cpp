@@ -1,5 +1,52 @@
 
 #include "application.hpp"
+#include <iostream>
+#include "meta/vulkan_helper.hpp"
+
+vk::raii::Buffer
+TriangleApplication::createBuffer(vk::DeviceSize size,
+                                  vk::BufferUsageFlagBits usage,
+                                  vk::MemoryPropertyFlagBits properties,
+                                  vk::raii::DeviceMemory& bufferMemory,
+                                  std::span<uint32_t> sharedIndices)
+{
+    vk::BufferCreateInfo createInfo = {
+        .size                  = size,
+        .usage                 = usage,
+        .sharingMode           = sharedIndices.size() > 1 ? vk::SharingMode::eConcurrent
+                                                          : vk::SharingMode::eExclusive,
+        .queueFamilyIndexCount = static_cast<uint32_t>(sharedIndices.size()),
+        .pQueueFamilyIndices   = sharedIndices.data()};
+
+    vk::raii::Buffer buffer{nullptr};
+    try
+    {
+        buffer = device.createBuffer(createInfo);
+    }
+    catch (std::exception const& e)
+    {
+        throw std::runtime_error{"failed to create buffer!"};
+    }
+
+    auto reqs = buffer.getMemoryRequirements();
+
+    vk::MemoryAllocateInfo allocInfo = {
+        .allocationSize  = reqs.size,
+        .memoryTypeIndex = findMemoryType(reqs.memoryTypeBits, properties)};
+
+    try
+    {
+        bufferMemory = device.allocateMemory(allocInfo);
+    }
+    catch (std::exception const& e)
+    {
+        throw std::runtime_error{"failed to allocate memory"};
+    }
+
+    buffer.bindMemory(*bufferMemory, 0);
+
+    return buffer;
+}
 
 static VKAPI_ATTR vk::Bool32 VKAPI_CALL
 debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -127,7 +174,8 @@ TriangleApplication::createLogicalDevice()
 
     std::vector<vk::DeviceQueueCreateInfo> queueCreateInfos;
     std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(),
-                                              indices.presentFamily.value()};
+                                              indices.presentFamily.value(),
+                                              indices.transferFamily.value()};
 
     float queuePriority = 1.0f;
     for (uint32_t queueFamily : uniqueQueueFamilies)
@@ -168,6 +216,7 @@ TriangleApplication::createLogicalDevice()
 
     graphicsQueue = vk::raii::Queue(device.getQueue(indices.graphicsFamily.value(), 0));
     presentQueue  = vk::raii::Queue(device.getQueue(indices.presentFamily.value(), 0));
+    transferQueue = vk::raii::Queue(device.getQueue(indices.transferFamily.value(), 0));
 }
 
 void
@@ -332,11 +381,14 @@ TriangleApplication::createGraphicsPipeline()
         .pDynamicStates    = dynamicStates.data(),
     };
 
+    auto bindingDescription    = Vertex::getBindingDescription();
+    auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
     vk::PipelineVertexInputStateCreateInfo vertexInputInfo{
-        .vertexBindingDescriptionCount   = 0,
-        .pVertexBindingDescriptions      = nullptr,
-        .vertexAttributeDescriptionCount = 0,
-        .pVertexAttributeDescriptions    = nullptr};
+        .vertexBindingDescriptionCount   = 1,
+        .pVertexBindingDescriptions      = &bindingDescription,
+        .vertexAttributeDescriptionCount = attributeDescriptions.size(),
+        .pVertexAttributeDescriptions    = attributeDescriptions.data()};
 
     vk::PipelineInputAssemblyStateCreateInfo inputAssembly{
         .topology               = vk::PrimitiveTopology::eTriangleList,
@@ -388,7 +440,10 @@ TriangleApplication::createGraphicsPipeline()
         .pAttachments    = &colorBlendAttachment,
     };
 
-    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{};
+    vk::PipelineLayoutCreateInfo pipelineLayoutInfo{
+        .setLayoutCount = 1,
+        .pSetLayouts    = &*descriptorSetLayout,
+    };
     pipelineLayout = device.createPipelineLayout(pipelineLayoutInfo);
 
     vk::GraphicsPipelineCreateInfo pipelineInfo{
@@ -439,8 +494,195 @@ TriangleApplication::createCommandPool()
         .queueFamilyIndex = indices.graphicsFamily.value()};
 
     commandPool = device.createCommandPool(poolInfo);
+
+    vk::CommandPoolCreateInfo transferPoolInfo{
+        .flags = meta::mask_as_enum<vk::CommandPoolCreateFlagBits>(
+            vk::CommandPoolCreateFlagBits::eResetCommandBuffer |
+            vk::CommandPoolCreateFlagBits::eTransient),
+        .queueFamilyIndex = indices.transferFamily.value()};
+    transferCommands = device.createCommandPool(transferPoolInfo);
+}
+uint32_t
+TriangleApplication::findMemoryType(uint32_t typeFilter,
+                                    vk::MemoryPropertyFlagBits properties)
+{
+    auto memProperties = physicalDevice.getMemoryProperties();
+    for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+    {
+        if ((typeFilter & (1 << i)) &&
+            (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
+
+    throw std::runtime_error("failed to find suitable memory type!");
 }
 
+void
+TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
+                                vk::raii::Buffer& toBuffer,
+                                vk::DeviceSize size)
+{
+    vk::CommandBufferAllocateInfo allocInfo = {.commandPool = *transferCommands,
+                                               .level = vk::CommandBufferLevel::ePrimary,
+                                               .commandBufferCount = 1};
+
+    auto&& transferCommands = device.allocateCommandBuffers(allocInfo);
+    auto& transferCommand   = transferCommands[0];
+
+    vk::CommandBufferBeginInfo beginInfo = {
+        .flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit,
+    };
+
+    transferCommand.begin(beginInfo);
+
+    vk::BufferCopy copyInfo = {.srcOffset = 0, .dstOffset = 0, .size = size};
+
+    transferCommand.copyBuffer(*fromBuffer, *toBuffer, copyInfo);
+
+    transferCommand.end();
+
+    vk::SubmitInfo submitInfo = {
+        .commandBufferCount = 1,
+        .pCommandBuffers    = &*transferCommand,
+    };
+
+    transferQueue.submit(submitInfo);
+    transferQueue.waitIdle();
+    transferCommands.clear();
+}
+
+void
+TriangleApplication::createDescriptorPool()
+{
+    vk::DescriptorPoolSize poolSize         = {.descriptorCount = ConcurrentFrames};
+    vk::DescriptorPoolCreateInfo createInfo = {
+        .maxSets       = static_cast<uint32_t>(ConcurrentFrames),
+        .poolSizeCount = 1,
+        .pPoolSizes    = &poolSize,
+    };
+}
+void
+TriangleApplication::createDescriptorSetLayout()
+{
+    vk::DescriptorSetLayoutBinding uboLayout = {
+        .binding            = 0,
+        .descriptorType     = vk::DescriptorType::eUniformBuffer,
+        .descriptorCount    = 1,
+        .stageFlags         = vk::ShaderStageFlagBits::eVertex,
+        .pImmutableSamplers = nullptr,
+    };
+    vk::DescriptorSetLayoutCreateInfo createInfo = {
+        .bindingCount = 1,
+        .pBindings    = &uboLayout,
+    };
+
+    try
+    {
+        descriptorSetLayout = device.createDescriptorSetLayout(createInfo);
+    }
+    catch (std::exception const& e)
+    {
+        std::cerr << "failed to create descriptor layout!" << '\n';
+        throw std::runtime_error{e.what()};
+    }
+}
+
+void
+TriangleApplication::createUniformBuffers()
+{
+    static constexpr auto bufferSize = sizeof(UniformBufferObject);
+
+    auto familyIndices = findQueueFamilies(physicalDevice);
+
+    for (std::size_t i = 0; i < ConcurrentFrames; ++i)
+    {
+        vk::raii::DeviceMemory memory{nullptr};
+        auto buffer = createBuffer(bufferSize,
+                                   vk::BufferUsageFlagBits::eUniformBuffer,
+                                   meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
+                                       vk::MemoryPropertyFlagBits::eHostVisible |
+                                       vk::MemoryPropertyFlagBits::eHostCoherent),
+                                   memory,
+                                   {&familyIndices.graphicsFamily.value(), 1});
+
+        auto* mappedMemory = memory.mapMemory(0, bufferSize);
+
+        uniformBuffers.emplace_back(std::move(buffer));
+        uniformBuffersMemory.emplace_back(std::move(memory));
+        uniformBuffersMapped.emplace_back(std::move(mappedMemory));
+    }
+}
+
+void
+TriangleApplication::createIndexBuffer()
+{
+
+    auto familyIndices = findQueueFamilies(physicalDevice);
+
+    auto bufferSize = sizeof(indices[0]) * indices.size();
+
+    vk::raii::DeviceMemory stagingMemory{nullptr};
+    std::array stageIndices = {familyIndices.graphicsFamily.value(),
+                               familyIndices.transferFamily.value()};
+
+    auto stagingBuffer = createBuffer(bufferSize,
+                                      vk::BufferUsageFlagBits::eTransferSrc,
+                                      meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
+                                          vk::MemoryPropertyFlagBits::eHostVisible |
+                                          vk::MemoryPropertyFlagBits::eHostCoherent),
+                                      stagingMemory,
+                                      {stageIndices.data(), 2});
+
+    auto* data = stagingMemory.mapMemory(0, bufferSize);
+    std::memcpy(data, indices.data(), bufferSize);
+    stagingMemory.unmapMemory();
+
+    indexBuffer = createBuffer(bufferSize,
+                               meta::mask_as_enum<vk::BufferUsageFlagBits>(
+                                   vk::BufferUsageFlagBits::eTransferDst |
+                                   vk::BufferUsageFlagBits::eIndexBuffer),
+                               vk::MemoryPropertyFlagBits::eDeviceLocal,
+                               indexBufferMemory,
+                               {&familyIndices.graphicsFamily.value(), 1});
+
+    copyBuffer(stagingBuffer, indexBuffer, bufferSize);
+}
+void
+TriangleApplication::createVertexBuffer()
+{
+
+    auto Indices = findQueueFamilies(physicalDevice);
+
+    auto bufferSize = sizeof(vertices[0]) * vertices.size();
+
+    vk::raii::DeviceMemory stagingMemory{nullptr};
+    std::array stageIndices = {Indices.graphicsFamily.value(),
+                               Indices.transferFamily.value()};
+
+    auto stagingBuffer = createBuffer(bufferSize,
+                                      vk::BufferUsageFlagBits::eTransferSrc,
+                                      meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
+                                          vk::MemoryPropertyFlagBits::eHostVisible |
+                                          vk::MemoryPropertyFlagBits::eHostCoherent),
+                                      stagingMemory,
+                                      {stageIndices.data(), 2});
+
+    auto* data = stagingMemory.mapMemory(0, bufferSize);
+    std::memcpy(data, vertices.data(), bufferSize);
+    stagingMemory.unmapMemory();
+
+    vertexBuffer = createBuffer(bufferSize,
+                                meta::mask_as_enum<vk::BufferUsageFlagBits>(
+                                    vk::BufferUsageFlagBits::eTransferDst |
+                                    vk::BufferUsageFlagBits::eVertexBuffer),
+                                vk::MemoryPropertyFlagBits::eDeviceLocal,
+                                vertexBufferMemory,
+                                {&Indices.graphicsFamily.value(), 1});
+
+    copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
+}
 void
 TriangleApplication::createCommandBuffer()
 {

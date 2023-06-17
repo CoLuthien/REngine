@@ -25,7 +25,7 @@ PUBLIC
 )
 
 target_compile_definitions(core_object
-    PRIVATE COREOBJECT_BUILD
+    PUBLIC COREOBJECT_BUILD
 )
 
 target_link_libraries(core_object

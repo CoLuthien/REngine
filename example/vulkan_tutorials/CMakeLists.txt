@@ -9,7 +9,7 @@ target_link_libraries(vulkan_tutorial
 PUBLIC
     core_object
     Vulkan::Vulkan
-    glfw
+    GLFWPP
     glm
 )
 

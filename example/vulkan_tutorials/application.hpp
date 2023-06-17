@@ -1,10 +1,17 @@
 
 #pragma once
 
+#include "primitives.hpp"
+
 #include "HAL/platforms.hpp"
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
+#define GLM_FORCE_RADIANS
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+#include <chrono>
 
 #include <vulkan/vulkan_raii.hpp>
 #include <GLFW/glfw3.h>
@@ -19,6 +26,7 @@
 #include <vector>
 #include <set>
 #include <memory>
+#include <span>
 
 static constexpr auto WIDTH            = 800;
 static constexpr auto HEIGHT           = 600;
@@ -26,6 +34,20 @@ static constexpr auto ConcurrentFrames = 2;
 
 const std::vector<const char*> validationLayers = {"VK_LAYER_KHRONOS_validation"};
 const std::vector<const char*> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
+const std::vector<Vertex> vertices = {{{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+                                      {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+                                      {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+                                      {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}};
+
+const std::vector<uint16_t> indices = {0, 1, 2, 2, 3, 0};
+
+struct UniformBufferObject
+{
+    glm::mat4 model;
+    glm::mat4 view;
+    glm::mat4 proj;
+};
 
 #ifdef NDEBUG
 constexpr bool enableValidationLayers = false;
@@ -36,11 +58,13 @@ constexpr bool enableValidationLayers = true;
 struct QueueFamilyIndices
 {
     std::optional<uint32_t> graphicsFamily;
+    std::optional<uint32_t> transferFamily;
     std::optional<uint32_t> presentFamily;
 
     bool isComplete() const
     {
-        return graphicsFamily.has_value() && presentFamily.has_value();
+        return graphicsFamily.has_value() && presentFamily.has_value() &&
+               transferFamily.has_value();
     }
 };
 
@@ -55,6 +79,17 @@ class TriangleApplication
 {
 public:
     bool framebufferResized = false;
+
+private:
+    vk::raii::Buffer createBuffer(vk::DeviceSize size,
+                                  vk::BufferUsageFlagBits usage,
+                                  vk::MemoryPropertyFlagBits properties,
+                                  vk::raii::DeviceMemory& bufferMemory,
+                                  std::span<uint32_t> sharedIndices);
+    void copyBuffer(vk::raii::Buffer& fromBuffer,
+                    vk::raii::Buffer& toBuffer,
+                    vk::DeviceSize size);
+
 private:
     GLFWwindow* window;
 
@@ -69,14 +104,28 @@ private:
     vk::raii::Device device{nullptr};
     vk::raii::Queue graphicsQueue{nullptr};
     vk::raii::Queue presentQueue{nullptr};
+    vk::raii::Queue transferQueue{nullptr};
     vk::raii::SwapchainKHR swapChain{nullptr};
     std::vector<vk::Image> swapImages;
     std::vector<vk::raii::ImageView> swapImageViews;
     vk::raii::RenderPass renderPass{nullptr};
+    vk::raii::DescriptorSetLayout descriptorSetLayout{nullptr};
+    vk::raii::DescriptorPool descriptorPool{nullptr};
     vk::raii::PipelineLayout pipelineLayout{nullptr};
     vk::raii::Pipeline graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
     vk::raii::CommandPool commandPool{nullptr};
+    vk::raii::CommandPool transferCommands{nullptr};
+
+    vk::raii::Buffer vertexBuffer{nullptr};
+    vk::raii::DeviceMemory vertexBufferMemory{nullptr};
+
+    vk::raii::Buffer indexBuffer{nullptr};
+    vk::raii::DeviceMemory indexBufferMemory{nullptr};
+
+    std::vector<vk::raii::Buffer> uniformBuffers;
+    std::vector<vk::raii::DeviceMemory> uniformBuffersMemory;
+    std::vector<void*> uniformBuffersMapped;
 
     std::vector<vk::raii::CommandBuffer> commandBuffers;
     std::vector<vk::raii::Fence> inFlights;
@@ -104,16 +153,32 @@ private:
         createLogicalDevice();
         createSwapChain();
         createImageViews();
+
+        createDescriptorSetLayout();
         createRenderPass();
         createGraphicsPipeline();
         createFramebuffers();
         createCommandPool();
+        createVertexBuffer();
+        createIndexBuffer();
+        createUniformBuffers();
+        createDescriptorPool();
+
         createCommandBuffer();
         createSyncObjects();
     }
+    void updateUniformBuffer(uint32_t frameIdx);
+
+    void createDescriptorPool();
+    uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties);
+
+    void createDescriptorSetLayout();
+    void createUniformBuffers();
 
     void createSyncObjects();
     void recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex);
+    void createIndexBuffer();
+    void createVertexBuffer();
     void createCommandBuffer();
     void createCommandPool();
     void createFramebuffers();

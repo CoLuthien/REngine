@@ -13,6 +13,7 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
         endif()
     endif()
 endif()
+set(GLFWPP_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # disable building GLFWPP examples
+add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glfwpp)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glfw)
 add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glm)
