@@ -17,10 +17,10 @@ PLATE_API void initialize();
 class PLATE_API plate : std::enable_shared_from_this<plate>
 {
 public:
-    virtual reply click(/*todo*/);
-    virtual reply key(/*todo*/);
+    virtual reply click(/*todo*/) { return {}; }
+    virtual reply key(/*todo*/) { return {}; }
 
-    virtual void draw(/*todo*/);
+    virtual void draw(/*todo*/) {}
 
 public:
     virtual slot_base* get_composite() = 0;
