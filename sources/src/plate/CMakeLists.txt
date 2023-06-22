@@ -12,8 +12,6 @@ target_include_directories(plate
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/plate
-PRIVATE
-    ${SKIA_INCLUDE_DIRS}
 )
 
 target_compile_options(plate
@@ -31,5 +29,4 @@ PUBLIC
 
 PRIVATE
     GLFWPP
-    skia
 )

@@ -3,8 +3,6 @@
 #include "plate.hpp"
 #include <glfwpp/glfwpp.h>
 
-#include <SkImage.h>
-
 namespace ivd::plate
 {
 
