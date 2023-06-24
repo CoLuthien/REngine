@@ -17,5 +17,5 @@ struct is_shared_ptr_t<std::shared_ptr<T>> : std::true_type
 };
 
 template <typename T>
-concept is_shared_ptr = is_shared_ptr_t<T>::value_type;
+concept is_shared_ptr = is_shared_ptr_t<T>::value;
 } // namespace meta

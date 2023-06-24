@@ -2,7 +2,7 @@ BasedOnStyle: Microsoft
 PointerAlignment: Left
 AccessModifierOffset: -4
 IndentWidth: 4
-ColumnLimit: 90
+ColumnLimit: 100
 SortIncludes: Never
 AllowShortBlocksOnASingleLine: Empty
 AlignAfterOpenBracket: Align
@@ -12,4 +12,6 @@ AlwaysBreakTemplateDeclarations: true
 AlwaysBreakAfterReturnType: TopLevelDefinitions
 BinPackArguments: false
 BinPackParameters: false
+AlignOperands: Align
 AlignConsecutiveAssignments: Consecutive
+AlignConsecutiveDeclarations: Consecutive

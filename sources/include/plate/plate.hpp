@@ -10,7 +10,7 @@
 
 namespace ivd::plate
 {
-class slot_base;
+class composite_base;
 
 PLATE_API void initialize();
 
@@ -20,12 +20,29 @@ public:
     virtual reply click(/*todo*/) { return {}; }
     virtual reply key(/*todo*/) { return {}; }
 
+    virtual void arrange(/*todo*/) {}
     virtual void draw(/*todo*/) {}
 
+    template <typename... Es>
+    constexpr void      content(Es&&... elements);
+    inline virtual void content(std::initializer_list<std::shared_ptr<plate>> list) = 0;
+
 public:
-    virtual slot_base* get_composite() = 0;
+    virtual composite_base* get_composite() = 0;
 
 private:
 };
 
+template <typename... Es>
+constexpr void
+plate::content(Es&&... elements)
+{
+    content(std::forward<Es>(elements)...);
+}
+
 } // namespace ivd::plate
+
+namespace ivd
+{
+using plate_ptr = std::shared_ptr<plate::plate>;
+}

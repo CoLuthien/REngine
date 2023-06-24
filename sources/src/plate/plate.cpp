@@ -1,5 +1,5 @@
 
-#include "plate_core/slot.hpp"
+#include "plate_core/composite.hpp"
 #include "plate.hpp"
 #include <glfwpp/glfwpp.h>
 
@@ -13,5 +13,6 @@ initialize()
 
     // todo
 }
+
 
 } // namespace ivd::plate

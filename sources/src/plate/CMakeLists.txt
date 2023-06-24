@@ -1,6 +1,11 @@
 
+
+set (PLATE_ELEMENT_SRCS
+    plate_element/box.cpp
+)
 set(PLATE_SRCS
     plate.cpp
+    ${PLATE_ELEMENT_SRCS}
 )
 
 add_library(plate
@@ -11,6 +16,7 @@ SHARED
 target_include_directories(plate
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
+    ${CMAKE_SOURCE_DIR}/sources/include/core
     ${CMAKE_SOURCE_DIR}/sources/include/plate
 )
 
