@@ -22,6 +22,10 @@ enum class drawable_type_e
 class element : non_copyable
 {
 public:
+    element();
+    virtual ~element();
+
+public:
     template <typename InfoType>
     inline InfoType const* get_info() const
     {

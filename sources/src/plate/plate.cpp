@@ -14,5 +14,4 @@ initialize()
     // todo
 }
 
-
 } // namespace ivd::plate

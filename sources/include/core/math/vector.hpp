@@ -14,6 +14,13 @@ template <typename T>
 struct vector2 : public point2<T>
 {
     // todo ...
+public:
+    using point2<T>::x;
+    using point2<T>::y;
+
+public:
+    inline vector2<T> operator*(T scale) { return vector2<T>{scale * x, scale * y}; }
+    inline vector2<T> operator/(T scale) { return vector2<T>{x / scale, y / scale}; }
 };
 
 template <typename T>

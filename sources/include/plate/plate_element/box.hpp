@@ -14,9 +14,15 @@ public:
     virtual ~box() = default;
 
 public:
-    using plate::content;
-    virtual void content(std::initializer_list<plate_ptr> plates) override;
+    virtual void organize(layout_geometry const&        geometry,
+                          std::vector<organized_plate>& plates) override;
+    virtual void draw(element_list&          list,
+                      std::size_t            layer_id,
+                      layout_geometry const& geometry) override;
 
+public:
+    using plate::content;
+    virtual void            content(std::initializer_list<plate_ptr> plates) override;
     virtual composite_base* get_composite() override { return &m_children; }
 
 private:

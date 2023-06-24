@@ -8,6 +8,7 @@ namespace ivd
 class DLLEXPORT non_copyable
 {
 public:
+    non_copyable()          = default;
     virtual ~non_copyable() = default;
 
 public:

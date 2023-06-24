@@ -87,7 +87,7 @@ public:
 
 Basically, it counts prior specialization of templates.  Details are left for future writing... 
 
-
+TODO: Add non hobject type reflection like vector...
 
 
 
