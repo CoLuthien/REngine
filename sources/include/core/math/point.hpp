@@ -12,8 +12,15 @@ template <typename T>
 struct point2
 {
 public:
+    point2() = default;
+    point2(T in_x, T in_y) : x(in_x), y(in_y) {}
+    point2(T in_value) : x(in_value), y(in_value) {}
+
 public:
-    T x, y;
+    point2<T> operator+(T value) { return point2<T>{x + value, y + value}; }
+
+public:
+    T x = {}, y = {};
 };
 
 template <typename T>

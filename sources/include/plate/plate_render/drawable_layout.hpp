@@ -4,6 +4,7 @@
 #include "plate/definitions.hpp"
 #include "math/vector.hpp"
 #include "math/extent.hpp"
+#include "math/transforms.hpp"
 
 namespace ivd::plate
 {
@@ -11,9 +12,21 @@ namespace ivd::plate
 class PLATE_API layout_transform
 {
 public:
+    explicit layout_transform(point2_f in_offset) : offset(in_offset) {}
+    explicit layout_transform(point2_f in_offset, float in_scale)
+        : scale(in_scale), offset(in_offset)
+    {
+    }
+    explicit layout_transform(float in_scale = 1.f) : scale(in_scale) {}
+
+    point2_f translate(point2_f const& original) const
+    {
+        return ivd::translate(original, as_extent(offset));
+    }
+
 private:
     float    scale;
-    point2_f translation;
+    point2_f offset;
 };
 
 /*
@@ -23,7 +36,13 @@ Assume that all the element layout anchored to upper left corner
 class PLATE_API layout_geometry
 {
 public:
-    layout_geometry organize_element(extent2_f offset, extent2_f size, float scale);
+    layout_geometry organize_element(point2_f location, extent2_f size, float scale) const
+    {
+        layout_geometry result;
+        result.from_parent = layout_transform(from_parent.translate(location), scale);
+        result.local_size  = size;
+        return result;
+    }
 
 private:
     layout_transform from_parent;

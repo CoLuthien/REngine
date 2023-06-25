@@ -13,7 +13,7 @@ public:
     virtual ~drawable_info() = default;
 };
 
-class box_drawable_info : public drawable_info
+class filled_box_drawable_info : public drawable_info
 {
 };
 
