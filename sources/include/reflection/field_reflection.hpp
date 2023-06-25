@@ -68,7 +68,7 @@ template <typename V>
 struct rfield::field_iface_t : public rfield::handle_t
 {
     virtual ~field_iface_t()                   = default;
-    virtual V get(void* obj) const             = 0;
+    virtual V    get(void* obj) const          = 0;
     virtual void set(void* obj, V value) const = 0;
 };
 
@@ -80,12 +80,12 @@ struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<T
     using pointer_type = field_pointer_t<Target, I>;
 
     static constinit field_info_t const field_info;
-    static constexpr pointer_type pointer = field_pointer_v<Target, I>;
-    static constexpr auto name            = field_name_v<Target, I>;
-    static constexpr auto field_type      = field_type_e<Target, I>();
+    static constexpr pointer_type       pointer    = field_pointer_v<Target, I>;
+    static constexpr auto               name       = field_name_v<Target, I>;
+    static constexpr auto               field_type = field_type_e<Target, I>();
 
     inline static consteval auto reflected_info() { return &field_info; }
-    inline virtual efield_type get_type() const override { return field_type; }
+    inline virtual efield_type   get_type() const override { return field_type; }
 
     inline virtual value_type get(void* obj) const override
     {
@@ -105,19 +105,15 @@ struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<T
 };
 
 template <class Target, std::size_t I>
-constinit rfield::field_info_t<Target, I> const
-    rfield::field_info_t<Target, I>::field_info = {};
+constinit rfield::field_info_t<Target, I> const rfield::field_info_t<Target, I>::field_info = {};
 
 template <class Target, std::size_t Index>
 struct gather_fields
 {
-    static constexpr auto instance         = refl::rfield::reflect_field<Target, Index>();
-    static constexpr std::string_view name = field_name_v<Target, Index>;
-    static constexpr auto pair = std::make_pair(name, const_cast<rfield*>(&instance));
-    static consteval std::pair<std::string_view, refl::rfield*> const& get_entry()
-    {
-        return pair;
-    }
+    static constexpr auto             instance = refl::rfield::reflect_field<Target, Index>();
+    static constexpr std::string_view name     = field_name_v<Target, Index>;
+    static constexpr auto             pair = std::make_pair(name, const_cast<rfield*>(&instance));
+    static consteval std::pair<std::string_view, refl::rfield*> const& get_entry() { return pair; }
 };
 
 template <class Target>
@@ -128,19 +124,19 @@ struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
 
 } // namespace refl
 
-#define REFLECT_FIELD(TYPES, NAME, ...)                                                  \
-    TYPES NAME{};                                                                        \
-                                                                                         \
-    struct detail_##NAME##_field_tag;                                                    \
-    static constexpr std::size_t detail_##NAME##_field_index =                           \
-        refl::detail::index<detail_##NAME##_field_tag, detail_field_reflection>::value;  \
-    template <>                                                                          \
-    struct detail_field_reflection<detail_##NAME##_field_index>                          \
-    {                                                                                    \
-        using value_type                       = TYPES;                                  \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class U>                                                               \
-        using pointer_type = value_type U::*;                                            \
-        template <class U>                                                               \
-        static constexpr value_type U::*pointer_value = &U::NAME;                        \
+#define REFLECT_FIELD(TYPES, NAME, ...)                                                            \
+    TYPES NAME{};                                                                                  \
+                                                                                                   \
+    struct detail_##NAME##_field_tag;                                                              \
+    static constexpr std::size_t detail_##NAME##_field_index =                                     \
+        refl::detail::index<detail_##NAME##_field_tag, detail_field_reflection>::value;            \
+    template <>                                                                                    \
+    struct detail_field_reflection<detail_##NAME##_field_index>                                    \
+    {                                                                                              \
+        using value_type                       = TYPES;                                            \
+        static constexpr std::string_view name = #NAME;                                            \
+        template <class U>                                                                         \
+        using pointer_type = value_type U::*;                                                      \
+        template <class U>                                                                         \
+        static constexpr value_type U::*pointer_value = &U::NAME;                                  \
     };

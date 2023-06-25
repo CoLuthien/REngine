@@ -20,40 +20,40 @@ class hclass;
 
 } // namespace ivd
 
-#define REFLECT_FUNCTIONS_INFO()                                                         \
-    static consteval auto reflected_functions()                                          \
-    {                                                                                    \
-        return refl::as_initializer_list<refl::gather_functions,                         \
-                                         this_type,                                      \
-                                         refl::func_counts<this_type>>::entry_point();   \
+#define REFLECT_FUNCTIONS_INFO()                                                                   \
+    static consteval auto reflected_functions()                                                    \
+    {                                                                                              \
+        return refl::as_initializer_list<refl::gather_functions,                                   \
+                                         this_type,                                                \
+                                         refl::func_counts<this_type>>::entry_point();             \
     }
 
-#define REFLECT_FIELDS_INFO()                                                            \
-    static consteval auto reflected_fields()                                             \
-    {                                                                                    \
-        return refl::as_initializer_list<refl::gather_fields,                            \
-                                         this_type,                                      \
-                                         refl::field_counts<this_type>>::entry_point();  \
+#define REFLECT_FIELDS_INFO()                                                                      \
+    static consteval auto reflected_fields()                                                       \
+    {                                                                                              \
+        return refl::as_initializer_list<refl::gather_fields,                                      \
+                                         this_type,                                                \
+                                         refl::field_counts<this_type>>::entry_point();            \
     }
 
-#define REFLECT_CLASS_INFO()                                                             \
-    static consteval auto reflected_class()                                              \
-    {                                                                                    \
-        return refl::rclass::make_class<this_type>();                                    \
+#define REFLECT_CLASS_INFO()                                                                       \
+    static consteval auto reflected_class()                                                        \
+    {                                                                                              \
+        return refl::rclass::make_class<this_type>();                                              \
     }
 
-#define REFLECT_CLASS()                                                                  \
-public:                                                                                  \
-    DECLARE_TYPE();                                                                      \
-    using pedigree_list = meta::list::push_front<super::pedigree_list, this_type>;       \
-                                                                                         \
-public:                                                                                  \
-    template <std::size_t>                                                               \
-    struct detail_field_reflection;                                                      \
-    template <std::size_t>                                                               \
-    struct detail_function_reflection;                                                   \
-                                                                                         \
-private:                                                                                 \
-    REFLECT_CLASS_INFO();                                                                \
-    REFLECT_FIELDS_INFO();                                                               \
+#define REFLECT_CLASS()                                                                            \
+public:                                                                                            \
+    DECLARE_TYPE();                                                                                \
+    using pedigree_list = meta::list::push_front<super::pedigree_list, this_type>;                 \
+                                                                                                   \
+public:                                                                                            \
+    template <std::size_t>                                                                         \
+    struct detail_field_reflection;                                                                \
+    template <std::size_t>                                                                         \
+    struct detail_function_reflection;                                                             \
+                                                                                                   \
+private:                                                                                           \
+    REFLECT_CLASS_INFO();                                                                          \
+    REFLECT_FIELDS_INFO();                                                                         \
     REFLECT_FUNCTIONS_INFO();

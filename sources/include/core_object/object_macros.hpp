@@ -11,9 +11,9 @@ public:                                                                         
     this_type& operator=(this_type const&) = delete;                                               \
     this_type& operator=(this_type&&)      = delete;                                               \
                                                                                                    \
-public:                                                                                           \
-    template <typename T, typename... Args>                                                        \
-    friend T* new_object(ivd::hobject* outer, Args... args);                                       \
+public:                                                                                            \
+    template <typename C, typename... Args>                                                        \
+    friend C* new_object(ivd::hobject* outer, Args... args);                                       \
                                                                                                    \
 public:                                                                                            \
     inline static ivd::hclass* static_class()                                                      \
