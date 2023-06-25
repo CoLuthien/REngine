@@ -5,6 +5,7 @@
 #include "math/point.hpp"
 #include "math/extent.hpp"
 #include "plate/definitions.hpp"
+#include "plate_render/drawable.hpp"
 
 #include <memory>
 #include <vector>
@@ -29,22 +30,7 @@ public:
     virtual ~drawable_description();
 
 public:
-    template <typename InfoType>
-    inline InfoType const* get_info() const
-    {
-        return static_cast<InfoType const*>(info.get());
-    }
-
-    template <typename InfoType>
-    inline InfoType* get_info()
-    {
-        return static_cast<InfoType*>(info.get());
-    }
-
-    auto get_type() const { return type; }
-    auto get_size() const { return size; }
-    auto get_location() const { return location; }
-    auto get_layer_id() const { return layer_id; }
+    drawable make_drawable() const;
 
 public:
     void initialize(drawable_type_e                in_type,
@@ -65,11 +51,13 @@ private:
 
 class PLATE_API drawable_description_list : non_copyable
 {
+    friend class drawable_batch;
+
 public:
     void add_element_description(drawable_description&& description);
 
 private:
-    std::vector<drawable_description> drawables;
+    std::vector<drawable_description> descriptions;
 };
 
 } // namespace ivd::plate

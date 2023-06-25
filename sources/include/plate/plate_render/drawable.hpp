@@ -24,8 +24,4 @@ private:
     std::vector<drawable_index>  indices;
 };
 
-class PLATE_API drawable_factory
-{
-};
-
 } // namespace ivd::plate
