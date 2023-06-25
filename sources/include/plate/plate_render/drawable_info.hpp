@@ -19,6 +19,9 @@ public:
 struct filled_box_drawable_info : public drawable_info
 {
 public:
+    virtual ~filled_box_drawable_info() = default;
+
+public:
     margin m_margin;
 };
 

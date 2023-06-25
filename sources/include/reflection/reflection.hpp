@@ -57,3 +57,19 @@ private:                                                                        
     REFLECT_CLASS_INFO();                                                                          \
     REFLECT_FIELDS_INFO();                                                                         \
     REFLECT_FUNCTIONS_INFO();
+
+// todo make hstruct ...
+#define REFLECT_STRUCT()                                                                           \
+public:                                                                                            \
+    DECLARE_SINGLE_TYPE();                                                                         \
+                                                                                                   \
+public:                                                                                            \
+    template <std::size_t>                                                                         \
+    struct detail_field_reflection;                                                                \
+    template <std::size_t>                                                                         \
+    struct detail_function_reflection;                                                             \
+                                                                                                   \
+private:                                                                                           \
+    REFLECT_CLASS_INFO();                                                                          \
+    REFLECT_FIELDS_INFO();                                                                         \
+    REFLECT_FUNCTIONS_INFO();

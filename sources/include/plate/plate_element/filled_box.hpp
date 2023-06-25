@@ -1,6 +1,7 @@
 
 #pragma once
 
+#include "plate_core/layout/margin.hpp"
 #include "plate_core/composite.hpp"
 #include "plate/plate.hpp"
 
@@ -14,9 +15,13 @@ public:
     virtual ~filled_box();
 
 public:
-    virtual void draw(drawable_description_list&          list,
-                      std::size_t            layer_id,
-                      layout_geometry const& geometry) override;
+    virtual void draw(drawable_description_list& list,
+                      std::size_t                layer_id,
+                      layout_geometry const&     geometry) override;
+
+private:
+    extent2_f size;
+    margin    m_margin;
 };
 
 } // namespace ivd::plate

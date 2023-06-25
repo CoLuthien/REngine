@@ -8,10 +8,15 @@
 namespace ivd::plate
 {
 
-struct PLATE_API margin : public hobject
+struct PLATE_API margin
 {
+    GENERATE_STRUCT()
 public:
-    GENERATE_BODY()
+    margin() = default;
+    margin(float in_left, float in_right, float in_top, float in_bottom)
+        : left(in_left), right(in_right), top(in_top), bottom(in_bottom)
+    {
+    }
 
 public:
     REFLECT_FIELD(float, left);

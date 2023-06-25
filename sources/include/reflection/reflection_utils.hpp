@@ -62,3 +62,10 @@ public:                                                                         
         ->decltype(refl::detail::this_type_writer<this_type_tag, decltype(this)>{}, void());       \
     using super     = this_type;                                                                   \
     using this_type = refl::detail::this_type_read<this_type_tag>;
+
+#define DECLARE_SINGLE_TYPE()                                                                      \
+public:                                                                                            \
+    struct this_type_tag;                                                                          \
+    constexpr auto this_type_helper()                                                              \
+        ->decltype(refl::detail::this_type_writer<this_type_tag, decltype(this)>{}, void());       \
+    using this_type = refl::detail::this_type_read<this_type_tag>;

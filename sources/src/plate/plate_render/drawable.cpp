@@ -4,5 +4,6 @@
 
 namespace ivd::plate
 {
+drawable::drawable() = default;
 
 } // namespace ivd::plate

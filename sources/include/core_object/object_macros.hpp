@@ -28,6 +28,8 @@ public:                                                                         
         return &instance;                                                                          \
     }
 
+#define GENERATE_STRUCT() REFLECT_STRUCT();
+
 #define GENERATE_HOBJECT_BODY()                                                                    \
 public:                                                                                            \
     using super         = std::nullptr_t;                                                          \
