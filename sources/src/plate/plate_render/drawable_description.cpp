@@ -34,8 +34,9 @@ drawable_description::make_drawable() const
     case drawable_type_e::BOX: {
         return drawable_factory::make_filled_box(*this);
     }
-    case drawable_type_e::LINE:
+    case drawable_type_e::LINE: {
         break;
+    }
     }
     return {};
 }

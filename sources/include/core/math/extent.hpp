@@ -17,6 +17,13 @@ public:
 };
 
 template <typename T>
+extent2<T>
+operator-(extent2<T> const& value)
+{
+    return {-value.x, -value.y};
+}
+
+template <typename T>
 struct extent3
 {
 public:

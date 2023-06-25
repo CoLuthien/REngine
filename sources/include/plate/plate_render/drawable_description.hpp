@@ -30,14 +30,30 @@ public:
     virtual ~drawable_description();
 
 public:
-    drawable make_drawable() const;
+    template <typename InfoType>
+    inline InfoType const* get_info() const
+    {
+        return static_cast<InfoType const*>(info.get());
+    }
+
+    template <typename InfoType>
+    inline InfoType* get_info()
+    {
+        return static_cast<InfoType*>(info.get());
+    }
+
+    auto get_type() const { return type; }
+    auto get_size() const { return size; }
+    auto get_location() const { return location; }
+    auto get_layer_id() const { return layer_id; }
 
 public:
-    void initialize(drawable_type_e                in_type,
-                    std::unique_ptr<drawable_info> in_info,
-                    point2_f                       in_location,
-                    extent2_f                      in_size,
-                    layer_id_t                     in_layer);
+    drawable make_drawable() const;
+    void     initialize(drawable_type_e                in_type,
+                        std::unique_ptr<drawable_info> in_info,
+                        point2_f                       in_location,
+                        extent2_f                      in_size,
+                        layer_id_t                     in_layer);
 
 private:
     drawable_type_e                type;

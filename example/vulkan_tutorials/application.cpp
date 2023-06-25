@@ -33,12 +33,11 @@ TriangleApplication::initWindow()
 std::vector<const char*>
 TriangleApplication::getRequiredExtensions()
 {
-    uint32_t glfwExtensionCount = 0;
+    uint32_t     glfwExtensionCount = 0;
     const char** glfwExtensions;
     glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
-    std::vector<const char*> extensions(glfwExtensions,
-                                        glfwExtensions + glfwExtensionCount);
+    std::vector<const char*> extensions(glfwExtensions, glfwExtensions + glfwExtensionCount);
 
     if (enableValidationLayers)
     {
@@ -49,8 +48,7 @@ TriangleApplication::getRequiredExtensions()
 }
 
 vk::SurfaceFormatKHR
-TriangleApplication::chooseSwapSurfaceFormat(
-    std::vector<vk::SurfaceFormatKHR> const& formats)
+TriangleApplication::chooseSwapSurfaceFormat(std::vector<vk::SurfaceFormatKHR> const& formats)
 {
     for (auto const& format : formats)
     {
@@ -66,9 +64,8 @@ TriangleApplication::chooseSwapSurfaceFormat(
 bool
 TriangleApplication::checkDeviceExtensionSupport(vk::raii::PhysicalDevice const& device)
 {
-    auto extensions = device.enumerateDeviceExtensionProperties();
-    std::set<std::string> requiredExtensions(deviceExtensions.begin(),
-                                             deviceExtensions.end());
+    auto                  extensions = device.enumerateDeviceExtensionProperties();
+    std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
     for (auto const& extension : extensions)
     {
@@ -157,7 +154,7 @@ TriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& device)
     QueueFamilyIndices indices;
 
     auto properties = device.getQueueFamilyProperties();
-    int i           = 0;
+    int  i          = 0;
     for (auto const& family : properties)
     {
         if (family.queueFlags & vk::QueueFlagBits::eGraphics)
@@ -187,8 +184,7 @@ TriangleApplication::findQueueFamilies(vk::raii::PhysicalDevice const& device)
 bool
 TriangleApplication::checkValidationLayerSupport()
 {
-    std::vector<vk::LayerProperties> availableLayers =
-        vk::enumerateInstanceLayerProperties();
+    std::vector<vk::LayerProperties> availableLayers = vk::enumerateInstanceLayerProperties();
 
     for (const char* layerName : validationLayers)
     {
@@ -213,8 +209,7 @@ TriangleApplication::checkValidationLayerSupport()
 }
 
 void
-TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer,
-                                         uint32_t imageIndex)
+TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32_t imageIndex)
 {
     vk::CommandBufferBeginInfo beginInfo{
         .pNext            = nullptr,
@@ -279,17 +274,15 @@ TriangleApplication::updateUniformBuffer(uint32_t frameIdx)
 {
     static auto startTime = std::chrono::high_resolution_clock::now();
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime -
-                                                                            startTime)
-                     .count();
+    auto  currentTime = std::chrono::high_resolution_clock::now();
+    float time =
+        std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
     UniformBufferObject ubo{};
-    ubo.model = glm::rotate(
-        glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.model =
+        glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f),
-                           glm::vec3(0.0f, 0.0f, 0.0f),
-                           glm::vec3(0.0f, 0.0f, 1.0f));
+    ubo.view = glm::lookAt(
+        glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
 
     ubo.proj = glm::perspective(
         glm::radians(45.0f), imageExtent.width / (float)imageExtent.height, 0.1f, 10.0f);
@@ -313,8 +306,7 @@ TriangleApplication::drawFrame()
     auto& commandBuffer  = commandBuffers[currentFrameIdx];
     auto& renderFinished = renderFinishes[currentFrameIdx];
 
-    auto waitResult =
-        device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
+    auto waitResult = device.waitForFences({*inFlight}, true, std::numeric_limits<uint64_t>::max());
     if (waitResult != vk::Result::eSuccess)
     {
         throw std::runtime_error{"Failed to wait in flight fence"};
@@ -329,8 +321,7 @@ TriangleApplication::drawFrame()
         recreateSwapChain();
         return;
     }
-    else if (acquireResult != vk::Result::eSuccess &&
-             acquireResult != vk::Result::eSuboptimalKHR)
+    else if (acquireResult != vk::Result::eSuccess && acquireResult != vk::Result::eSuboptimalKHR)
     {
         throw std::runtime_error("failed to acquire swap chain image!");
     }
@@ -339,15 +330,14 @@ TriangleApplication::drawFrame()
 
     updateUniformBuffer(currentFrameIdx);
 
-    vk::PipelineStageFlags waitStages[] = {
-        vk::PipelineStageFlagBits::eColorAttachmentOutput};
-    vk::SubmitInfo submitInfo{.waitSemaphoreCount   = 1,
-                              .pWaitSemaphores      = &(*imageAvailable),
-                              .pWaitDstStageMask    = waitStages,
-                              .commandBufferCount   = 1,
-                              .pCommandBuffers      = &(*commandBuffer),
-                              .signalSemaphoreCount = 1,
-                              .pSignalSemaphores    = &(*renderFinished)};
+    vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
+    vk::SubmitInfo         submitInfo{.waitSemaphoreCount   = 1,
+                                      .pWaitSemaphores      = &(*imageAvailable),
+                                      .pWaitDstStageMask    = waitStages,
+                                      .commandBufferCount   = 1,
+                                      .pCommandBuffers      = &(*commandBuffer),
+                                      .signalSemaphoreCount = 1,
+                                      .pSignalSemaphores    = &(*renderFinished)};
 
     graphicsQueue.submit({submitInfo}, *inFlight);
 

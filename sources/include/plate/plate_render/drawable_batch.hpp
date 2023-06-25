@@ -14,7 +14,7 @@ namespace ivd::plate
 class PLATE_API drawable_batch
 {
 public:
-    void add_drawables(drawable_description_list&& list);
+    void add_drawables(drawable_description_list const&& list);
 
 private:
     std::vector<drawable> drawables;

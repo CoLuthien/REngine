@@ -5,8 +5,7 @@
 
 namespace ivd::plate
 {
-
-class PLATE_API plate_renderer
+class PLATE_API plate_renderer_interface
 {
 public:
 };
