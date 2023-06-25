@@ -3,6 +3,8 @@
 
 #include "plate/definitions.hpp"
 
+#include "plate_core/layout/margin.hpp"
+
 namespace ivd::plate
 {
 
@@ -10,12 +12,14 @@ namespace ivd::plate
 struct drawable_info
 {
 public:
+    drawable_info()          = default;
     virtual ~drawable_info() = default;
 };
 
 struct filled_box_drawable_info : public drawable_info
 {
 public:
+    margin m_margin;
 };
 
 } // namespace ivd::plate
