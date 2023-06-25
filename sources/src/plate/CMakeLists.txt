@@ -6,7 +6,9 @@ set (PLATE_ELEMENT_SRCS
 
 set (PLATE_RENDER_SRCS
     plate_render/drawable.cpp
+    plate_render/drawable_info.cpp
     plate_render/drawable_layout.cpp
+    plate_render/drawable_description.cpp
     plate_render/drawable_description_factory.cpp
 )
 

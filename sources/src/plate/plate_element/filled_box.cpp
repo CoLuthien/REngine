@@ -14,6 +14,7 @@ filled_box::draw(drawable_description_list& list,
                  std::size_t                layer_id,
                  layout_geometry const&     geometry)
 {
+    // todo
 
     drawable_description_factory::make_box_description(
         list, layer_id, geometry.organize_element(0, {}, 1), {});

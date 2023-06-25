@@ -44,8 +44,12 @@ public:
         return result;
     }
 
+    point2_f  get_location() const { return from_parent.translate(location); }
+    extent2_f get_size() const { return local_size; }
+
 private:
     layout_transform from_parent;
+    point2_f         location;
     extent2_f        local_size;
 };
 

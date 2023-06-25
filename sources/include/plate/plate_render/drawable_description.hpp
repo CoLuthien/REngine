@@ -11,7 +11,8 @@
 
 namespace ivd::plate
 {
-class drawable_info;
+struct drawable_info;
+using layer_id_t = std::uint32_t;
 
 enum class drawable_type_e
 {
@@ -19,10 +20,12 @@ enum class drawable_type_e
     LINE,
 };
 
-class drawable_description : non_copyable
+class PLATE_API drawable_description : non_copyable
 {
 public:
     drawable_description();
+    drawable_description(drawable_description&&);
+    drawable_description& operator=(drawable_description&&) noexcept;
     virtual ~drawable_description();
 
 public:
@@ -38,17 +41,29 @@ public:
         return static_cast<InfoType*>(info.get());
     }
 
-private:
-    std::unique_ptr<drawable_info> info;
-    drawable_type_e               type;
+    auto get_type() const { return type; }
+    auto get_size() const { return size; }
+    auto get_location() const { return location; }
+    auto get_layer_id() const { return layer_id; }
+
+public:
+    void initialize(drawable_type_e                in_type,
+                    std::unique_ptr<drawable_info> in_info,
+                    point2_f                       in_location,
+                    extent2_f                      in_size,
+                    layer_id_t                     in_layer);
 
 private:
-    point2_f    location;
-    extent2_f   size;
-    std::size_t layer_id;
+    drawable_type_e                type;
+    std::unique_ptr<drawable_info> info;
+
+private:
+    point2_f   location;
+    extent2_f  size;
+    layer_id_t layer_id;
 };
 
-class drawable_description_list : non_copyable
+class PLATE_API drawable_description_list : non_copyable
 {
 public:
     void add_element_description(drawable_description&& description);
