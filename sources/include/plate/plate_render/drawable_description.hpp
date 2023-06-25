@@ -11,7 +11,7 @@
 
 namespace ivd::plate
 {
-class element_info;
+class drawable_info;
 
 enum class drawable_type_e
 {
@@ -19,11 +19,11 @@ enum class drawable_type_e
     LINE,
 };
 
-class element : non_copyable
+class drawable_description : non_copyable
 {
 public:
-    element();
-    virtual ~element();
+    drawable_description();
+    virtual ~drawable_description();
 
 public:
     template <typename InfoType>
@@ -39,7 +39,7 @@ public:
     }
 
 private:
-    std::unique_ptr<element_info> info;
+    std::unique_ptr<drawable_info> info;
     drawable_type_e               type;
 
 private:
@@ -48,13 +48,13 @@ private:
     std::size_t layer_id;
 };
 
-class element_list : non_copyable
+class drawable_description_list : non_copyable
 {
 public:
-    void add_drawble(element&& element);
+    void add_element_description(drawable_description&& description);
 
 private:
-    std::vector<element> drawables;
+    std::vector<drawable_description> drawables;
 };
 
 } // namespace ivd::plate

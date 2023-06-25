@@ -11,7 +11,7 @@ box::organize(layout_geometry const& geometry, std::vector<organized_plate>& pla
 }
 
 void
-box::draw(element_list& list, std::size_t layer_id, layout_geometry const& geometry)
+box::draw(drawable_description_list& list, std::size_t layer_id, layout_geometry const& geometry)
 {
 }
 

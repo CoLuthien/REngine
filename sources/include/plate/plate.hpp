@@ -5,8 +5,8 @@
 #include "plate_types.hpp"
 
 #include "plate_core/reply.hpp"
-#include "plate_render/element.hpp"
-#include "plate_render/element_layout.hpp"
+#include "plate_render/drawable_description.hpp"
+#include "plate_render/drawable_layout.hpp"
 
 #include <memory>
 
@@ -25,18 +25,17 @@ public:
     virtual reply click(/*todo*/) { return {}; }
     virtual reply key(/*todo*/) { return {}; }
 
-    virtual void organize(layout_geometry const&        geometry,
-                          std::vector<organized_plate>& plates) = 0;
-    virtual void draw(element_list&          list,
-                      std::size_t            layer_id,
-                      layout_geometry const& geometry)          = 0;
+    virtual void organize(layout_geometry const& geometry, std::vector<organized_plate>& plates) {}
+    virtual void draw(drawable_description_list& list,
+                      std::size_t                layer_id,
+                      layout_geometry const&     geometry) = 0;
 
     template <typename... Es>
     inline constexpr void content(Es&&... elements);
-    inline virtual void   content(std::initializer_list<std::shared_ptr<plate>> list) = 0;
+    inline virtual void   content(std::initializer_list<std::shared_ptr<plate>> list) {}
 
 public:
-    virtual composite_base* get_composite() = 0;
+    virtual composite_base* get_composite() { return nullptr; }
 
 private:
 };

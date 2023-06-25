@@ -16,9 +16,9 @@ public:
 public:
     virtual void organize(layout_geometry const&        geometry,
                           std::vector<organized_plate>& plates) override;
-    virtual void draw(element_list&          list,
-                      std::size_t            layer_id,
-                      layout_geometry const& geometry) override;
+    virtual void draw(drawable_description_list&          list,
+                              std::size_t            layer_id,
+                              layout_geometry const& geometry) override;
 
 public:
     using plate::content;
