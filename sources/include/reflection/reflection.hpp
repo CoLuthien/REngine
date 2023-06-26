@@ -58,7 +58,7 @@ private:                                                                        
     REFLECT_FIELDS_INFO();                                                                         \
     REFLECT_FUNCTIONS_INFO();
 
-// todo make hstruct ...
+/*************/
 #define REFLECT_STRUCT()                                                                           \
 public:                                                                                            \
     DECLARE_SINGLE_TYPE();                                                                         \
@@ -71,5 +71,4 @@ public:                                                                         
                                                                                                    \
 private:                                                                                           \
     REFLECT_CLASS_INFO();                                                                          \
-    REFLECT_FIELDS_INFO();                                                                         \
-    REFLECT_FUNCTIONS_INFO();
+    REFLECT_FIELDS_INFO();

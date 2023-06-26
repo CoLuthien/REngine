@@ -3,7 +3,7 @@
 
 #include "object.hpp"
 #include "reflection/reflection.hpp"
-#include "definitions.hpp"
+#include "core_object/definitions.hpp"
 
 #include <unordered_map>
 #include <span>
@@ -57,15 +57,28 @@ private:
     refl::rfunction* m_func;
 };
 
+class COREOBJECT_API hstruct : public hobject
+{
+public:
+    hstruct(refl::rclass&&                                              self_class,
+            std::span<std::pair<std::string_view, refl::rfield*> const> field_span)
+        : m_self(self_class), m_fields(field_span.begin(), field_span.end())
+    {
+    }
+
+private:
+    refl::rclass                                       m_self;
+    std::unordered_map<std::string_view, hfield> const m_fields;
+};
+
 class COREOBJECT_API hclass : public hobject
 {
 public:
-    hclass(refl::rclass&& self_class,
-           hclass const* super_class,
-           std::span<std::pair<std::string_view, refl::rfield*> const> field_map,
+    hclass(refl::rclass&&                                                 self_class,
+           hclass const*                                                  super_class,
+           std::span<std::pair<std::string_view, refl::rfield*> const>    field_map,
            std::span<std::pair<std::string_view, refl::rfunction*> const> func_map)
-        : m_super(super_class), m_self(self_class),
-          m_fields(field_map.begin(), field_map.end()),
+        : m_super(super_class), m_self(self_class), m_fields(field_map.begin(), field_map.end()),
           m_functions(func_map.begin(), func_map.end())
     {
     }
@@ -75,12 +88,12 @@ public:
 
     hfield const* find_field(std::string_view name) const;
     hclass const* get_super() const noexcept { return m_super; }
-    auto const& get_fields() { return m_fields; }
+    auto const&   get_fields() { return m_fields; }
 
 private:
-    hclass const* m_super;
-    refl::rclass m_self;
-    std::unordered_map<std::string_view, hfield> const m_fields;
+    hclass const*                                         m_super;
+    refl::rclass                                          m_self;
+    std::unordered_map<std::string_view, hfield> const    m_fields;
     std::unordered_map<std::string_view, hfunction> const m_functions;
 };
 

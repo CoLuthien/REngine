@@ -5,6 +5,7 @@
 #include "reflection_concepts.hpp"
 #include "reflection_helper.hpp"
 #include "meta/func_traits.hpp"
+#include <string_view>
 
 namespace refl
 {

@@ -8,7 +8,6 @@
 #include "meta/array.hpp"
 
 #include <array>
-#include <frozen/unordered_map.h>
 #include <type_traits>
 
 namespace refl

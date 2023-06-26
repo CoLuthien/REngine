@@ -28,7 +28,17 @@ public:                                                                         
         return &instance;                                                                          \
     }
 
-#define GENERATE_STRUCT() REFLECT_STRUCT();
+#define GENERATE_STRUCT()                                                                          \
+    REFLECT_STRUCT();                                                                              \
+                                                                                                   \
+public:                                                                                            \
+    inline static ivd::hstruct* static_struct()                                                    \
+    {                                                                                              \
+        static constexpr auto fields = reflected_fields();                                         \
+        static auto           instance =                                                           \
+            ivd::hstruct(reflected_class(), std::span{fields.data(), fields.size()});              \
+        return &instance;                                                                          \
+    }
 
 #define GENERATE_HOBJECT_BODY()                                                                    \
 public:                                                                                            \
