@@ -6,8 +6,9 @@
 
 namespace ivd
 {
+class hobject;
 
 template <typename T>
-concept hobject_type = std::is_base_of_v<class hobject, std::decay_t<T>>;
+concept hobject_type = std::is_base_of_v<hobject, std::decay_t<T>>;
 
 } // namespace ivd

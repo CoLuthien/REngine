@@ -11,7 +11,7 @@ set (CMAKE_CXX_STANDARD 20)
 find_package(Vulkan REQUIRED)
 
 include(cmake/CompileOptions.cmake)
-
+include (GenerateExportHeader)
 include(cmake/Graphics.cmake)
 include(cmake/submodule.cmake)
 

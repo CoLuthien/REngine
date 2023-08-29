@@ -19,16 +19,16 @@ mark(hobject* object)
     {
         return;
     }
-    auto* cls          = object->get_class();
+    auto*       cls    = object->get_class();
     auto const& fields = cls->get_fields();
 
     object->clear_flags(eobject_flag::UNREACHABLE);
     for (auto& [name, field] : fields)
     {
-        auto const type = field.get_type();
+        auto const type = field->get_type();
         if (type == efield_type::REFLECTED_PTR)
         {
-            auto obj_ptr = field.get<hobject*>(object);
+            auto* obj_ptr = field->get<hobject*>(object);
             mark(obj_ptr);
         }
         else
@@ -55,7 +55,7 @@ garbage_collector::mark_objects()
 void
 garbage_collector::sweep_objects()
 {
-    auto const& idxs = object_array->get_idxs();
+    auto const&              idxs = object_array->get_idxs();
     std::vector<std::size_t> idx_to_remove{};
 
     for (auto idx : idxs)

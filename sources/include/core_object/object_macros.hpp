@@ -1,8 +1,10 @@
 
 #pragma once
 
+#include "frozen/unordered_map.h"
 #include "reflection/reflection.hpp"
 #include <span>
+#include <string_view>
 
 #define GENERATE_BODY()                                                                            \
     REFLECT_CLASS();                                                                               \

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
+#include "plate_export.hpp"
 #include "math/vector.hpp"
 #include "math/extent.hpp"
 #include "math/transforms.hpp"

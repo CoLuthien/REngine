@@ -24,8 +24,15 @@ SHARED
     ${PLATE_SRCS}
 )
 
+GENERATE_EXPORT_HEADER(plate 
+    EXPORT_MACRO_NAME PLATE_API
+    EXPORT_FILE_NAME plate_export.hpp
+)
+
+
 target_include_directories(plate
 PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/core
 

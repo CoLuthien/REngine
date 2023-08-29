@@ -25,7 +25,7 @@ public:
     }
 
     template <typename R, typename... Args>
-    R invoke(void* obj, Args... args)
+    R invoke(void* obj, Args... args) const
     {
         using type = field_iface_t<R, Args...>;
         auto ptr   = static_cast<type const*>(m_info);
@@ -73,8 +73,8 @@ struct rfunction::field_info_t : public rfunction::field_iface_t<R, Args...>
     using pointer_type = func_pointer_t<Target, I>;
     using result_type  = R;
 
-    static constexpr auto pointer = func_pointer_v<Target, I>;
-    static constexpr auto name    = func_name_v<Target, I>;
+    static constexpr auto               pointer = func_pointer_v<Target, I>;
+    static constexpr auto               name    = func_name_v<Target, I>;
     static constinit field_info_t const field_info;
 
     static constexpr auto reflected_info() { return &field_info; }
@@ -95,7 +95,7 @@ struct gather_functions
 {
     static constexpr auto instance = refl::rfunction::reflect_field<Target, Index>();
     static constexpr auto name     = func_name_v<Target, Index>;
-    static constexpr auto pair = std::make_pair(name, const_cast<rfunction*>(&instance));
+    static constexpr auto pair     = std::make_pair(name, const_cast<rfunction*>(&instance));
     static consteval std::pair<std::string_view, refl::rfunction*> const& get_entry()
     {
         return pair;
@@ -112,22 +112,22 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
 };
 } // namespace refl
 
-#define INFER_FUNC_TYPE(NAME)                                                            \
-    template <class C, typename... Args>                                                 \
-    using inferred_type =                                                                \
+#define INFER_FUNC_TYPE(NAME)                                                                      \
+    template <class C, typename... Args>                                                           \
+    using inferred_type =                                                                          \
         decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
 
-#define REFLECT_FUNCTION(NAME, ...)                                                      \
-    static constexpr size_t detail_##NAME##_function_index =                             \
-        refl::detail::index<struct detail_##NAME##_function_tag,                         \
-                            detail_function_reflection>::value;                          \
-    template <>                                                                          \
-    struct detail_function_reflection<detail_##NAME##_function_index>                    \
-    {                                                                                    \
-        INFER_FUNC_TYPE(NAME);                                                           \
-        static constexpr std::string_view name = #NAME;                                  \
-        template <class Target>                                                          \
-        using type = inferred_type<Target, __VA_ARGS__>;                                 \
-        template <class Target>                                                          \
-        static constexpr type<Target> pointer_v = &Target::NAME;                         \
+#define REFLECT_FUNCTION(NAME, ...)                                                                \
+    static constexpr size_t detail_##NAME##_function_index =                                       \
+        refl::detail::index<struct detail_##NAME##_function_tag,                                   \
+                            detail_function_reflection>::value;                                    \
+    template <>                                                                                    \
+    struct detail_function_reflection<detail_##NAME##_function_index>                              \
+    {                                                                                              \
+        INFER_FUNC_TYPE(NAME);                                                                     \
+        static constexpr std::string_view name = #NAME;                                            \
+        template <class Target>                                                                    \
+        using type = inferred_type<Target, __VA_ARGS__>;                                           \
+        template <class Target>                                                                    \
+        static constexpr type<Target> pointer_v = &Target::NAME;                                   \
     };

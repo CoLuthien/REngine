@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
+#include "plate_export.h"
 
 #include "plate_render/drawable.hpp"
 #include "plate_render/drawable_description.hpp"

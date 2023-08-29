@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
+#include "plate_export.hpp"
 #include "plate_types.hpp"
 
 #include "plate_core/reply.hpp"

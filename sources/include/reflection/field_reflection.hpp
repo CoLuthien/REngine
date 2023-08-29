@@ -7,6 +7,8 @@
 #include "reflection_helper.hpp"
 
 #include <type_traits>
+#include <string_view>
+#include <numeric>
 
 namespace refl
 {
@@ -23,11 +25,12 @@ public:
 
 public:
     template <class V>
-    V get(void* obj) const
+    V const& get(void* obj) const
     {
         auto ptr = static_cast<field_iface_t<V> const*>(m_info);
         return ptr->get(obj);
     }
+
     template <class V>
     void set(void* obj, V value) const
     {
@@ -67,17 +70,19 @@ rfield::get_type() const
 template <typename V>
 struct rfield::field_iface_t : public rfield::handle_t
 {
-    virtual ~field_iface_t()                   = default;
-    virtual V    get(void* obj) const          = 0;
-    virtual void set(void* obj, V value) const = 0;
+    virtual ~field_iface_t()                       = default;
+    virtual V const& get(void* obj) const          = 0;
+    virtual void     set(void* obj, V value) const = 0;
 };
 
 template <class Target, std::size_t I>
 struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<Target, I>>
 {
-    using owner_type   = Target;
-    using value_type   = field_value_t<Target, I>;
-    using pointer_type = field_pointer_t<Target, I>;
+    using owner_type     = Target;
+    using value_type     = field_value_t<Target, I>;
+    using ref_type       = std::remove_const_t<value_type>&;
+    using const_ref_type = value_type const&;
+    using pointer_type   = std::remove_const_t<field_pointer_t<Target, I>>;
 
     static constinit field_info_t const field_info;
     static constexpr pointer_type       pointer    = field_pointer_v<Target, I>;
@@ -87,7 +92,7 @@ struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<T
     inline static consteval auto reflected_info() { return &field_info; }
     inline virtual efield_type   get_type() const override { return field_type; }
 
-    inline virtual value_type get(void* obj) const override
+    inline virtual const_ref_type get(void* obj) const override
     {
         return reinterpret_cast<owner_type*>(obj)->*pointer;
     }
@@ -136,7 +141,7 @@ struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
         using value_type                       = TYPES;                                            \
         static constexpr std::string_view name = #NAME;                                            \
         template <class U>                                                                         \
-        using pointer_type = value_type U::*;                                                      \
+        using pointer_type = TYPES U::*;                                                           \
         template <class U>                                                                         \
-        static constexpr value_type U::*pointer_value = &U::NAME;                                  \
+        static constexpr TYPES U::*pointer_value = &U::NAME;                                       \
     };

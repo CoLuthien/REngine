@@ -1,8 +1,6 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
-
 #include "plate_core/layout/margin.hpp"
 
 namespace ivd::plate

@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
+#include "plate_export.h"
 #include "math/point.hpp"
 #include "plate_render/drawable_vertex.hpp"
 
