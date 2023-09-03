@@ -33,31 +33,31 @@ template <class Target, size_t I>
 static inline constexpr auto
 field_type_e()
 {
-    using type       = std::decay_t<field_value_t<Target, I>>;
-    using value_type = std::remove_pointer_t<type>;
+    using type = std::decay_t<field_value_t<Target, I>>;
 
-    if constexpr (is_reflected_type<value_type>)
+    if constexpr (refl::is_reflected_type<type> && std::is_pointer_v<type>)
     {
-        if constexpr (std::is_pointer_v<type>)
-        {
-            return efield_type::REFLECTED_PTR;
-        }
-        else
-        {
-            return efield_type::REFLECTED;
-        }
+        return efield_type::REFLECTED_PTR;
     }
-    else if constexpr (refl::is_object_container<value_type>)
+    else if constexpr (refl::is_reflected_object_map<type>)
     {
-        return efield_type::REFLECTED_OBJECT_CONTAINER;
+        return efield_type::REFLECTED_OBJECT_MAP;
     }
-    else if constexpr (std::is_fundamental_v<value_type>)
+    else if constexpr (refl::is_reflected_object_vector<type>)
+    {
+        return efield_type::REFLECTED_OBJECT_VECTOR;
+    }
+    else if constexpr (refl::is_reflected_object_queue<type>)
+    {
+        return efield_type::REFLECTED_OBJECT_QUEUE;
+    }
+    else if constexpr (std::is_fundamental_v<type>)
     {
         return efield_type::PRIM;
     }
     else
     {
-        return efield_type::REGULAR;
+        return efield_type::INVALID;
     }
 }
 

@@ -3,7 +3,7 @@
 
 #include "math/color.hpp"
 
-#include "plate_export.h"
+#include "plate_export.hpp"
 #include "plate_render/drawable_description.hpp"
 #include "plate_render/drawable_layout.hpp"
 #include "plate_core/layout/margin.hpp"

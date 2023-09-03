@@ -6,6 +6,8 @@
 #include <span>
 #include <string_view>
 
+#define DECLARE_TEMPLATE_PARAMS(...) __VA_ARGS__
+
 #define GENERATE_BODY()                                                                            \
     REFLECT_CLASS();                                                                               \
                                                                                                    \

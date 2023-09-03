@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "plate/definitions.hpp"
 #include "plate_types.hpp"
 
 #include "utils/non_copyable.hpp"

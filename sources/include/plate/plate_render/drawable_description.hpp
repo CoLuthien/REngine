@@ -4,7 +4,7 @@
 #include "utils/non_copyable.hpp"
 #include "math/point.hpp"
 #include "math/extent.hpp"
-#include "plate_export.h"
+#include "plate_export.hpp"
 #include "plate_render/drawable.hpp"
 
 #include <memory>

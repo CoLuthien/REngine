@@ -52,6 +52,7 @@ PRIVATE
     core_object
     GLFWPP
 )
+message(${CMAKE_CURRENT_BINARY_DIR})
 
 target_compile_options(plate
 PUBLIC

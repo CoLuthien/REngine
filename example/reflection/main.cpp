@@ -37,6 +37,7 @@ public:
 
 public:
     REFLECT_FIELD(std::vector<T>, Type);
+    REFLECT_FIELD(std::queue<T>, queue);
 };
 
 int
