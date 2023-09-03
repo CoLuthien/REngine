@@ -13,11 +13,25 @@ template <typename T>
 struct extent2
 {
 public:
+    extent2() = default;
+    extent2(T in_x, T in_y) : x(in_x), y(in_y) {}
+
+public:
+    constexpr extent2<T> operator*(T scale);
+
+public:
     T x, y;
 };
 
 template <typename T>
-extent2<T>
+constexpr extent2<T>
+extent2<T>::operator*(T scale)
+{
+    return {x * scale, y * scale};
+}
+
+template <typename T>
+constexpr extent2<T>
 operator-(extent2<T> const& value)
 {
     return {-value.x, -value.y};
