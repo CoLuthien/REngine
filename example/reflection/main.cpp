@@ -3,6 +3,7 @@
 #include "core_object/core_object.hpp"
 #include <string_view>
 #include <iostream>
+#include <unordered_map>
 #include <meta/utils.hpp>
 
 class Sample : public ivd::hobject
@@ -38,6 +39,7 @@ public:
 public:
     REFLECT_FIELD(std::vector<T>, Type);
     REFLECT_FIELD(std::queue<T>, queue);
+    REFLECT_FIELD(std::unordered_map<DECLARE_TEMPLATE_PARAMS(std::string, T)>, map);
 };
 
 int
