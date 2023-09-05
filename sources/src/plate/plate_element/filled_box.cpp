@@ -17,7 +17,7 @@ filled_box::draw(drawable_description_list& list,
     // todo
 
     drawable_description_factory::make_box_description(
-        list, layer_id, geometry.organize_element(0, {}, 1), {}, m_margin);
+        list, layer_id, geometry.organize_element({}, {}, 1), {}, m_margin);
 }
 
 } // namespace ivd::plate

@@ -3,9 +3,14 @@ set(GC_SRCS
     garbage_collection/garbage_collection.cpp
 )
 
+set(MATH_SRCS
+    math/color.cpp
+)
+
 add_library(core
 SHARED
     ${GC_SRCS}
+    ${MATH_SRCS}
 )
 
 target_include_directories(core
@@ -13,6 +18,8 @@ PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/core
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
+PRIVATE
+    ${CMAKE_SOURCE_DIR}/sources/include/core
 )
 
 target_compile_options(core
@@ -21,7 +28,8 @@ PUBLIC
 )
 
 target_compile_definitions(core 
-    PRIVATE CORE_BUILD
+PRIVATE 
+    CORE_BUILD
 )
 
 target_link_libraries(core
