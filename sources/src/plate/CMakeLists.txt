@@ -49,10 +49,10 @@ PUBLIC
     glm
 
 PRIVATE
+    core
     core_object
     GLFWPP
 )
-message(${CMAKE_CURRENT_BINARY_DIR})
 
 target_compile_options(plate
 PUBLIC
@@ -60,5 +60,7 @@ PUBLIC
 )
 
 target_compile_definitions(plate
-    PRIVATE PLATE_BUILD
+PRIVATE 
+    PLATE_BUILD
+    ${DEFAULT_COMPILE_DEFINITIONS}
 )

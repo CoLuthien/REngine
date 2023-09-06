@@ -12,9 +12,14 @@ SHARED
     ${GC_SRCS}
     ${MATH_SRCS}
 )
+GENERATE_EXPORT_HEADER(core
+    EXPORT_MACRO_NAME CORE_API
+    EXPORT_FILE_NAME core_export.hpp
+)
 
 target_include_directories(core
 PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/core
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
@@ -30,6 +35,7 @@ PUBLIC
 target_compile_definitions(core 
 PRIVATE 
     CORE_BUILD
+    ${DEFAULT_COMPILE_DEFINITIONS}
 )
 
 target_link_libraries(core

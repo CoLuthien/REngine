@@ -22,6 +22,8 @@ public:
     {
     }
 
+    hfield const* find_field(std::string_view name) const;
+
 private:
     refl::rclass                                        m_self;
     std::unordered_map<std::string_view, hfield*> const m_fields;

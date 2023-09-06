@@ -5,7 +5,7 @@
 namespace refl
 {
 
-class rclass
+class rclass // should be removed in future
 {
 private:
     struct class_iface_t

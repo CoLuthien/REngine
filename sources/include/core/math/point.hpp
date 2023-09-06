@@ -9,6 +9,9 @@
 namespace ivd
 {
 
-using point2_f = math::point2<float>;
+using point2f = math::point2<float>;
+using point3f = math::point3<float>;
 
-}
+using point3d = math::point3<double>;
+
+} // namespace ivd

@@ -32,6 +32,7 @@ public:                                                                         
         return &instance;                                                                          \
     }
 
+// todo add serialization method for hstruct
 #define GENERATE_STRUCT()                                                                          \
     REFLECT_STRUCT();                                                                              \
                                                                                                    \

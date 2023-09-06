@@ -44,4 +44,14 @@ hclass::find_field(std::string_view name)
     return nullptr;
 }
 
+hfield const*
+hstruct::find_field(std::string_view name) const
+{
+    if (m_fields.contains(name))
+    {
+        return m_fields.at(name);
+    }
+    return nullptr;
+}
+
 } // namespace ivd

@@ -23,6 +23,7 @@ public:
 
     // outer product of two vector..
     constexpr explicit matrix3(vector3<T> const& p, vector3<T> const& q);
+
     constexpr matrix3(T m00, T m01, T m02, T m10, T m11, T m12, T m20, T m21, T m22);
     constexpr matrix3(row_type const& p,
                       row_type const& q,
@@ -31,7 +32,7 @@ public:
 
 public:
     static constexpr matrix3 zero() { return matrix3(0); }
-    static constexpr matrix3 identiry() { return matrix3(1, 1, 1); }
+    static constexpr matrix3 identity() { return matrix3(1, 1, 1); }
 
 public:
     vector3<T> u{}, v{}, w{}; // as row vector

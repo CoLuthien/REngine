@@ -18,4 +18,7 @@ struct is_shared_ptr_t<std::shared_ptr<T>> : std::true_type
 
 template <typename T>
 concept is_shared_ptr = is_shared_ptr_t<T>::value;
+
+template <typename T>
+concept arithmetic_type = std::is_arithmetic_v<T>;
 } // namespace meta

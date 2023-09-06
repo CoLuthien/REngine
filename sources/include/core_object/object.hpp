@@ -30,13 +30,13 @@ public:
     virtual ~hobject();
 
 public:
-    void init_property(hclass* in_class);
+    void    init_property(hclass* in_class);
     hclass* get_class() const noexcept { return self_class; }
 
 public:
     static bool is_valid(hobject* ptr);
-    void set_flags(object_flag const flag) { m_flag = m_flag | flag; }
-    void clear_flags(object_flag const flag) { m_flag = m_flag & ~flag; }
+    void        set_flags(object_flag const flag) { m_flag = m_flag | flag; }
+    void        clear_flags(object_flag const flag) { m_flag = m_flag & ~flag; }
     object_flag get_flag() const { return m_flag; }
 
 public: // safe fast runtime cast impl starts
@@ -66,7 +66,7 @@ private:
 private:
     std::size_t m_idx;
     object_flag m_flag = eobject_flag::UNREACHABLE;
-    hclass* self_class;
+    hclass*     self_class;
 };
 
 } // namespace ivd

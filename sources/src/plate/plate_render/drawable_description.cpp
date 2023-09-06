@@ -14,7 +14,7 @@ drawable_description& drawable_description::operator=(drawable_description&&) no
 void
 drawable_description::initialize(drawable_type_e                in_type,
                                  std::unique_ptr<drawable_info> in_info,
-                                 point2_f                       in_location,
+                                 point2f                       in_location,
                                  extent2_f                      in_size,
                                  layer_id_t                     in_layer)
 {

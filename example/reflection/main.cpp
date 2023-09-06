@@ -1,6 +1,9 @@
 
 #include "core/core.hpp"
 #include "core_object/core_object.hpp"
+#include "math/vector.hpp"
+#include "math/point.hpp"
+#include "math/quaternion.hpp"
 #include <string_view>
 #include <iostream>
 #include <unordered_map>
@@ -48,6 +51,14 @@ main()
     using TType = ivd::hobject*;
     auto* ptr   = new_object<Test2<TType>>(nullptr);
     auto* clazz = Test2<TType>::static_class();
+
+    ivd::vector3d v(3);
+    auto*         d = v.static_struct();
+
+    if (auto* my_x = d->find_field("x"))
+    {
+        return 0;
+    }
 
     auto func_add = clazz->find_func("add");
 
