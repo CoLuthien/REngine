@@ -9,6 +9,7 @@
 #include <type_traits>
 #include <string_view>
 #include <numeric>
+#include <typeinfo>
 
 namespace refl
 {
@@ -39,6 +40,10 @@ public:
     }
 
     inline efield_type get_type() const;
+    inline std::size_t get_typehash() const;
+
+    template <class T>
+    inline bool is_a() const; // check exact match
 
 private:
     struct handle_t;
@@ -57,14 +62,29 @@ private:
 
 struct rfield::handle_t
 {
-    virtual ~handle_t()                  = default;
-    virtual efield_type get_type() const = 0;
+    virtual ~handle_t()                      = default;
+    virtual efield_type get_type() const     = 0;
+    virtual std::size_t get_typehash() const = 0;
 };
 
-efield_type
+inline efield_type
 rfield::get_type() const
 {
     return m_info->get_type();
+}
+
+inline std::size_t
+rfield::get_typehash() const
+{
+    return m_info->get_typehash();
+}
+
+template <class T>
+inline bool
+rfield::is_a() const
+{
+    static constexpr auto hash = meta::typehash<T>;
+    return hash == m_info->get_typehash();
 }
 
 template <typename V>
@@ -88,9 +108,11 @@ struct rfield::field_info_t final : public rfield::field_iface_t<field_value_t<T
     static constexpr pointer_type       pointer    = field_pointer_v<Target, I>;
     static constexpr auto               name       = field_name_v<Target, I>;
     static constexpr auto               field_type = field_type_e<Target, I>();
+    static constexpr std::size_t        id         = meta::typehash<value_type>;
 
     inline static consteval auto reflected_info() { return &field_info; }
     inline virtual efield_type   get_type() const override { return field_type; }
+    inline virtual std::size_t   get_typehash() const override { return id; }
 
     inline virtual const_ref_type get(void* obj) const override
     {

@@ -19,26 +19,31 @@ template <typename T>
 using has_reflected_function_t = typename T::template detail_function_reflection<0>;
 
 template <typename T>
-concept is_reflected_type = requires {
-    typename has_reflected_field_t<typename meta::remove_all_qualifiers_t<T>>;
-    typename has_reflected_function_t<typename meta::remove_all_qualifiers_t<T>>;
-};
+concept has_reflected_field =
+    requires { typename has_reflected_field_t<typename meta::remove_all_qualifiers_t<T>>; };
+
+template <typename T>
+concept has_reflected_function =
+    requires { typename has_reflected_function_t<typename meta::remove_all_qualifiers_t<T>>; };
+template <typename T>
+concept is_reflected_class = has_reflected_function<T> && has_reflected_field<T>;
+
 template <typename T>
 concept is_reflected_object_queue =
     meta::is_specialization<T, std::queue> &&
-    is_reflected_type<typename meta::remove_all_qualifiers_t<T>::value_type> &&
+    is_reflected_class<typename meta::remove_all_qualifiers_t<T>::value_type> &&
     std::is_pointer_v<typename meta::remove_all_qualifiers_t<T>::value_type>;
 
 template <typename T>
 concept is_reflected_object_vector =
     meta::is_specialization<T, std::vector> &&
-    is_reflected_type<typename meta::remove_all_qualifiers_t<T>::value_type> &&
+    is_reflected_class<typename meta::remove_all_qualifiers_t<T>::value_type> &&
     std::is_pointer_v<typename meta::remove_all_qualifiers_t<T>::value_type>;
 
 template <typename T>
 concept is_reflected_object_map =
     meta::is_specialization<T, std::unordered_map> &&
-    is_reflected_type<typename meta::remove_all_qualifiers_t<T>::mapped_type> &&
+    is_reflected_class<typename meta::remove_all_qualifiers_t<T>::mapped_type> &&
     std::is_pointer_v<typename meta::remove_all_qualifiers_t<T>::mapped_type>;
 
 template <typename T>

@@ -66,8 +66,6 @@ public:                                                                         
 public:                                                                                            \
     template <std::size_t>                                                                         \
     struct detail_field_reflection;                                                                \
-    template <std::size_t>                                                                         \
-    struct detail_function_reflection;                                                             \
                                                                                                    \
 private:                                                                                           \
     REFLECT_CLASS_INFO();                                                                          \

@@ -9,6 +9,10 @@
 #include <unordered_map>
 #include <meta/utils.hpp>
 
+#include <nlohmann/json.hpp>
+
+using json = nlohmann::json;
+
 class Sample : public ivd::hobject
 {
 public:
@@ -45,9 +49,23 @@ public:
     REFLECT_FIELD(std::unordered_map<DECLARE_TEMPLATE_PARAMS(std::string, T)>, map);
 };
 
+struct StructTest
+{
+    GENERATE_STRUCT()
+
+public:
+    REFLECT_FIELD(std::string, name);
+    REFLECT_FIELD(std::string, job);
+};
+
 int
 main()
 {
+    {
+        auto* clazz = StructTest::static_struct();
+        auto* field = clazz->find_field("name");
+    }
+
     using TType = ivd::hobject*;
     auto* ptr   = new_object<Test2<TType>>(nullptr);
     auto* clazz = Test2<TType>::static_class();

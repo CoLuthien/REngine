@@ -35,7 +35,7 @@ field_type_e()
 {
     using type = std::decay_t<field_value_t<Target, I>>;
 
-    if constexpr (refl::is_reflected_type<type> && std::is_pointer_v<type>)
+    if constexpr (refl::is_reflected_class<type> && std::is_pointer_v<type>)
     {
         return efield_type::REFLECTED_PTR;
     }
@@ -61,13 +61,11 @@ field_type_e()
     }
 }
 
-template <class Target>
-    requires is_reflected_type<Target>
+template <has_reflected_field Target>
 constexpr std::size_t field_counts =
     detail::index<struct field_counter_tag, Target::template detail_field_reflection>::value;
 
-template <class Target>
-    requires is_reflected_type<Target>
+template <has_reflected_function Target>
 using field_counter =
     detail::index<struct field_counter_tag, Target::template detail_field_reflection>;
 
@@ -86,12 +84,12 @@ template <class Target, std::size_t I>
 constexpr auto func_pointer_v = reflected_func<Target, I>::template pointer_v<Target>;
 
 template <class Target>
-    requires is_reflected_type<Target>
+    requires is_reflected_class<Target>
 constexpr std::size_t func_counts =
     detail::index<struct function_counter_tag, Target::template detail_function_reflection>::value;
 
 template <class Target>
-    requires is_reflected_type<Target>
+    requires is_reflected_class<Target>
 using function_counter =
     detail::index<struct function_counter_tag, Target::template detail_function_reflection>;
 // field and property constexpr map maker

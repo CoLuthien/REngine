@@ -7,11 +7,15 @@ add_dependencies(reflection_example
     core_object
     core
     plate
+    nlohmann_json::nlohmann_json
 )
+
 target_link_libraries(reflection_example
+PRIVATE
     core_object
     core
     plate
+    nlohmann_json::nlohmann_json
 )
 target_include_directories(reflection_example
 PUBLIC

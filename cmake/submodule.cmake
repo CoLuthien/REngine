@@ -1,4 +1,5 @@
 
+include(ExternalProject)
 find_package(Git QUIET)
 if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
 # Update submodules as needed
@@ -13,7 +14,10 @@ if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
         endif()
     endif()
 endif()
-set(GLFWPP_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # disable building GLFWPP examples
 
+set(GLFWPP_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE) # disable building GLFWPP examples
 add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glfwpp)
 add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glm)
+
+set(JSON_BuildTests OFF CACHE INTERNAL "") # disable building tests in json library
+add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/json)
