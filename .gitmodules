@@ -8,3 +8,6 @@
 [submodule "sources/thirdparty/json"]
 	path = sources/thirdparty/json
 	url = git@github.com:nlohmann/json.git
+[submodule "sources/thirdparty/assimp"]
+	path = sources/thirdparty/assimp
+	url = https://github.com/assimp/assimp.git

@@ -113,6 +113,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
         -Wno-range-loop-analysis # -> disable warning: loop variable 'kv' is always a copy because the range of type 'pybind11::dict' does not return a reference (caused by pybind11) 
         -Wno-unused-private-field
         -Wno-unused-variable
+        -Wno-unused-function
         -Wno-deprecated-volatile
         -std=c++20
         ${WARN_AS_ERROR_FLAGS}

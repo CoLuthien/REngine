@@ -21,3 +21,7 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/glm)
 
 set(JSON_BuildTests OFF CACHE INTERNAL "") # disable building tests in json library
 add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/json)
+
+set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
+set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "")
+add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/assimp)
