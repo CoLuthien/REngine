@@ -9,7 +9,6 @@
 #include <type_traits>
 #include <string_view>
 #include <numeric>
-#include <typeinfo>
 
 namespace refl
 {

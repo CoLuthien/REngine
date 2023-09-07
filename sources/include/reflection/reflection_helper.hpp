@@ -29,6 +29,21 @@ using field_pointer_t = typename reflected_field<Target, I>::template pointer_ty
 template <class Target, std::size_t I>
 constexpr auto field_pointer_v = reflected_field<Target, I>::template pointer_value<Target>;
 
+template <class Target, size_t I, class Enable = void>
+struct contained_type
+{
+    using type = std::nullptr_t;
+};
+
+template <class Target, size_t I>
+struct contained_type<Target, I, std::enable_if_t<is_container_type<Target>, Target>>
+{
+    using type = typename field_value_t<Target, I>::value_type;
+};
+
+template <class Target, size_t I>
+using contained_type_t = contained_type<Target, I>;
+
 template <class Target, size_t I>
 static inline constexpr auto
 field_type_e()

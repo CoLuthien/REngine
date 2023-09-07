@@ -6,6 +6,7 @@
 #include "math/quaternion.hpp"
 #include <string_view>
 #include <iostream>
+#include <fstream>
 #include <unordered_map>
 #include <meta/utils.hpp>
 
@@ -56,14 +57,25 @@ struct StructTest
 public:
     REFLECT_FIELD(std::string, name);
     REFLECT_FIELD(std::string, job);
+    REFLECT_FIELD(std::unordered_map<DECLARE_TEMPLATE_PARAMS(std::string, int)>, map);
 };
 
 int
 main()
 {
     {
+        json data = {{"name", "grkim"},
+                     {"job", "engineer"},
+                     {"map",
+                      {
+                          {"a", 1},
+                          {"b", 2},
+                          {"c", 3},
+                          {"d", 4},
+                          {"e", 5},
+                      }}};
+
         auto* clazz = StructTest::static_struct();
-        auto* field = clazz->find_field("name");
     }
 
     using TType = ivd::hobject*;
