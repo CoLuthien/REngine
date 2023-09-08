@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include "coreobject_export.hpp"
+
 #include "object.hpp"
 #include "class.hpp"
 #include "object_allocators.hpp"

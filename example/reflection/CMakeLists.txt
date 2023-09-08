@@ -7,20 +7,25 @@ add_dependencies(reflection_example
     core_object
     core
     plate
+    engine
     nlohmann_json::nlohmann_json
 )
 
 target_link_libraries(reflection_example
+PUBLIC
+    engine
 PRIVATE
     core_object
     core
     plate
     nlohmann_json::nlohmann_json
+    assimp::assimp
 )
 target_include_directories(reflection_example
 PUBLIC
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/core
+    ${CMAKE_SOURCE_DIR}/sources/include/engine
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
 )
 

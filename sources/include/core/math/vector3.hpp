@@ -14,14 +14,14 @@ namespace math
 {
 
 template <meta::arithmetic_type T>
-struct vector3 : public point3<T>
+struct vector3
 {
     GENERATE_STRUCT();
 
 public:
     constexpr vector3() = default;
-    constexpr vector3(T value) : point3<T>(value) {}
-    constexpr vector3(T in_x, T in_y, T in_z) : point3<T>(in_x, in_y, in_z) {}
+    constexpr vector3(T value) : x(value), y(value), z(value) {}
+    constexpr vector3(T in_x, T in_y, T in_z) : x(in_x), y(in_y), z(in_z) {}
 
 public:
     T          squared_norm() const { return x * x + y * y + z * z; }
@@ -30,9 +30,9 @@ public:
     vector3<T> normalized(T const eps = epsilon<T>) const;
 
 public:
-    using point3<T>::x;
-    using point3<T>::y;
-    using point3<T>::z;
+    REFLECT_FIELD(T, x);
+    REFLECT_FIELD(T, y);
+    REFLECT_FIELD(T, z);
 };
 
 template <meta::arithmetic_type T>

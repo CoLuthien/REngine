@@ -4,7 +4,7 @@
 #include "templates/concepts.hpp"
 #include "object_macros.hpp"
 #include "object_globals.hpp"
-#include "core_object/definitions.hpp"
+#include "coreobject_export.hpp"
 #include <cstddef>
 
 namespace ivd
@@ -41,7 +41,7 @@ public:
 
 public: // safe fast runtime cast impl starts
     template <typename T>
-    inline bool is_a()
+    bool is_a()
     {
         return is_child_of(get_class(), T::static_class());
     }

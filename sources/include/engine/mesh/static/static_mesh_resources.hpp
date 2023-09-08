@@ -7,6 +7,7 @@
 #include "math/point.hpp"
 #include "math/vector.hpp"
 
+#include "core.hpp"
 #include "core_object.hpp"
 
 #include <vector>
@@ -14,20 +15,19 @@
 namespace ivd
 {
 
-struct ENGINE_API static_mesh_data : public hobject
+struct ENGINE_API static_mesh_description
 {
-    GENERATE_BODY()
+    GENERATE_STRUCT()
 
 public:
-    std::vector<mesh_index> m_indices;
+    REFLECT_FIELD(std::vector<std::uint32_t>, m_indices);
+    REFLECT_FIELD(std::vector<point3d>, m_vertices);
 
 public:
-    std::vector<point3d> m_vertices;
-    std::vector<point3d> m_texcoords;
-
-    std::vector<vector3d> m_normals;
-    std::vector<vector3d> m_tangents;
-    std::vector<vector3d> m_bitangents;
+    REFLECT_FIELD(std::vector<vector3d>, m_normals);
+    REFLECT_FIELD(std::vector<vector3d>, m_texcoords);
+    REFLECT_FIELD(std::vector<vector3d>, m_tangents);
+    REFLECT_FIELD(std::vector<vector3d>, m_bitangents);
 };
 
 } // namespace ivd

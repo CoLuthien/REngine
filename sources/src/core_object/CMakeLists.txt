@@ -15,6 +15,7 @@ SHARED
 
 target_include_directories(core_object
 PUBLIC
+    ${CMAKE_CURRENT_BINARY_DIR}/
     ${CMAKE_SOURCE_DIR}/sources/include
     ${CMAKE_SOURCE_DIR}/sources/include/thirdparty
     ${CMAKE_SOURCE_DIR}/sources/include/core_object
@@ -24,9 +25,11 @@ PUBLIC
     ${DEFAULT_COMPILE_OPTIONS}
 )
 
-target_compile_definitions(core_object
-    PUBLIC COREOBJECT_BUILD
+GENERATE_EXPORT_HEADER(core_object
+    EXPORT_MACRO_NAME COREOBJECT_API
+    EXPORT_FILE_NAME coreobject_export.hpp
 )
+
 
 target_link_libraries(core_object
 )

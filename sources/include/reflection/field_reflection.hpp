@@ -150,8 +150,9 @@ struct gather_fields<Target, std::numeric_limits<std::size_t>::max()>
 
 } // namespace refl
 
+// __VA_ARGS__ are initial value
 #define REFLECT_FIELD(TYPES, NAME, ...)                                                            \
-    TYPES NAME{};                                                                                  \
+    TYPES NAME{__VA_ARGS__};                                                                       \
                                                                                                    \
     struct detail_##NAME##_field_tag;                                                              \
     static constexpr std::size_t detail_##NAME##_field_index =                                     \

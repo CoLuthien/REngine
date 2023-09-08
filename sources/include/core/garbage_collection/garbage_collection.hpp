@@ -3,6 +3,7 @@
 
 #include "HAL/attributes.hpp"
 #include "core/definitions.hpp"
+#include "coreobject_export.hpp"
 
 #include <vector>
 #include <unordered_set>

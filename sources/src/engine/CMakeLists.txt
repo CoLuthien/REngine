@@ -3,19 +3,22 @@ set(ENGINE_SRCS
     main.cpp
 )
 
-set(STATIC_MESH_SRCS
-    mesh/static/static_mesh_resources.cpp
+file (GLOB_RECURSE MESH_SRCS
+    *.cpp
+)
+
+file(GLOB_RECURSE ASSET_SRCS
+    *.cpp
 )
 
 add_library(engine
 SHARED
     ${ENGINE_SRCS}
-    ${STATIC_MESH_SRCS}
+    ${MESH_SRCS}
+    ${ASSET_SRCS}
 )
-GENERATE_EXPORT_HEADER(engine
-    EXPORT_MACRO_NAME ENGINE_API
-    EXPORT_FILE_NAME engine_export.hpp
-)
+
+
 
 target_include_directories(engine
 PUBLIC
@@ -33,10 +36,22 @@ target_link_libraries(engine
 PUBLIC
     core
     core_object
+
+PRIVATE
+    assimp::assimp
+)
+
+GENERATE_EXPORT_HEADER(engine
+    EXPORT_MACRO_NAME ENGINE_API
+    EXPORT_FILE_NAME engine_export.hpp
+)
+
+target_compile_options(engine
+PUBLIC
+    ${DEFAULT_COMPILE_OPTIONS}
 )
 
 target_compile_definitions(engine
 PRIVATE 
-    ENGINE_BUILD
     ${DEFAULT_COMPILE_DEFINITIONS}
 )
