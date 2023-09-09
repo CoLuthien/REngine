@@ -234,10 +234,11 @@ TriangleApplication::recordCommandBuffer(vk::raii::CommandBuffer& buffer, uint32
     };
 
     buffer.beginRenderPass(renderPassInfo, vk::SubpassContents::eInline);
-
     buffer.bindPipeline(vk::PipelineBindPoint::eGraphics, *graphicsPipeline);
     buffer.bindVertexBuffers(0, *vertexBuffer, {0});
     buffer.bindIndexBuffer(*indexBuffer, 0, vk::IndexType::eUint16);
+    buffer.bindDescriptorSets(
+        vk::PipelineBindPoint::eGraphics, *pipelineLayout, 0, *descriptorSets[currentFrameIdx], {});
 
     buffer.setViewport(0, viewport);
 

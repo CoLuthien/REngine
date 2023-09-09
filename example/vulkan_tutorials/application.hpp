@@ -96,24 +96,25 @@ private:
     vk::Viewport viewport;
     vk::Rect2D   scissor;
 
-    vk::raii::Instance                 instance{nullptr};
-    vk::raii::PhysicalDevice           physicalDevice{nullptr};
-    vk::raii::SurfaceKHR               surface{nullptr};
-    vk::raii::Device                   device{nullptr};
-    vk::raii::Queue                    graphicsQueue{nullptr};
-    vk::raii::Queue                    presentQueue{nullptr};
-    vk::raii::Queue                    transferQueue{nullptr};
-    vk::raii::SwapchainKHR             swapChain{nullptr};
-    std::vector<vk::Image>             swapImages;
-    std::vector<vk::raii::ImageView>   swapImageViews;
-    vk::raii::RenderPass               renderPass{nullptr};
-    vk::raii::DescriptorSetLayout      descriptorSetLayout{nullptr};
-    vk::raii::DescriptorPool           descriptorPool{nullptr};
-    vk::raii::PipelineLayout           pipelineLayout{nullptr};
-    vk::raii::Pipeline                 graphicsPipeline{nullptr};
-    std::vector<vk::raii::Framebuffer> swapchainFramebuffers;
-    vk::raii::CommandPool              commandPool{nullptr};
-    vk::raii::CommandPool              transferCommands{nullptr};
+    vk::raii::Instance                   instance{nullptr};
+    vk::raii::PhysicalDevice             physicalDevice{nullptr};
+    vk::raii::SurfaceKHR                 surface{nullptr};
+    vk::raii::Device                     device{nullptr};
+    vk::raii::Queue                      graphicsQueue{nullptr};
+    vk::raii::Queue                      presentQueue{nullptr};
+    vk::raii::Queue                      transferQueue{nullptr};
+    vk::raii::SwapchainKHR               swapChain{nullptr};
+    std::vector<vk::Image>               swapImages;
+    std::vector<vk::raii::ImageView>     swapImageViews;
+    vk::raii::RenderPass                 renderPass{nullptr};
+    vk::raii::DescriptorSetLayout        descriptorSetLayout{nullptr};
+    vk::raii::DescriptorPool             descriptorPool{nullptr};
+    vk::raii::PipelineLayout             pipelineLayout{nullptr};
+    vk::raii::Pipeline                   graphicsPipeline{nullptr};
+    std::vector<vk::raii::Framebuffer>   swapchainFramebuffers;
+    vk::raii::CommandPool                commandPool{nullptr};
+    vk::raii::CommandPool                transferCommands{nullptr};
+    std::vector<vk::raii::DescriptorSet> descriptorSets;
 
     vk::raii::Buffer       vertexBuffer{nullptr};
     vk::raii::DeviceMemory vertexBufferMemory{nullptr};
@@ -152,8 +153,8 @@ private:
         createSwapChain();
         createImageViews();
 
-        createDescriptorSetLayout();
         createRenderPass();
+        createDescriptorSetLayout();
         createGraphicsPipeline();
         createFramebuffers();
         createCommandPool();
@@ -161,6 +162,7 @@ private:
         createIndexBuffer();
         createUniformBuffers();
         createDescriptorPool();
+        createDescriptorSets();
 
         createCommandBuffer();
         createSyncObjects();
@@ -171,6 +173,7 @@ private:
     uint32_t findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties);
 
     void createDescriptorSetLayout();
+    void createDescriptorSets();
     void createUniformBuffers();
 
     void createSyncObjects();

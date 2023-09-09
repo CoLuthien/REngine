@@ -406,7 +406,7 @@ TriangleApplication::createGraphicsPipeline()
         .depthClampEnable = false,
         .polygonMode      = vk::PolygonMode::eFill,
         .cullMode         = vk::CullModeFlagBits::eBack,
-        .frontFace        = vk::FrontFace::eClockwise,
+        .frontFace        = vk::FrontFace::eCounterClockwise,
         .depthBiasEnable  = false,
         .lineWidth        = 1.0f,
     };
@@ -449,11 +449,9 @@ TriangleApplication::createGraphicsPipeline()
         .renderPass          = *renderPass,
         .subpass             = 0,
         .basePipelineHandle  = nullptr,
-        .basePipelineIndex   = -1,
     };
 
-    graphicsPipeline =
-        device.createGraphicsPipeline(vk::raii::PipelineCache{nullptr}, pipelineInfo);
+    graphicsPipeline = device.createGraphicsPipeline(nullptr, pipelineInfo);
 }
 
 void
@@ -543,12 +541,16 @@ TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
 void
 TriangleApplication::createDescriptorPool()
 {
-    vk::DescriptorPoolSize       poolSize   = {.descriptorCount = ConcurrentFrames};
+    vk::DescriptorPoolSize       poolSize   = {.type            = vk::DescriptorType::eUniformBuffer,
+                                               .descriptorCount = ConcurrentFrames};
     vk::DescriptorPoolCreateInfo createInfo = {
+        .flags         = vk::DescriptorPoolCreateFlagBits::eFreeDescriptorSet,
         .maxSets       = static_cast<uint32_t>(ConcurrentFrames),
         .poolSizeCount = 1,
         .pPoolSizes    = &poolSize,
     };
+
+    descriptorPool = device.createDescriptorPool(createInfo);
 }
 void
 TriangleApplication::createDescriptorSetLayout()
@@ -565,14 +567,41 @@ TriangleApplication::createDescriptorSetLayout()
         .pBindings    = &uboLayout,
     };
 
-    try
+    descriptorSetLayout = device.createDescriptorSetLayout(createInfo);
+}
+
+void
+TriangleApplication::createDescriptorSets()
+{
+    std::vector<vk::DescriptorSetLayout> layouts(ConcurrentFrames, *descriptorSetLayout);
+
+    vk::DescriptorSetAllocateInfo allocInfo{.descriptorPool     = *descriptorPool,
+                                            .descriptorSetCount = ConcurrentFrames,
+                                            .pSetLayouts        = layouts.data()};
+
+    descriptorSets.reserve(ConcurrentFrames);
+    descriptorSets = device.allocateDescriptorSets(allocInfo);
+
+    for (size_t i = 0; i < ConcurrentFrames; i++)
     {
-        descriptorSetLayout = device.createDescriptorSetLayout(createInfo);
-    }
-    catch (std::exception const& e)
-    {
-        std::cerr << "failed to create descriptor layout!" << '\n';
-        throw std::runtime_error{e.what()};
+        vk::DescriptorBufferInfo bufferInfo{
+            .buffer = *uniformBuffers[i],
+            .offset = 0,
+            .range  = sizeof(UniformBufferObject),
+        };
+
+        vk::WriteDescriptorSet descriptorWrite{
+            .dstSet           = *descriptorSets[i],
+            .dstBinding       = 0,
+            .dstArrayElement  = 0,
+            .descriptorCount  = 1,
+            .descriptorType   = vk::DescriptorType::eUniformBuffer,
+            .pImageInfo       = nullptr,
+            .pBufferInfo      = &bufferInfo,
+            .pTexelBufferView = nullptr,
+        };
+
+        device.updateDescriptorSets(descriptorWrite, {});
     }
 }
 
