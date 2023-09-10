@@ -86,6 +86,7 @@ load_static_mesh(fs::path const& filename)
             std::launch::async, load_vector_atrrib, mesh->mBitangents, mesh->mNumVertices);
         auto texcoords = std::async(
             std::launch::async, load_vector_atrrib, mesh->mTextureCoords[0], mesh->mNumVertices);
+
         result.emplace_back(std::make_shared<static_mesh_description>(
             static_mesh_description{.m_indices    = indices.get(),
                                     .m_vertices   = vertices.get(),

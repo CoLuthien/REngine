@@ -36,8 +36,6 @@ public:
     std::vector<data_type> const& get_mesh_descriptions() const;
     data_type                     get_mesh_description(std::size_t idx) const;
 
-
-
 private:
     REFLECT_FIELD(std::vector<data_type>, m_descriptions);
 };
