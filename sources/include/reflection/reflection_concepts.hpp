@@ -35,6 +35,8 @@ template <typename T>
 concept is_reflected_class = has_reflected_function<T> && has_reflected_field<T>;
 
 template <typename T>
+concept is_reflected_struct = has_reflected_field<T>;
+template <typename T>
 concept is_reflected_object_queue =
     meta::is_specialization<T, std::queue> &&
     is_reflected_class<typename meta::remove_all_qualifiers_t<T>::value_type> &&

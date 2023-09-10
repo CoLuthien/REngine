@@ -18,7 +18,7 @@ template <class Target, std::size_t I>
 using reflected_field = typename Target::template detail_field_reflection<I>;
 
 template <class Target, size_t I>
-constexpr auto field_name_v = reflected_field<Target, I>::name;
+static constexpr auto field_name_v = reflected_field<Target, I>::name;
 
 template <class Target, size_t I>
 using field_value_t = typename reflected_field<Target, I>::value_type;
@@ -27,7 +27,7 @@ template <class Target, size_t I>
 using field_pointer_t = typename reflected_field<Target, I>::template pointer_type<Target>;
 
 template <class Target, std::size_t I>
-constexpr auto field_pointer_v = reflected_field<Target, I>::template pointer_value<Target>;
+static constexpr auto field_pointer_v = reflected_field<Target, I>::template pointer_value<Target>;
 
 template <class Target, size_t I, class Enable = void>
 struct contained_type
@@ -77,7 +77,7 @@ field_type_e()
 }
 
 template <has_reflected_field Target>
-constexpr std::size_t field_counts =
+static constexpr std::size_t field_counts =
     detail::index<struct field_counter_tag, Target::template detail_field_reflection>::value;
 
 template <has_reflected_function Target>
@@ -90,17 +90,17 @@ template <class Target, std::size_t I>
 using reflected_func = typename Target::template detail_function_reflection<I>;
 
 template <class Target, std::size_t I>
-constexpr auto func_name_v = reflected_func<Target, I>::name;
+static constexpr auto func_name_v = reflected_func<Target, I>::name;
 
 template <class Target, std::size_t I>
 using func_pointer_t = typename reflected_func<Target, I>::template type<Target>;
 
 template <class Target, std::size_t I>
-constexpr auto func_pointer_v = reflected_func<Target, I>::template pointer_v<Target>;
+inline static auto const func_pointer_v = reflected_func<Target, I>::template pointer_v<Target>;
 
 template <class Target>
     requires is_reflected_class<Target>
-constexpr std::size_t func_counts =
+static constexpr std::size_t func_counts =
     detail::index<struct function_counter_tag, Target::template detail_function_reflection>::value;
 
 template <class Target>

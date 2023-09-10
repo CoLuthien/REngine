@@ -61,6 +61,7 @@ public:
     virtual void      load() = 0;
 
 public:
+    REFLECT_FUNCTION(get_metadata)
     asset_metadata get_metadata();
 
 public:

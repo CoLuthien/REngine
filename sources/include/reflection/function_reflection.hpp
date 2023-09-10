@@ -14,7 +14,7 @@ class rfunction
 {
 public:
     template <class Target, std::size_t I>
-    static consteval auto reflect_field()
+    static constexpr auto reflect_field()
     {
         using trait     = func_traits<func_pointer_t<Target, I>>;
         using info_type = typename strip_tuple<Target,
@@ -27,7 +27,7 @@ public:
     template <typename R, typename... Args>
     R invoke(void* obj, Args... args) const
     {
-        using type = field_iface_t<R, Args...>;
+        using type = func_iface_t<R, Args...>;
         auto ptr   = static_cast<type const*>(m_info);
 
         return ptr->invoke_impl(obj, args...);
@@ -36,9 +36,9 @@ public:
 private:
     struct handle_t;
     template <typename R, typename... Args>
-    struct field_iface_t;
+    struct func_iface_t;
     template <class Target, std::size_t I, typename R, typename... Args>
-    struct field_info_t;
+    struct func_info_t;
 
     handle_t const* m_info;
 
@@ -50,7 +50,7 @@ private:
     template <typename Target, std::size_t I, typename R, typename... Ts>
     struct strip_tuple<Target, I, R, std::tuple<Ts...>>
     {
-        using type = field_info_t<Target, I, R, Ts...>;
+        using type = func_info_t<Target, I, R, Ts...>;
     };
 };
 
@@ -60,26 +60,26 @@ struct rfunction::handle_t
 };
 
 template <typename R, typename... Args>
-struct rfunction::field_iface_t : public rfunction::handle_t
+struct rfunction::func_iface_t : public rfunction::handle_t
 {
-    virtual ~field_iface_t()                                = default;
+    virtual ~func_iface_t()                                 = default;
     virtual R invoke_impl(void* object, Args... args) const = 0;
 };
 
-template <class Target, std::size_t I, typename R, typename... Args>
-struct rfunction::field_info_t : public rfunction::field_iface_t<R, Args...>
+template <class TargetClass, std::size_t Index, typename ReturnType, typename... Args>
+struct rfunction::func_info_t : public rfunction::func_iface_t<ReturnType, Args...>
 {
-    using owner_type   = Target;
-    using pointer_type = func_pointer_t<Target, I>;
-    using result_type  = R;
+    using owner_type   = TargetClass;
+    using pointer_type = func_pointer_t<TargetClass, Index>;
+    using result_type  = ReturnType;
 
-    static constexpr auto               pointer = func_pointer_v<Target, I>;
-    static constexpr auto               name    = func_name_v<Target, I>;
-    static constinit field_info_t const field_info;
+    inline static auto const           pointer = func_pointer_v<TargetClass, Index>;
+    static constexpr auto              name    = func_name_v<TargetClass, Index>;
+    static constinit func_info_t const field_info;
 
     static constexpr auto reflected_info() { return &field_info; }
 
-    virtual R invoke_impl(void* object, Args... args) const
+    virtual ReturnType invoke_impl(void* object, Args... args) const
     {
         return std::invoke(
             pointer, reinterpret_cast<owner_type*>(object), std::forward<Args>(args)...);
@@ -87,8 +87,8 @@ struct rfunction::field_info_t : public rfunction::field_iface_t<R, Args...>
 };
 
 template <class Target, std::size_t I, typename R, typename... Args>
-constinit rfunction::field_info_t<Target, I, R, Args...> const
-    rfunction::field_info_t<Target, I, R, Args...>::field_info = {};
+constinit rfunction::func_info_t<Target, I, R, Args...> const
+    rfunction::func_info_t<Target, I, R, Args...>::field_info = {};
 
 template <class Target, std::size_t Index>
 struct gather_functions
@@ -129,5 +129,5 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
         template <class Target>                                                                    \
         using type = inferred_type<Target, __VA_ARGS__>;                                           \
         template <class Target>                                                                    \
-        static constexpr type<Target> pointer_v = &Target::NAME;                                   \
+        inline static type<Target> const pointer_v = &Target::NAME;                                \
     };

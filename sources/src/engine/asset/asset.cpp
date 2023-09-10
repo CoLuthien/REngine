@@ -6,6 +6,7 @@ namespace ivd
 {
 namespace asset
 {
+
 asset::asset(std::string const& filename, fs::path const& directory, easset_category type)
 {
     metadata = {.filename       = filename,
