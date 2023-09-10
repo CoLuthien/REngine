@@ -1,8 +1,7 @@
 
 #include "core/core.hpp"
 #include "core_object/core_object.hpp"
-#include "engine/asset/static_mesh_asset.hpp"
-#include "engine/asset/import/static_mesh_importer.hpp"
+#include "asset/static_mesh_asset.hpp"
 #include "math/vector.hpp"
 #include "math/point.hpp"
 #include "math/quaternion.hpp"
@@ -15,6 +14,8 @@
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
+
+static constexpr auto pointer_v = &ivd::asset::static_mesh_asset::get_metadata;
 
 class Sample : public ivd::hobject
 {
@@ -62,24 +63,12 @@ public:
     REFLECT_FIELD(std::unordered_map<DECLARE_TEMPLATE_PARAMS(std::string, int)>, map);
 };
 
-namespace asset = ivd::asset;
 int
 main()
 {
     {
-        auto importer   = std::make_shared<asset::static_mesh_importer>();
-        auto task       = std::make_unique<asset::import_task>();
-        task->file_path = "C:/Users/TECHTREE-GARAM/workspace/REngine/example/reflection/sample.fbx";
-        task->kind      = ivd::asset::easset_category::STATIC_MESH;
-        auto* result    = importer->load_asset(std::move(task));
-
-        auto* my_asset = cast<asset::static_mesh_asset>(result);
-        if (my_asset)
-        {
-            std::cout << "yeah!!";
-            auto data = my_asset->get_mesh(0);
-            std::cout << data->m_vertices.size() << '\n';
-        }
+        auto* mesh = new ivd::asset::static_mesh_asset{};
+        mesh->get_num_meshes();
     }
     using TType = ivd::hobject*;
     auto* ptr   = new_object<Test2<TType>>(nullptr);

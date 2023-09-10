@@ -25,7 +25,7 @@ public:
 
 public:
     REFLECT_FIELD(std::vector<vector3d>, m_normals);
-    REFLECT_FIELD(std::vector<vector3d>, m_texcoords);
+    REFLECT_FIELD(std::vector<vector3d>, m_texcoords); // for now we only support one uv channel
     REFLECT_FIELD(std::vector<vector3d>, m_tangents);
     REFLECT_FIELD(std::vector<vector3d>, m_bitangents);
 };

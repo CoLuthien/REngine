@@ -615,13 +615,14 @@ TriangleApplication::createUniformBuffers()
     for (std::size_t i = 0; i < ConcurrentFrames; ++i)
     {
         vk::raii::DeviceMemory memory{nullptr};
-        auto                   buffer = createBuffer(bufferSize,
+
+        auto buffer = createBuffer(bufferSize,
                                    vk::BufferUsageFlagBits::eUniformBuffer,
                                    meta::mask_as_enum<vk::MemoryPropertyFlagBits>(
                                        vk::MemoryPropertyFlagBits::eHostVisible |
                                        vk::MemoryPropertyFlagBits::eHostCoherent),
                                    memory,
-                                                     {&familyIndices.graphicsFamily.value(), 1});
+                                   {&familyIndices.graphicsFamily.value(), 1});
 
         auto* mappedMemory = memory.mapMemory(0, bufferSize);
 

@@ -12,9 +12,8 @@ add_dependencies(reflection_example
 )
 
 target_link_libraries(reflection_example
-PUBLIC
-    engine
 PRIVATE
+    engine
     core_object
     core
     plate

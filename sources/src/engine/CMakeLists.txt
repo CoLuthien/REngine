@@ -4,11 +4,11 @@ set(ENGINE_SRCS
 )
 
 file (GLOB_RECURSE MESH_SRCS
-    *.cpp
+    mesh/*.cpp
 )
 
 file(GLOB_RECURSE ASSET_SRCS
-    *.cpp
+    asset/*.cpp
 )
 
 add_library(engine

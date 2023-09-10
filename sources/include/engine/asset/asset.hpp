@@ -4,7 +4,9 @@
 
 #include "core.hpp"
 #include "core_object.hpp"
+
 #include <filesystem>
+#include <future>
 
 namespace fs = std::filesystem;
 
@@ -32,12 +34,17 @@ public:
     REFLECT_FIELD(std::string, filename, "invalid");
     REFLECT_FIELD(std::size_t, file_size, 0);
     REFLECT_FIELD(fs::path, file_directory, fs::current_path());
+    REFLECT_FIELD(fs::path, file_path);
     REFLECT_FIELD(easset_category, asset_type, easset_category::INVALID);
 };
 
 class ENGINE_API asset : public hobject
 {
     GENERATE_BODY();
+
+public:
+    asset() = default;
+    asset(std::string const& filename, fs::path const& directory, easset_category type);
 
 public:
     enum class status
@@ -48,6 +55,13 @@ public:
         IMPORTED,
         INVALID
     };
+
+public:
+    std::future<void> async_load();
+    virtual void      load() = 0;
+
+public:
+    asset_metadata get_metadata();
 
 public:
     REFLECT_FIELD(asset_metadata, metadata);
