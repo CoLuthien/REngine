@@ -15,7 +15,6 @@
 
 using json = nlohmann::json;
 
-static constexpr auto pointer_v = &ivd::asset::static_mesh_asset::get_metadata;
 
 class Sample : public ivd::hobject
 {
