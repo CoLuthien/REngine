@@ -4,3 +4,4 @@ build/**
 *.exe
 .vs
 .cache
+compile_commands.json
