@@ -486,8 +486,9 @@ TriangleApplication::createCommandPool()
             vk::CommandPoolCreateFlagBits::eResetCommandBuffer |
             vk::CommandPoolCreateFlagBits::eTransient),
         .queueFamilyIndex = indices.transferFamily.value()};
-    transferCommands = device.createCommandPool(transferPoolInfo);
+    transferCommandPool = device.createCommandPool(transferPoolInfo);
 }
+
 uint32_t
 TriangleApplication::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties)
 {
@@ -509,7 +510,7 @@ TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
                                 vk::raii::Buffer& toBuffer,
                                 vk::DeviceSize    size)
 {
-    vk::CommandBufferAllocateInfo allocInfo = {.commandPool = *transferCommands,
+    vk::CommandBufferAllocateInfo allocInfo = {.commandPool = *transferCommandPool,
                                                .level       = vk::CommandBufferLevel::ePrimary,
                                                .commandBufferCount = 1};
 

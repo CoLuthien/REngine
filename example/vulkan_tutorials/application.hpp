@@ -113,7 +113,7 @@ private:
     vk::raii::Pipeline                   graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer>   swapchainFramebuffers;
     vk::raii::CommandPool                commandPool{nullptr};
-    vk::raii::CommandPool                transferCommands{nullptr};
+    vk::raii::CommandPool                transferCommandPool{nullptr};
     std::vector<vk::raii::DescriptorSet> descriptorSets;
 
     vk::raii::Buffer       vertexBuffer{nullptr};

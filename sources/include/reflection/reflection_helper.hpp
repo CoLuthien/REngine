@@ -36,7 +36,7 @@ struct contained_type
 };
 
 template <class Target, size_t I>
-struct contained_type<Target, I, std::enable_if_t<is_container_type<Target>, Target>>
+struct contained_type<Target, I, std::enable_if_t<meta::is_iterable_type<Target>, Target>>
 {
     using type = typename field_value_t<Target, I>::value_type;
 };

@@ -1,13 +1,17 @@
 
 
-file (GLOB_RECURSE RDI_SRCS
-    ./*.cpp
+file (GLOB RDI_SRCS
+    *.cpp
 )
 
+file (GLOB_RECURSE VK_SRCS
+    ./vk/*.cpp
+)
 
 add_library(rdi
 SHARED
     ${RDI_SRCS}
+    ${VK_SRCS}
 )
 
 GENERATE_EXPORT_HEADER(rdi
@@ -23,24 +27,23 @@ PUBLIC
 
 PRIVATE 
     ${CMAKE_SOURCE_DIR}/sources/include
+    ${CMAKE_SOURCE_DIR}/sources/include/engine
 )
 
 
-target_link_libraries(render
+target_link_libraries(rdi
 PUBLIC
-    glm
-
-PRIVATE
     Vulkan::Vulkan
+    GLFWPP
 )
 
-target_compile_options(render
+target_compile_options(rdi
 PUBLIC
     ${DEFAULT_COMPILE_OPTIONS}
 )
 
-target_compile_definitions(render
+target_compile_definitions(rdi
 PRIVATE 
-    PLATE_BUILD
     ${DEFAULT_COMPILE_DEFINITIONS}
+    ${RDI_COMPILE_DEFINITIONS}
 )

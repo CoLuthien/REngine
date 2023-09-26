@@ -18,11 +18,6 @@ using has_reflected_field_t = typename T::template detail_field_reflection<0>;
 template <typename T>
 using has_reflected_function_t = typename T::template detail_function_reflection<0>;
 
-template <typename T>
-concept is_container_type = requires {
-    typename T::const_iterator;
-    typename T::value_type;
-};
 
 template <typename T>
 concept has_reflected_field =

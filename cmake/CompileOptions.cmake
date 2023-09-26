@@ -1,8 +1,4 @@
 
-#
-# Platform and architecture setup
-#
-
 # Set warnings as errors flag
 option(RENGINE_WARNINGS_AS_ERRORS "Treat all warnings as errors" ON)
 if(RENGINE_WARNINGS_AS_ERRORS)
