@@ -3,6 +3,7 @@
 
 #include "rdi_export.hpp"
 
+#include <string>
 #include <string_view>
 
 namespace ivd

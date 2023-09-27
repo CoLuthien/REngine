@@ -7,6 +7,7 @@
 #include <vector>
 #include <string_view>
 #include <ranges>
+#include <cstdint>
 
 namespace meta
 {

@@ -1,7 +1,7 @@
 
 #include "vulkan_command_buffer.hpp"
 #include "vulkan_device.hpp"
-
+#include <cstdint>
 namespace ivd::rdi
 {
 
