@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "core/definitions.hpp"
 #include "point2.hpp"
 #include "point3.hpp"
 #include "point4.hpp"

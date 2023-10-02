@@ -1,9 +1,15 @@
 
 #pragma once
 
-#include "primitives.hpp"
+#ifndef VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#endif
 
-#include "HAL/platforms.hpp"
+#ifndef VULKAN_HPP_NO_SMART_HANDLE
+#define VULKAN_HPP_NO_SMART_HANDLE
+#endif
+
+#include "primitives.hpp"
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>

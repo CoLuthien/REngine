@@ -6,6 +6,7 @@ add_executable(link_cast_test
     comp_unit2.cpp
 )
 target_link_libraries(link_cast_test
+    core
     core_object
 )
 add_dependencies(link_cast_test

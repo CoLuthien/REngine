@@ -1,11 +1,7 @@
 
 #pragma once
 
-#include "HAL/attributes.hpp"
-
-namespace ivd
-{
-class DLLEXPORT non_copyable
+class non_copyable
 {
 public:
     non_copyable()          = default;
@@ -13,8 +9,7 @@ public:
 
 public:
     non_copyable(const non_copyable&)                = delete;
-    non_copyable(non_copyable&&) noexcept            = default;
     non_copyable& operator=(const non_copyable&)     = delete;
+    non_copyable(non_copyable&&) noexcept            = default;
     non_copyable& operator=(non_copyable&&) noexcept = default;
 };
-} // namespace ivd

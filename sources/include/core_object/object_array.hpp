@@ -1,8 +1,7 @@
 
 #pragma once
-#include "HAL/attributes.hpp"
 
-#include "coreobject_export.hpp"
+#include "object_export.hpp"
 
 #include "object.hpp"
 #include "class.hpp"

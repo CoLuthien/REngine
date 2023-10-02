@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "core/definitions.hpp"
 #include "meta/concepts.hpp"
 
 namespace ivd

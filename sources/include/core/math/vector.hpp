@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "core/definitions.hpp"
 
 #include "vector2.hpp"
 #include "vector3.hpp"

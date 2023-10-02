@@ -262,11 +262,11 @@ TriangleApplication::createSwapChain()
                       .queueFamilyIndexCount = 0,
                       .pQueueFamilyIndices   = nullptr};
     }
-    createInfo.setPreTransform(swapChainSupport.capabilities.currentTransform);
-    createInfo.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
-    createInfo.setPresentMode(presentMode);
-    createInfo.setClipped(true);
-    createInfo.setOldSwapchain(nullptr);
+    createInfo.preTransform   = swapChainSupport.capabilities.currentTransform;
+    createInfo.compositeAlpha = (vk::CompositeAlphaFlagBitsKHR::eOpaque);
+    createInfo.presentMode    = (presentMode);
+    createInfo.clipped        = (true);
+    createInfo.oldSwapchain   = (nullptr);
 
     swapChain   = device.createSwapchainKHR(createInfo);
     auto images = swapChain.getImages();

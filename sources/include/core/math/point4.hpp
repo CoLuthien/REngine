@@ -1,6 +1,4 @@
 
-#include "core/definitions.hpp"
-
 namespace ivd
 {
 namespace math
