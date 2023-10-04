@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "rdi/rdi_buffers.hpp"
+#include "rdi/buffer.hpp"
 #include <vulkan/vulkan_raii.hpp>
 
 namespace ivd::rdi

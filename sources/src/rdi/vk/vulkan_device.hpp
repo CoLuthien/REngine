@@ -1,7 +1,8 @@
 
 #pragma once
 
-#include "vk/rdi_vulkan.hpp"
+#include "utils/non_copyable.hpp"
+
 #include <vulkan/vulkan_raii.hpp>
 
 namespace ivd
@@ -9,10 +10,10 @@ namespace ivd
 namespace rdi
 {
 
-class vk_device
+class vk_device : non_copyable
 {
 public:
-    vk_device(rdi_vulkan* rdi, vk::PhysicalDevice GPU);
+    vk_device(vk::PhysicalDevice GPU);
 
 public:
     vk::raii::Device&         get_handle() { return m_device; }

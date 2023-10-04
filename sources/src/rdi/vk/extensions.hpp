@@ -1,14 +1,13 @@
 
 #pragma once
 
-#include "vk/vulkan_commons.hpp"
+#include "rdi/common.hpp"
 
 namespace ivd
 {
 
 namespace rdi
 {
-using device_extensions = std::vector<class vk_device_extension>;
 
 class vk_extension
 {
@@ -23,19 +22,18 @@ protected:
     std::string m_name;
 };
 
+class vk_instance_extention : public vk_extension
+{
+public:
+    vk_instance_extention(std::string_view name) : vk_extension(name) {}
+    virtual ~vk_instance_extention() = default;
+};
+
 class vk_device_extension : public vk_extension
 {
 public:
     vk_device_extension(std::string_view name) : vk_extension(name) {}
     virtual ~vk_device_extension() = default;
-
-public:
-    static device_extensions get_required();
-
-public:
-    bool check_available(std::vector<vk::ExtensionProperties> const& props) const;
-
-private:
 };
 
 } // namespace rdi

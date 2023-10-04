@@ -41,7 +41,7 @@ vk_buffer::vk_buffer(std::weak_ptr<vk_device>           in_device,
                      std::span<vk::BufferUsageFlags>    in_usage,
                      std::span<vk::MemoryPropertyFlags> in_properties,
                      std::span<uint32_t>                in_shared_indices)
-    : buffer(in_size, in_stride), m_device(in_device)
+    : buffer(in_size, in_stride, {}, {}), m_device(in_device)
 {
     auto  device = m_device.lock();
     auto& handle = device->get_handle();

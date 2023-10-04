@@ -3,7 +3,7 @@
 
 #include "rdi_export.hpp"
 
-#include "rdi_buffers.hpp"
+#include "rdi/buffer.hpp"
 
 namespace ivd
 {

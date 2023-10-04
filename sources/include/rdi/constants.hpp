@@ -8,7 +8,7 @@ namespace ivd
 
 namespace rdi
 {
-static constexpr auto concurrent_frame_count = 2;
+static constexpr auto concurrent_frames = 2;
 }
 
 } // namespace ivd

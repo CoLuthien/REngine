@@ -23,10 +23,10 @@ GENERATE_EXPORT_HEADER(rdi
 target_include_directories(rdi
 PUBLIC
     ${CMAKE_CURRENT_BINARY_DIR}/
-    ${CMAKE_SOURCE_DIR}/sources/include/rdi
 
 PRIVATE 
     ${CMAKE_SOURCE_DIR}/sources/include
+    ${CMAKE_SOURCE_DIR}/sources/include/section
     ${CMAKE_SOURCE_DIR}/sources/include/engine
 )
 
@@ -35,6 +35,7 @@ target_link_libraries(rdi
 PUBLIC
     Vulkan::Vulkan
     GLFWPP
+PRIVATE
 )
 
 target_compile_options(rdi

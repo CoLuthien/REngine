@@ -1,4 +1,6 @@
 
+#pragma once
+
 #include "rdi_export.hpp"
 #include <cstdint>
 #include <string>
@@ -7,6 +9,14 @@
 
 namespace ivd::rdi
 {
-RDI_API extern std::string   RENGINE_APPLICATION_NAME;
-RDI_API extern std::uint32_t RENGINE_APPLICATION_VERSION;
+enum class e_buffer_usage
+{
+    NONE,
+    INDEX, 
+    VERTEX
+};
+
+enum class e_buffer_accsse
+{
+};
 } // namespace ivd::rdi

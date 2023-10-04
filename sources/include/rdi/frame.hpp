@@ -2,7 +2,7 @@
 #pragma once
 
 #include "rdi_export.hpp"
-#include "rdi/rdi_constants.hpp"
+#include "rdi/constants.hpp"
 
 #include <memory>
 
