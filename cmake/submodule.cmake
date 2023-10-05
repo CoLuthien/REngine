@@ -24,4 +24,9 @@ add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/json)
 
 set(ASSIMP_BUILD_TESTS OFF CACHE BOOL "")
 set(ASSIMP_WARNINGS_AS_ERRORS OFF CACHE BOOL "")
+set(ASSIMP_BUILD_ZLIB TRUE)
+
 add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/assimp)
+
+
+add_subdirectory(${CMAKE_SOURCE_DIR}/sources/thirdparty/vma)

@@ -2,9 +2,9 @@
 #pragma once
 
 #include "templates/concepts.hpp"
+#include "object_export.hpp"
 #include "object_macros.hpp"
 #include "object_globals.hpp"
-#include "coreobject_export.hpp"
 #include <cstddef>
 
 namespace ivd

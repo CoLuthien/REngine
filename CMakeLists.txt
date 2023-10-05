@@ -13,6 +13,7 @@ find_package(Vulkan REQUIRED)
 include(cmake/CompileOptions.cmake)
 include (GenerateExportHeader)
 include(cmake/Graphics.cmake)
+include(cmake/rdi_options.cmake)
 include(cmake/submodule.cmake)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)

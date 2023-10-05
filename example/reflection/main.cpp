@@ -15,7 +15,6 @@
 
 using json = nlohmann::json;
 
-
 class Sample : public ivd::hobject
 {
 public:

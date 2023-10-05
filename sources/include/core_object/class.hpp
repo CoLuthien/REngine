@@ -3,7 +3,8 @@
 
 #include "object.hpp"
 #include "reflection/reflection.hpp"
-#include "core_object/definitions.hpp"
+
+#include "object_export.hpp"
 
 #include <unordered_map>
 #include <span>

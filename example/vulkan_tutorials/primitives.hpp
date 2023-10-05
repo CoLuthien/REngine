@@ -1,7 +1,18 @@
 
 #pragma once
 
-#include "HAL/platforms.hpp"
+#ifndef VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#endif
+
+#ifndef VULKAN_HPP_NO_SMART_HANDLE
+#define VULKAN_HPP_NO_SMART_HANDLE
+#endif
+
+#ifndef VULKAN_HPP_NO_STRUCT_SETTERS
+#define VULKAN_HPP_NO_STRUCT_SETTERS
+#endif
+
 
 #include <glm/glm.hpp>
 
@@ -19,7 +30,7 @@ struct Vertex
     static vk::VertexInputBindingDescription getBindingDescription()
     {
         return vk::VertexInputBindingDescription{
-            .binding   = 0,
+            .binding   = 1,
             .stride    = sizeof(Vertex),
             .inputRate = vk::VertexInputRate::eVertex,
         };

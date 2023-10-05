@@ -262,11 +262,11 @@ TriangleApplication::createSwapChain()
                       .queueFamilyIndexCount = 0,
                       .pQueueFamilyIndices   = nullptr};
     }
-    createInfo.setPreTransform(swapChainSupport.capabilities.currentTransform);
-    createInfo.setCompositeAlpha(vk::CompositeAlphaFlagBitsKHR::eOpaque);
-    createInfo.setPresentMode(presentMode);
-    createInfo.setClipped(true);
-    createInfo.setOldSwapchain(nullptr);
+    createInfo.preTransform   = swapChainSupport.capabilities.currentTransform;
+    createInfo.compositeAlpha = (vk::CompositeAlphaFlagBitsKHR::eOpaque);
+    createInfo.presentMode    = (presentMode);
+    createInfo.clipped        = (true);
+    createInfo.oldSwapchain   = (nullptr);
 
     swapChain   = device.createSwapchainKHR(createInfo);
     auto images = swapChain.getImages();
@@ -486,8 +486,9 @@ TriangleApplication::createCommandPool()
             vk::CommandPoolCreateFlagBits::eResetCommandBuffer |
             vk::CommandPoolCreateFlagBits::eTransient),
         .queueFamilyIndex = indices.transferFamily.value()};
-    transferCommands = device.createCommandPool(transferPoolInfo);
+    transferCommandPool = device.createCommandPool(transferPoolInfo);
 }
+
 uint32_t
 TriangleApplication::findMemoryType(uint32_t typeFilter, vk::MemoryPropertyFlagBits properties)
 {
@@ -509,7 +510,7 @@ TriangleApplication::copyBuffer(vk::raii::Buffer& fromBuffer,
                                 vk::raii::Buffer& toBuffer,
                                 vk::DeviceSize    size)
 {
-    vk::CommandBufferAllocateInfo allocInfo = {.commandPool = *transferCommands,
+    vk::CommandBufferAllocateInfo allocInfo = {.commandPool = *transferCommandPool,
                                                .level       = vk::CommandBufferLevel::ePrimary,
                                                .commandBufferCount = 1};
 

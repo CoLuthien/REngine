@@ -1,14 +1,13 @@
 
 #pragma once
 
-#include "HAL/attributes.hpp"
 #include <cstddef>
 #include <cstdint>
 
 namespace ivd
 {
 
-using object_flag = uint64_t;
+using object_flag = std::uint64_t;
 namespace eobject_flag
 {
 static constexpr uint64_t UNREACHABLE  = 1 << 0;

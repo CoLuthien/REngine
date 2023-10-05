@@ -1,13 +1,13 @@
 
 #pragma once
 
-#include "core/definitions.hpp"
+#include "core_export.hpp"
 
 #include <cstdint>
 
 namespace ivd::math
 {
-struct color
+struct CORE_API color
 {
 public:
     using dtype = std::uint8_t;

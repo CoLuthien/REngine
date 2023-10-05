@@ -6,6 +6,8 @@
 #include <concepts>
 #include <vector>
 #include <string_view>
+#include <ranges>
+#include <cstdint>
 
 namespace meta
 {
@@ -64,5 +66,8 @@ inline constexpr bool is_specialization = false;
 
 template <template <class...> class T, class... Args>
 inline constexpr bool is_specialization<T<Args...>, T> = true;
+
+template <typename T>
+concept is_iterable_type = std::ranges::range<T>;
 
 } // namespace meta

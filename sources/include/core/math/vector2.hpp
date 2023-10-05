@@ -1,5 +1,4 @@
 
-#include "core/definitions.hpp"
 #include "point.hpp"
 #include "basics.hpp"
 #include "meta/concepts.hpp"

@@ -1,9 +1,15 @@
 
 #pragma once
 
-#include "primitives.hpp"
+#ifndef VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#define VULKAN_HPP_NO_STRUCT_CONSTRUCTORS
+#endif
 
-#include "HAL/platforms.hpp"
+#ifndef VULKAN_HPP_NO_SMART_HANDLE
+#define VULKAN_HPP_NO_SMART_HANDLE
+#endif
+
+#include "primitives.hpp"
 
 #include <glm/vec4.hpp>
 #include <glm/mat4x4.hpp>
@@ -113,7 +119,7 @@ private:
     vk::raii::Pipeline                   graphicsPipeline{nullptr};
     std::vector<vk::raii::Framebuffer>   swapchainFramebuffers;
     vk::raii::CommandPool                commandPool{nullptr};
-    vk::raii::CommandPool                transferCommands{nullptr};
+    vk::raii::CommandPool                transferCommandPool{nullptr};
     std::vector<vk::raii::DescriptorSet> descriptorSets;
 
     vk::raii::Buffer       vertexBuffer{nullptr};

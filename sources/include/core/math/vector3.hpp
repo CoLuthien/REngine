@@ -1,7 +1,6 @@
 
 #pragma once
 
-#include "core/definitions.hpp"
 #include "point.hpp"
 #include "basics.hpp"
 

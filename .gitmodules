@@ -11,3 +11,6 @@
 [submodule "sources/thirdparty/assimp"]
 	path = sources/thirdparty/assimp
 	url = https://github.com/assimp/assimp.git
+[submodule "sources/thirdparty/vma"]
+	path = sources/thirdparty/vma
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator.git

@@ -5,6 +5,9 @@
 #include "reflection_concepts.hpp"
 #include "reflection_helper.hpp"
 #include "meta/func_traits.hpp"
+
+#include <functional>
+#include <numeric>
 #include <string_view>
 
 namespace refl
@@ -127,7 +130,7 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
         INFER_FUNC_TYPE(NAME);                                                                     \
         static constexpr std::string_view name = #NAME;                                            \
         template <class Target>                                                                    \
-        using type = inferred_type<Target, __VA_ARGS__>;                                           \
+        using type = inferred_type<Target, ##__VA_ARGS__>;                                         \
         template <class Target>                                                                    \
         inline static type<Target> const pointer_v = &Target::NAME;                                \
     };
