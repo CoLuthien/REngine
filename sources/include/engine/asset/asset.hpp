@@ -62,7 +62,7 @@ public:
 
 public:
     REFLECT_FUNCTION(get_metadata)
-    asset_metadata get_metadata();
+    asset_metadata get_metadata() const;
 
 public:
     REFLECT_FIELD(asset_metadata, metadata);

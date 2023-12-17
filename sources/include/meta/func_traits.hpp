@@ -22,8 +22,14 @@ struct func_traits<R (C::*)(Args...) const> : func_traits<R (*)(Args...)>
 template <typename R, typename... Args>
 struct func_traits<R (*)(Args...)>
 {
-    using result_type = R;
-    static constexpr auto args_count =
-        std::integral_constant<std::size_t, sizeof...(Args)>::value;
-    using args_type = std::tuple<typename std::decay<Args>::type...>;
+    using result_type                = R;
+    static constexpr auto args_count = std::integral_constant<std::size_t, sizeof...(Args)>::value;
+    using args_type                  = std::tuple<typename std::decay<Args>::type...>;
+};
+
+template <class T, class MemberF, class... Args>
+concept is_const_member_function = requires(const T& _instance, MemberF _member_function) {
+    {
+        (_instance.*_member_function)(std::declval<Args>()...)
+    };
 };

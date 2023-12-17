@@ -118,7 +118,10 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
 #define INFER_FUNC_TYPE(NAME)                                                                      \
     template <class C, typename... Args>                                                           \
     using inferred_type =                                                                          \
-        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);
+        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);                 \
+    template <class C, typename... Args>                                                           \
+    using inferred_type_const =                                                                    \
+        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...) const;
 
 #define REFLECT_FUNCTION(NAME, ...)                                                                \
     static constexpr size_t detail_##NAME##_function_index =                                       \
@@ -132,5 +135,11 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
         template <class Target>                                                                    \
         using type = inferred_type<Target, ##__VA_ARGS__>;                                         \
         template <class Target>                                                                    \
-        inline static type<Target> const pointer_v = &Target::NAME;                                \
+        using type_const = inferred_type_const<Target, ##__VA_ARGS__>;                             \
+        template <class Target>                                                                    \
+        inline static std::conditional_t<                                                          \
+            is_const_member_function<Target, decltype(&Target::NAME), ##__VA_ARGS__>,              \
+            type_const<Target>,                                                                    \
+            type<Target>>                                                                          \
+            pointer_v = &Target::NAME;                                                             \
     };

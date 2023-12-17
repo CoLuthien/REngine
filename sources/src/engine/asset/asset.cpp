@@ -22,7 +22,7 @@ asset::async_load()
 }
 
 asset_metadata
-asset::get_metadata()
+asset::get_metadata() const
 {
     return metadata;
 }

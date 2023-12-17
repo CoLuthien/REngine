@@ -1,10 +1,10 @@
 
 #pragma once
+#include "coreobject_export.hpp"
 
 #include "object.hpp"
 #include "reflection/reflection.hpp"
 
-#include "object_export.hpp"
 
 #include <unordered_map>
 #include <span>

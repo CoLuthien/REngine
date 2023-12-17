@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "object_export.hpp"
+#include "coreobject_export.hpp"
 
 #include "object.hpp"
 #include "class.hpp"
