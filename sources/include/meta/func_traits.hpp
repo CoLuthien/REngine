@@ -28,7 +28,7 @@ struct func_traits<R (*)(Args...)>
 };
 
 template <class T, class MemberF, class... Args>
-concept is_const_member_function = requires(const T& _instance, MemberF _member_function) {
+concept is_const_function = requires(const T& _instance, MemberF _member_function) {
     {
         (_instance.*_member_function)(std::declval<Args>()...)
     };

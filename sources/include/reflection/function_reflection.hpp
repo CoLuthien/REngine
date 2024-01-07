@@ -115,13 +115,29 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
 };
 } // namespace refl
 
-#define INFER_FUNC_TYPE(NAME)                                                                      \
+template <class Target, class ResultType, class... Args>
+inline static consteval auto
+take_function_type(ResultType (Target::*Ptr)(Args...))
+{
+    return decltype(Ptr){};
+}
+template <class Target, class ResultType, class... Args>
+inline static consteval auto
+take_function_type(ResultType (Target::*const Ptr)(Args...) const)
+{
+    return decltype(Ptr){};
+}
+
+template <class Target, class ResultType, class... Args>
+inline static consteval auto
+take_function_type(ResultType Ptr(Args...))
+{
+    return decltype(Ptr){};
+}
+
+#define DEDUCE_RETURN_TYPE(NAME)                                                                   \
     template <class C, typename... Args>                                                           \
-    using inferred_type =                                                                          \
-        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...);                 \
-    template <class C, typename... Args>                                                           \
-    using inferred_type_const =                                                                    \
-        decltype(std::declval<C>().NAME(std::declval<Args>()...)) (C::*)(Args...) const;
+    using result_type = decltype(std::declval<C>().NAME(std::declval<Args>()...));
 
 #define REFLECT_FUNCTION(NAME, ...)                                                                \
     static constexpr size_t detail_##NAME##_function_index =                                       \
@@ -130,16 +146,12 @@ struct gather_functions<Target, std::numeric_limits<std::size_t>::max()>
     template <>                                                                                    \
     struct detail_function_reflection<detail_##NAME##_function_index>                              \
     {                                                                                              \
-        INFER_FUNC_TYPE(NAME);                                                                     \
+        DEDUCE_RETURN_TYPE(NAME);                                                                  \
         static constexpr std::string_view name = #NAME;                                            \
         template <class Target>                                                                    \
-        using type = inferred_type<Target, ##__VA_ARGS__>;                                         \
+        using type = decltype(take_function_type<Target,                                           \
+                                                 result_type<Target, ##__VA_ARGS__>,               \
+                                                 ##__VA_ARGS__>(&Target::NAME));                   \
         template <class Target>                                                                    \
-        using type_const = inferred_type_const<Target, ##__VA_ARGS__>;                             \
-        template <class Target>                                                                    \
-        inline static std::conditional_t<                                                          \
-            is_const_member_function<Target, decltype(&Target::NAME), ##__VA_ARGS__>,              \
-            type_const<Target>,                                                                    \
-            type<Target>>                                                                          \
-            pointer_v = &Target::NAME;                                                             \
+        inline static type<Target> pointer_v = &Target::NAME;                                      \
     };
